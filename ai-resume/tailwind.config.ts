@@ -6,18 +6,46 @@ export default {
     extend: {
       colors: {
         primary: {
-          50: "#f5f3ff",
-          100: "#ede9fe",
-          200: "#ddd6fe",
-          300: "#c4b5fd",
-          400: "#a78bfa",
-          500: "#8b5cf6",
-          600: "#7c3aed",
-          700: "#6d28d9",
-          800: "#5b21b6",
-          900: "#4c1d95",
-          950: "#2e1065",
+          50: "#e6f4ff",
+          100: "#bae0ff",
+          200: "#91caff",
+          300: "#69b1ff",
+          400: "#4096ff",
+          500: "#1677ff", // Main Brand Color
+          600: "#0958d9",
+          700: "#003eb3",
+          800: "#002c8c",
+          900: "#001d66",
+          950: "#001140",
         },
+        success: "#52c41a",
+        ai: "#722ed1",
+        neutral: {
+          50: "#f5f5f7",
+          100: "#f0f0f0",
+          200: "#d9d9d9",
+          300: "#bfbfbf",
+          400: "#8c8c8c",
+          500: "#595959",
+          600: "#434343", // Main Text
+          700: "#262626",
+          800: "#1f1f1f",
+          900: "#141414",
+        },
+      },
+      fontFamily: {
+        sans: [
+          "Inter",
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "PingFang SC",
+          "Microsoft YaHei",
+          "sans-serif",
+        ],
+      },
+      boxShadow: {
+        'card': '0 4px 20px rgba(0,0,0,0.08)',
+        'card-hover': '0 8px 30px rgba(0,0,0,0.12)',
       },
       animation: {
         "fade-in": "fadeIn 0.5s ease-out forwards",

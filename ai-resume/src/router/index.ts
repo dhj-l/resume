@@ -8,15 +8,9 @@ import { useAuthStore } from "@/stores/auth";
 const routes: RouteRecordRaw[] = [
   {
     path: "/",
-    component: () => import("@/layouts/DefaultLayout.vue"),
-    children: [
-      {
-        path: "",
-        name: "Home",
-        component: () => import("@/views/home/LandingPage.vue"),
-        meta: { title: "首页" },
-      },
-    ],
+    name: "Home",
+    component: () => import("@/views/home/HomePage.vue"),
+    meta: { title: "首页" },
   },
   {
     path: "/auth",

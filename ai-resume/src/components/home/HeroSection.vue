@@ -1,190 +1,152 @@
 <template>
-  <section class="relative overflow-hidden bg-slate-50 pt-16 pb-32 space-y-24">
+  <section
+    class="relative overflow-hidden bg-[#f5f5f7] pt-20 pb-32 lg:pt-32 lg:pb-40"
+  >
+    <!-- Background Decor -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+      <div
+        class="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"
+      ></div>
+      <div
+        class="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-100/40 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"
+      ></div>
+    </div>
+
     <div class="container mx-auto px-4 relative z-10">
       <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-        <!-- Text Content -->
-        <div class="flex-1 text-center lg:text-left space-y-8">
-          <div
-            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-100 text-primary-700 text-sm font-medium"
-          >
-            <Sparkles class="w-4 h-4" />
-            <span>AI 驱动的简历生成器</span>
-          </div>
-
+        <!-- Left: Content -->
+        <div class="flex-1 text-center lg:text-left space-y-8 max-w-2xl">
           <h1
-            class="text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-tight"
+            class="text-4xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-[1.15]"
           >
-            几分钟内构建你的<br />
-            <span class="text-primary-600">
-              <TypewriterEffect
-                :words="[
-                  '软件工程师',
-                  '产品经理',
-                  '数据科学家',
-                  'UI/UX 设计师',
-                ]"
-                :typing-speed="150"
-                :pause-time="2000"
-              />
-            </span>
-            <br />专业简历。
+            专注于大学生的<br />
+            <span class="text-primary-600">专业简历平台</span>
           </h1>
 
-          <p class="text-xl text-slate-600 max-w-2xl mx-auto lg:mx-0">
-            与我们的 AI 助手对话，制作一份专业、ATS
-            友好的简历，突出你的独特经历。告别写作障碍。
+          <p class="text-lg text-slate-600 leading-relaxed">
+            制作简历和导出完全免费，AI功能让创建更智能。<br
+              class="hidden lg:block"
+            />
+            助你轻松获得心仪Offer。
           </p>
 
-          <div
-            class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
-          >
-            <router-link
-              to="/auth/register"
-              class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-colors shadow-lg shadow-primary-200"
+          <!-- Selling Points -->
+          <div class="space-y-4 pt-2">
+            <div
+              v-for="(point, index) in sellingPoints"
+              :key="index"
+              class="flex items-center justify-center lg:justify-start gap-3"
             >
-              免费试用
-              <ArrowRight class="w-5 h-5 ml-2" />
-            </router-link>
-            <button
-              class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
-            >
-              查看示例
-            </button>
+              <div
+                class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0"
+              >
+                <Check class="w-4 h-4 text-success" />
+              </div>
+              <span class="text-slate-700 font-medium">{{ point }}</span>
+            </div>
           </div>
 
+          <!-- CTA Buttons -->
           <div
-            class="flex items-center justify-center lg:justify-start gap-6 text-sm text-slate-500 pt-4"
+            class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4"
           >
-            <div class="flex items-center gap-2">
-              <CheckCircle2 class="w-4 h-4 text-green-500" />
-              <span>ATS 友好</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <CheckCircle2 class="w-4 h-4 text-green-500" />
-              <span>GPT-4 驱动</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <CheckCircle2 class="w-4 h-4 text-green-500" />
-              <span>PDF 导出</span>
-            </div>
+            <button
+              @click="router.push('/dashboard/templates')"
+              class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/30 hover:shadow-primary-500/40 hover:-translate-y-1 cursor-pointer"
+            >
+              免费开始制作
+            </button>
+            <button
+              class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors hover:border-slate-300 cursor-pointer"
+            >
+              查看AI功能演示
+            </button>
           </div>
         </div>
 
-        <!-- Conversational UI Demo -->
-        <div class="flex-1 w-full max-w-md lg:max-w-full perspective-1000">
+        <!-- Right: Visual -->
+        <div class="flex-1 w-full relative perspective-1000">
+          <!-- Editor UI Simulator -->
           <div
-            class="relative bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 transform rotate-y-[-5deg] hover:rotate-y-0 transition-transform duration-500 ease-out"
+            class="relative bg-white rounded-xl shadow-2xl border border-slate-200/60 p-2 transform rotate-y-[-6deg] hover:rotate-y-0 transition-transform duration-700 ease-out origin-left"
           >
-            <!-- Chat Header -->
+            <!-- Browser Header -->
             <div
-              class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4"
+              class="bg-slate-50 border-b border-slate-100 px-4 py-3 flex items-center gap-2 rounded-t-lg"
             >
-              <div class="flex items-center gap-3">
-                <div
-                  class="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center"
-                >
-                  <Bot class="w-6 h-6 text-primary-600" />
-                </div>
-                <div>
-                  <h3 class="font-semibold text-slate-900">简历 AI 助手</h3>
-                  <p class="text-xs text-green-500 flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                    在线
-                  </p>
-                </div>
+              <div class="flex gap-1.5">
+                <div class="w-3 h-3 rounded-full bg-red-400"></div>
+                <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+                <div class="w-3 h-3 rounded-full bg-green-400"></div>
               </div>
-              <MoreHorizontal class="w-5 h-5 text-slate-400" />
+              <div
+                class="ml-4 bg-white px-3 py-1 rounded-md text-xs text-slate-400 border border-slate-100 flex-1 text-center font-mono"
+              >
+                ai-resume.com/editor
+              </div>
             </div>
-
-            <!-- Chat Messages -->
-            <div class="space-y-4 h-[300px] overflow-y-auto px-2 relative">
-              <!-- AI Message -->
-              <div class="flex gap-3">
-                <div
-                  class="w-8 h-8 rounded-full bg-primary-50 flex-shrink-0 flex items-center justify-center mt-1"
-                >
-                  <Bot class="w-5 h-5 text-primary-600" />
-                </div>
-                <div
-                  class="bg-slate-100 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-slate-700 max-w-[85%]"
-                >
-                  你好！我可以帮你制作简历。首先，你在上一家公司的职位是什么？
+            <!-- Editor Content -->
+            <div class="grid grid-cols-12 h-[400px] bg-slate-50">
+              <!-- Sidebar -->
+              <div
+                class="col-span-3 bg-white border-r border-slate-100 p-4 space-y-4"
+              >
+                <div class="h-8 w-16 bg-slate-100 rounded mb-6"></div>
+                <div class="space-y-3">
+                  <div class="h-2 w-full bg-slate-100 rounded"></div>
+                  <div class="h-2 w-3/4 bg-slate-100 rounded"></div>
+                  <div class="h-2 w-5/6 bg-slate-100 rounded"></div>
                 </div>
               </div>
-
-              <!-- User Message -->
+              <!-- Preview -->
               <div
-                class="flex gap-3 flex-row-reverse animate-fade-in delay-700"
-                style="animation-fill-mode: backwards; animation-delay: 1s"
+                class="col-span-9 p-6 flex justify-center bg-slate-50/50 overflow-hidden"
               >
                 <div
-                  class="w-8 h-8 rounded-full bg-slate-200 flex-shrink-0 flex items-center justify-center mt-1"
+                  class="w-full h-full bg-white shadow-sm border border-slate-200 rounded px-8 py-8 space-y-6"
                 >
-                  <User class="w-5 h-5 text-slate-600" />
-                </div>
-                <div
-                  class="bg-primary-600 rounded-2xl rounded-tr-none px-4 py-3 text-sm text-white max-w-[85%]"
-                >
-                  我是 TechCorp 的高级前端开发工程师。
-                </div>
-              </div>
-
-              <!-- AI Message (Typing/Response) -->
-              <div
-                class="flex gap-3 animate-fade-in"
-                style="animation-fill-mode: backwards; animation-delay: 2.5s"
-              >
-                <div
-                  class="w-8 h-8 rounded-full bg-primary-50 flex-shrink-0 flex items-center justify-center mt-1"
-                >
-                  <Bot class="w-5 h-5 text-primary-600" />
-                </div>
-                <div
-                  class="bg-slate-100 rounded-2xl rounded-tl-none px-4 py-3 text-sm text-slate-700 max-w-[85%]"
-                >
-                  <p class="mb-2">太棒了！这是为你生成的经历描述：</p>
+                  <!-- Resume Header -->
+                  <div class="border-b border-slate-100 pb-6">
+                    <div class="h-8 w-48 bg-slate-800 rounded mb-2"></div>
+                    <div class="h-4 w-64 bg-slate-200 rounded"></div>
+                  </div>
+                  <!-- Content Blocks -->
+                  <div class="space-y-4">
+                    <div class="h-4 w-32 bg-slate-200 rounded"></div>
+                    <div class="space-y-2">
+                      <div class="h-2 w-full bg-slate-100 rounded"></div>
+                      <div class="h-2 w-full bg-slate-100 rounded"></div>
+                      <div class="h-2 w-2/3 bg-slate-100 rounded"></div>
+                    </div>
+                    <div class="h-4 w-24 bg-slate-200 rounded mt-6"></div>
+                    <div class="space-y-2">
+                      <div class="h-2 w-full bg-slate-100 rounded"></div>
+                      <div class="h-2 w-3/4 bg-slate-100 rounded"></div>
+                    </div>
+                  </div>
+                  <!-- AI Suggestion Popover (Floating) -->
                   <div
-                    class="bg-white rounded p-2 border border-slate-200 text-xs text-slate-600"
+                    class="absolute top-1/3 right-8 bg-white p-4 rounded-xl shadow-xl border border-primary-100 w-56 animate-pulse-slow"
                   >
-                    • 负责基于 Vue 3 和 TypeScript
-                    的前端架构设计，将页面加载性能提升了 40%。
-                  </div>
-                  <div class="mt-2 flex gap-2">
-                    <button
-                      class="text-xs bg-white border border-slate-200 px-2 py-1 rounded hover:bg-slate-50"
-                    >
-                      更简练一点
-                    </button>
-                    <button
-                      class="text-xs bg-white border border-slate-200 px-2 py-1 rounded hover:bg-slate-50"
-                    >
-                      添加数据指标
-                    </button>
+                    <div class="flex items-center gap-2 mb-2">
+                      <Sparkles class="w-4 h-4 text-ai" />
+                      <span class="text-xs font-bold text-ai">AI 优化建议</span>
+                    </div>
+                    <p class="text-xs text-slate-600">
+                      建议使用"负责"、"主导"等强动词开头，突出你的领导能力。
+                    </p>
+                    <div class="mt-3 flex gap-2">
+                      <button
+                        class="text-xs bg-ai text-white px-3 py-1.5 rounded-md hover:bg-purple-700 transition-colors"
+                      >
+                        一键优化
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <!-- Input Area -->
-            <div class="mt-4 pt-4 border-t border-slate-100 flex gap-2">
-              <input
-                type="text"
-                placeholder="输入你的回答..."
-                class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                disabled
-              />
-              <button
-                class="p-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-              >
-                <Send class="w-4 h-4" />
-              </button>
             </div>
           </div>
-
-          <!-- Decorative Elements -->
-          <div
-            class="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-gradient-to-tr from-primary-200/50 to-blue-200/50 blur-3xl rounded-full opacity-60"
-          ></div>
         </div>
       </div>
     </div>
@@ -192,16 +154,16 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Sparkles,
-  ArrowRight,
-  CheckCircle2,
-  Bot,
-  MoreHorizontal,
-  User,
-  Send,
-} from "lucide-vue-next";
-import TypewriterEffect from "../common/TypewriterEffect.vue";
+import { useRouter } from "vue-router";
+import { Check, Sparkles } from "lucide-vue-next";
+
+const router = useRouter();
+
+const sellingPoints = [
+  "100%免费制作与导出",
+  "AI智能优化与匹配",
+  "海量专业模板",
+];
 </script>
 
 <style scoped>
