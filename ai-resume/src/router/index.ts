@@ -11,6 +11,14 @@ const routes: RouteRecordRaw[] = [
     name: "Home",
     component: () => import("@/views/home/HomePage.vue"),
     meta: { title: "首页" },
+    redirect: "/home",
+    children: [
+      {
+        name: "home",
+        path: "/home",
+        component: () => import("@/views/home/home.vue"),
+      },
+    ],
   },
   {
     path: "/auth",
@@ -27,23 +35,6 @@ const routes: RouteRecordRaw[] = [
         name: "Register",
         component: () => import("@/views/auth/RegisterPage.vue"),
         meta: { title: "注册" },
-      },
-    ],
-  },
-  {
-    path: "/dashboard",
-    component: () => import("@/layouts/DashboardLayout.vue"),
-    meta: { requiresAuth: true },
-    children: [
-      {
-        path: "",
-        name: "DashboardHome",
-        component: () => import("@/views/dashboard/ResumeList.vue"),
-      },
-      {
-        path: "templates",
-        name: "TemplateSelection",
-        component: () => import("@/views/template/TemplateLibrary.vue"),
       },
     ],
   },

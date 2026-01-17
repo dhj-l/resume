@@ -50,7 +50,7 @@
                 {{ template.description }}
               </p>
               <button
-                class="bg-primary-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-700 transition-colors transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100 shadow-lg cursor-pointer"
+                class="bg-primary-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-700 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-100 shadow-lg cursor-pointer"
               >
                 使用此模板
               </button>
