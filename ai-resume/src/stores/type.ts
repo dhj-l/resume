@@ -1,3 +1,5 @@
+import type { Component } from "vue";
+
 /**
  * 简历数据接口
  */
@@ -242,4 +244,16 @@ export interface GlobalStyle {
    * 行高
    */
   lineHeight: string;
+}
+
+export interface ModuleItem<T = any, F = any> {
+  index: number;
+  moduleKey: keyof ResumeData;
+  label: string;
+  component: Component<T>;
+  formComponent: Component<F>;
+  /**
+   * 是否展示
+   */
+  isShow: boolean;
 }

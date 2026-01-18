@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import { ref, reactive } from "vue";
 import { Layout } from "ant-design-vue";
 import EditorHeader from "./components/EditorHeader.vue";
 import ResumePreview from "./components/ResumePreview.vue";
 import EditDrawer from "./components/EditDrawer.vue";
-import { mockResumeData } from "./data/mockData";
-import type { ResumeData } from "@/stores/type";
 
-const resumeData = reactive<ResumeData>(
-  JSON.parse(JSON.stringify(mockResumeData)),
-);
+import { storeToRefs } from "pinia";
+import { useResumeStore } from "@/stores/resumeStore";
+import { ref } from "vue";
+const { resumeData } = storeToRefs(useResumeStore());
+const { setCurrentModel } = useResumeStore();
+const open = ref(false);
+const handleModuleClick = (moduleKey: string) => {
+  console.log("点击了模块:", moduleKey);
+  setCurrentModel(moduleKey);
+  open.value = true;
+};
 </script>
 
 <template>
@@ -23,12 +28,15 @@ const resumeData = reactive<ResumeData>(
     >
       <div class="min-h-full py-8 px-4 flex justify-center pb-[35vh]">
         <!-- 简历预览区域 -->
-        <ResumePreview :resume-data="resumeData" />
+        <ResumePreview
+          :resume-data="resumeData"
+          @moduleClick="handleModuleClick"
+        />
       </div>
     </Layout.Content>
 
     <!-- 底部编辑抽屉 -->
-    <EditDrawer :resume-data="resumeData" />
+    <EditDrawer :resume-data="resumeData" v-model:open="open" />
   </Layout>
 </template>
 

@@ -8,8 +8,11 @@ defineProps<{
   resumeData: ResumeData;
 }>();
 
-const isExpanded = ref(false);
-const drawerHeight = ref("30vh");
+const isExpanded = defineModel("open", {
+  type: Boolean,
+  default: false,
+});
+const drawerHeight = ref("40vh");
 
 // TODO: 处理抽屉展开/收起
 const toggleDrawer = () => {

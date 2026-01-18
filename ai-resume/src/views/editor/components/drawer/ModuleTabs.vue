@@ -1,38 +1,45 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Tabs, TabPane } from 'ant-design-vue';
-import type { ResumeData } from '@/stores/type';
-import BasicInfoForm from './BasicInfoForm.vue';
-import EducationForm from './EducationForm.vue';
+import { Tabs, TabPane } from "ant-design-vue";
+import type { ResumeData } from "@/stores/type";
+import { storeToRefs } from "pinia";
+import { useResumeStore } from "@/stores/resumeStore";
 
 defineProps<{
   resumeData: ResumeData;
 }>();
-
-const activeKey = ref('basic');
+const { moduleOrder, currentModule } = storeToRefs(useResumeStore());
 </script>
 
 <template>
   <div class="h-full flex flex-col bg-gray-50">
-    <Tabs v-model:activeKey="activeKey" class="bg-white px-4 border-b border-gray-200">
-      <TabPane key="basic" tab="基本信息" />
-      <TabPane key="intention" tab="求职意向" />
-      <TabPane key="education" tab="教育背景" />
-      <TabPane key="work" tab="工作经验" />
-      <TabPane key="project" tab="项目经历" />
-      <TabPane key="skills" tab="技能特长" />
-      <TabPane key="others" tab="其他模块" />
+    <Tabs
+      v-model:activeKey="currentModule"
+      class="bg-white px-4 border-b border-gray-200"
+      centered
+    >
+      <TabPane
+        v-for="item in moduleOrder"
+        :key="item.moduleKey"
+        :tab="item.label"
+        :name="item.moduleKey"
+      />
     </Tabs>
-    
+
     <div class="flex-1 overflow-y-auto p-6">
-      <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-6 min-h-full">
-        <BasicInfoForm v-if="activeKey === 'basic'" :data="resumeData.basicInfo" />
-        <EducationForm v-else-if="activeKey === 'education'" :data="resumeData.educationBackground" />
-        
-        <!-- 其他模块占位 -->
-        <div v-else class="text-center py-12 text-gray-400">
-          <p>{{ activeKey }} 模块表单开发中...</p>
-        </div>
+      <div
+        class="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-6 min-h-full"
+      >
+        <template v-for="item in moduleOrder" :key="item.moduleKey">
+          <component
+            v-if="currentModule === item.moduleKey"
+            :is="item.formComponent"
+            :data="resumeData[item.moduleKey]"
+          />
+          <!-- 其他模块占位
+          <div v-else class="text-center py-12 text-gray-400">
+            <p>{{ activeKey }} 模块表单开发中...</p>
+          </div> -->
+        </template>
       </div>
     </div>
   </div>
