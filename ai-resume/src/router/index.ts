@@ -21,6 +21,12 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: "/editor",
+    name: "Editor",
+    component: () => import("@/views/editor/EditorPage.vue"),
+    meta: { title: "简历编辑" },
+  },
+  {
     path: "/auth",
     component: () => import("@/layouts/AuthLayout.vue"),
     children: [
