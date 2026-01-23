@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ProjectExperience } from "@/stores/type";
+import type { templateType } from "./type";
+import { getProjectExperienceStyles } from "./ProjectExperienceSection";
+import { computed } from "vue";
 
-defineProps<{
+const props = defineProps<{
   data?: ProjectExperience[];
   label?: string;
+  templateType: templateType;
 }>();
 
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+
+const styles = computed(() => getProjectExperienceStyles(props.templateType));
+
 const handleClick = () => {
   setCurrentModel("projectExperience");
   setIsExpanded(true);
@@ -15,34 +22,33 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div
-    class="resume-section p-4 mb-4 hover:bg-blue-50 hover:border-blue-300 border border-transparent rounded cursor-pointer transition-all duration-200"
-    @click="handleClick"
-  >
-    <h3
-      class="text-lg font-bold text-gray-800 border-b border-gray-300 pb-2 mb-3"
-    >
+  <div :class="styles.container" @click="handleClick">
+    <h3 :class="styles.title">
       {{ label || "项目经历" }}
     </h3>
-    <div class="space-y-4">
+    <div :class="styles.listWrapper">
       <template v-if="data && data.length">
-        <div v-for="(project, index) in data" :key="index">
-          <div class="flex justify-between mb-1">
-            <h4 class="font-bold text-gray-800">{{ project.title }}</h4>
-            <span class="text-sm text-gray-600">
+        <div
+          v-for="(project, index) in data"
+          :key="index"
+          :class="styles.itemWrapper"
+        >
+          <div :class="styles.headerWrapper">
+            <h4 :class="styles.projectName">{{ project.title }}</h4>
+            <span :class="styles.timeRange">
               {{ project.startTime }}
               <span v-if="project.endTime">- {{ project.endTime }}</span>
             </span>
           </div>
-          <div class="text-sm text-gray-700 mb-1 font-medium">
+          <div :class="styles.role">
             {{ project.description }}
           </div>
-          <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
+          <p :class="styles.description">
             {{ project.content }}
           </p>
         </div>
       </template>
-      <div v-else class="text-gray-400 italic">暂无项目经历信息</div>
+      <div v-else :class="styles.empty">暂无项目经历信息</div>
     </div>
   </div>
 </template>

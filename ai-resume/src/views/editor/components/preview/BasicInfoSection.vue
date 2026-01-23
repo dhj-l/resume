@@ -1,11 +1,21 @@
 <script setup lang="ts">
 import { useResumeStore } from "@/stores/resumeStore";
 import type { BasicInfo } from "@/stores/type";
+import type { templateType } from "./type";
+import { getBasicInfoStyles } from "./BasicInfoSection";
+import { computed } from "vue";
 
-defineProps<{
+const props = defineProps<{
   data: BasicInfo;
+  /**
+   * 当前模板的类型
+   */
+  templateType: templateType;
 }>();
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+
+const styles = computed(() => getBasicInfoStyles(props.templateType));
+
 const handleClick = () => {
   setCurrentModel("basicInfo");
   setIsExpanded(true);
@@ -13,32 +23,27 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div
-    class="resume-section p-6 hover:bg-blue-50 hover:border-blue-300 border border-transparent rounded cursor-pointer transition-all duration-200"
-    @click="handleClick"
-  >
-    <div class="flex items-start gap-6">
-      <img
-        :src="data.avatar"
-        alt="avatar"
-        class="w-24 h-24 rounded object-cover bg-gray-200"
-      />
-      <div class="flex-1">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">{{ data.name }}</h1>
-        <div class="grid grid-cols-2 gap-y-2 text-sm text-gray-600">
-          <div class="flex items-center gap-2" v-if="data.workYear">
+  <div :class="styles.container" @click="handleClick">
+    <div :class="styles.contentWrapper">
+      <img :src="data.avatar" alt="avatar" :class="styles.avatar" />
+      <div :class="styles.infoWrapper">
+        <h1 :class="styles.name">
+          {{ data.name }}
+        </h1>
+        <div :class="styles.detailsWrapper">
+          <div :class="styles.detailItem" v-if="data.workYear">
             <span>工作年限：{{ data.workYear }}</span>
           </div>
-          <div class="flex items-center gap-2" v-if="data.gender">
+          <div :class="styles.detailItem" v-if="data.gender">
             <span>性别：{{ data.gender }}</span>
           </div>
-          <div class="flex items-center gap-2" v-if="data.phone">
+          <div :class="styles.detailItem" v-if="data.phone">
             <span>电话：{{ data.phone }}</span>
           </div>
-          <div class="flex items-center gap-2" v-if="data.email">
+          <div :class="styles.detailItem" v-if="data.email">
             <span>邮箱：{{ data.email }}</span>
           </div>
-          <div class="flex items-center gap-2" v-if="data.politicalStatus">
+          <div :class="styles.detailItem" v-if="data.politicalStatus">
             <span>政治面貌：{{ data.politicalStatus }}</span>
           </div>
         </div>

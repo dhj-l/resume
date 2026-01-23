@@ -13,8 +13,10 @@ import { templateList } from "../templates";
 import { useResumeStore } from "@/stores/resumeStore";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
+import type { templateType } from "./preview/type";
 
 const { currentTemplate } = storeToRefs(useResumeStore());
+const { setCurrentTemplate } = useResumeStore();
 interface Props {
   resumeTitle?: string;
 }
@@ -52,8 +54,8 @@ const handleGlobalStyle = () => {
 };
 
 // TODO: 处理模板切换
-const handleTemplateChange = (key: string) => {
-  console.log("Template changed to:", key);
+const handleTemplateChange = (key: templateType) => {
+  setCurrentTemplate(key);
 };
 
 // TODO: 处理主题切换
@@ -85,7 +87,7 @@ const handleThemeChange = () => {
     <div class="flex items-center space-x-4">
       <Dropdown>
         <template #overlay>
-          <Menu @click="({ key }) => handleTemplateChange(key as string)">
+          <Menu @click="({ key }) => handleTemplateChange(key as templateType)">
             <MenuItem
               v-for="item in templateList"
               :key="item.value"

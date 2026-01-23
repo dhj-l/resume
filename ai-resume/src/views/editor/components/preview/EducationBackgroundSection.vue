@@ -1,13 +1,20 @@
 <script setup lang="ts">
 import { useResumeStore } from "@/stores/resumeStore";
 import type { EducationBackground } from "@/stores/type";
+import type { templateType } from "./type";
+import { getEducationBackgroundStyles } from "./EducationBackgroundSection";
+import { computed } from "vue";
 
-defineProps<{
+const props = defineProps<{
   data: EducationBackground[];
   label?: string;
+  templateType: templateType;
 }>();
 
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+
+const styles = computed(() => getEducationBackgroundStyles(props.templateType));
+
 const handleClick = () => {
   setCurrentModel("educationBackground");
   setIsExpanded(true);
@@ -15,44 +22,37 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div
-    class="resume-section p-4 mb-4 hover:bg-blue-50 hover:border-blue-300 border border-transparent rounded cursor-pointer transition-all duration-200"
-    @click="handleClick"
-  >
-    <h3
-      class="text-lg font-bold text-gray-800 border-b border-gray-300 pb-2 mb-3"
-    >
+  <div :class="styles.container" @click="handleClick">
+    <h3 :class="styles.title">
       {{ label || "教育背景" }}
     </h3>
-    <div class="space-y-4">
+    <div :class="styles.listWrapper">
       <div
         v-for="(edu, index) in data"
         :key="index"
-        class="flex justify-between items-start"
+        :class="styles.itemWrapper"
       >
-        <div class="flex-1">
-          <div class="flex justify-between mb-1">
-            <h4 class="font-bold text-gray-800">{{ edu.schoolName }}</h4>
-            <span class="text-sm text-gray-600"
+        <div :class="styles.contentWrapper">
+          <div :class="styles.headerWrapper">
+            <h4 :class="styles.schoolName">{{ edu.schoolName }}</h4>
+            <span :class="styles.timeRange"
               >{{ edu.enrollmentTime }} - {{ edu.graduationTime }}</span
             >
           </div>
-          <div class="flex gap-4 text-sm text-gray-700">
+          <div :class="styles.detailsWrapper">
             <span>{{ edu.degree }}</span>
             <span>{{ edu.major }}</span>
             <span v-if="edu.majorScore">成绩：{{ edu.majorScore }}</span>
           </div>
           <div
             v-if="edu.majorCourses && edu.majorCourses.length"
-            class="mt-1 text-xs text-gray-500"
+            :class="styles.courses"
           >
             主修课程：{{ edu.majorCourses.join("、") }}
           </div>
         </div>
       </div>
-      <div v-if="data.length === 0" class="text-gray-400 italic">
-        暂无教育背景信息
-      </div>
+      <div v-if="data.length === 0" :class="styles.empty">暂无教育背景信息</div>
     </div>
   </div>
 </template>

@@ -2,8 +2,7 @@ import { defineStore } from "pinia";
 import { ref, shallowRef } from "vue";
 import type { ModuleItem, ResumeData } from "./type";
 import { mockResumeData } from "@/views/editor/data/mockData";
-import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
-import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+
 import EducationBackgroundSection from "@/views/editor/components/preview/EducationBackgroundSection.vue";
 import WorkExperienceSection from "@/views/editor/components/preview/WorkExperienceSection.vue";
 import ProjectExperienceSection from "@/views/editor/components/preview/ProjectExperienceSection.vue";
@@ -12,6 +11,7 @@ import CertificatesSection from "@/views/editor/components/preview/CertificatesS
 import SelfEvaluationSection from "@/views/editor/components/preview/SelfEvaluationSection.vue";
 import BasicInfoForm from "@/views/editor/components/drawer/BasicInfoForm.vue";
 import EducationForm from "@/views/editor/components/drawer/EducationForm.vue";
+import type { templateType } from "@/views/editor/components/preview/type";
 
 export const useResumeStore = defineStore("resume", () => {
   // 初始化简历数据
@@ -24,7 +24,10 @@ export const useResumeStore = defineStore("resume", () => {
       index: 0,
       moduleKey: "basicInfo",
       label: "基本信息",
-      component: shallowRef(BasicInfoSection),
+      /**
+       * null代表是固定模块，不能删除
+       */
+      component: null,
       formComponent: shallowRef(BasicInfoForm),
       isShow: true,
     },
@@ -32,7 +35,7 @@ export const useResumeStore = defineStore("resume", () => {
       index: 1,
       moduleKey: "jobIntention",
       label: "求职意向",
-      component: shallowRef(JobIntentionSection),
+      component: null,
       formComponent: shallowRef(null),
       isShow: true,
     },
@@ -87,12 +90,15 @@ export const useResumeStore = defineStore("resume", () => {
   ]);
   //控制抽屉展开/收起
   const isExpanded = ref(false);
-  const currentTemplate = ref<string>("default");
+  const currentTemplate = ref<templateType>("default");
   const setCurrentModel = (moduleKey: string) => {
     currentModule.value = moduleKey;
   };
   const setIsExpanded = (value: boolean) => {
     isExpanded.value = value;
+  };
+  const setCurrentTemplate = (template: templateType) => {
+    currentTemplate.value = template;
   };
   return {
     resumeData,
@@ -102,5 +108,6 @@ export const useResumeStore = defineStore("resume", () => {
     currentTemplate,
     setCurrentModel,
     setIsExpanded,
+    setCurrentTemplate,
   };
 });

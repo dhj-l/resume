@@ -250,7 +250,7 @@ export interface ModuleItem<T = any, F = any> {
   index: number;
   moduleKey: keyof ResumeData;
   label: string;
-  component: Component<T>;
+  component: Component<T> | null;
   formComponent: Component<F>;
   /**
    * 是否展示
