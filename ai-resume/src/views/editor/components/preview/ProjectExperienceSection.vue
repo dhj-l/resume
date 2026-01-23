@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useResumeStore } from "@/stores/resumeStore";
 import type { ProjectExperience } from "@/stores/type";
 
 defineProps<{
@@ -6,9 +7,10 @@ defineProps<{
   label?: string;
 }>();
 
-// TODO: 处理模块点击
+const { setCurrentModel, setIsExpanded } = useResumeStore();
 const handleClick = () => {
-  console.log("Project Experience clicked");
+  setCurrentModel("projectExperience");
+  setIsExpanded(true);
 };
 </script>
 

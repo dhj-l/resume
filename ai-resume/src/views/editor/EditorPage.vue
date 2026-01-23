@@ -6,15 +6,9 @@ import EditDrawer from "./components/EditDrawer.vue";
 
 import { storeToRefs } from "pinia";
 import { useResumeStore } from "@/stores/resumeStore";
-import { ref } from "vue";
+import { provide } from "vue";
 const { resumeData } = storeToRefs(useResumeStore());
-const { setCurrentModel } = useResumeStore();
-const open = ref(false);
-const handleModuleClick = (moduleKey: string) => {
-  console.log("点击了模块:", moduleKey);
-  setCurrentModel(moduleKey);
-  open.value = true;
-};
+provide("resumeData", resumeData);
 </script>
 
 <template>
@@ -28,15 +22,12 @@ const handleModuleClick = (moduleKey: string) => {
     >
       <div class="min-h-full py-8 px-4 flex justify-center pb-[35vh]">
         <!-- 简历预览区域 -->
-        <ResumePreview
-          :resume-data="resumeData"
-          @moduleClick="handleModuleClick"
-        />
+        <ResumePreview />
       </div>
     </Layout.Content>
 
     <!-- 底部编辑抽屉 -->
-    <EditDrawer :resume-data="resumeData" v-model:open="open" />
+    <EditDrawer :resume-data="resumeData" />
   </Layout>
 </template>
 

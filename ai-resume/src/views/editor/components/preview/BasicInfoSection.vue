@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { useResumeStore } from "@/stores/resumeStore";
 import type { BasicInfo } from "@/stores/type";
 
 defineProps<{
   data: BasicInfo;
 }>();
-
-// TODO: 处理模块点击
+const { setCurrentModel, setIsExpanded } = useResumeStore();
 const handleClick = () => {
-  console.log("Basic Info clicked");
+  setCurrentModel("basicInfo");
+  setIsExpanded(true);
 };
 </script>
 

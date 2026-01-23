@@ -85,9 +85,22 @@ export const useResumeStore = defineStore("resume", () => {
       isShow: true,
     },
   ]);
-
+  //控制抽屉展开/收起
+  const isExpanded = ref(false);
+  const currentTemplate = ref<string>("default");
   const setCurrentModel = (moduleKey: string) => {
     currentModule.value = moduleKey;
   };
-  return { resumeData, currentModule, moduleOrder, setCurrentModel };
+  const setIsExpanded = (value: boolean) => {
+    isExpanded.value = value;
+  };
+  return {
+    resumeData,
+    currentModule,
+    moduleOrder,
+    isExpanded,
+    currentTemplate,
+    setCurrentModel,
+    setIsExpanded,
+  };
 });

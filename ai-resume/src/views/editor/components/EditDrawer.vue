@@ -3,20 +3,19 @@ import { ref } from "vue";
 import { UpOutlined, DownOutlined } from "@ant-design/icons-vue";
 import ModuleTabs from "./drawer/ModuleTabs.vue";
 import type { ResumeData } from "@/stores/type";
+import { storeToRefs } from "pinia";
+import { useResumeStore } from "@/stores/resumeStore";
 
 defineProps<{
   resumeData: ResumeData;
 }>();
-
-const isExpanded = defineModel("open", {
-  type: Boolean,
-  default: false,
-});
+const { isExpanded } = storeToRefs(useResumeStore());
+const { setIsExpanded } = useResumeStore();
 const drawerHeight = ref("40vh");
 
 // TODO: 处理抽屉展开/收起
 const toggleDrawer = () => {
-  isExpanded.value = !isExpanded.value;
+  setIsExpanded(!isExpanded.value);
 };
 
 // TODO: 处理拖拽调整高度

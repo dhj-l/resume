@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { useResumeStore } from "@/stores/resumeStore";
+
 defineProps<{
   data?: string[];
   label?: string;
 }>();
 
-// TODO: 处理模块点击
+const { setCurrentModel, setIsExpanded } = useResumeStore();
 const handleClick = () => {
-  console.log("Skills clicked");
+  setCurrentModel("skills");
+  setIsExpanded(true);
 };
 </script>
 
