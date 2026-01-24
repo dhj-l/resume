@@ -71,6 +71,14 @@ export interface JobIntention {
    * 意向城市
    */
   intentionCity: string;
+  /**
+   * 期望薪资
+   */
+  expectationSalary: string;
+  /**
+   * 入职时间
+   */
+  entryTime: string;
 }
 
 export interface InternshipExperience {
@@ -187,13 +195,9 @@ export interface EducationBackground {
    */
   graduationTime: string;
   /**
-   * 专业成绩
+   * 详细内容
    */
-  majorScore?: string;
-  /**
-   * 主修课程
-   */
-  majorCourses?: string[];
+  content: string;
 }
 
 export interface BasicInfo {
@@ -209,6 +213,10 @@ export interface BasicInfo {
    * 手机号
    */
   phone: string;
+  /**
+   * 年龄
+   */
+  age: string;
   /**
    * 邮箱
    */

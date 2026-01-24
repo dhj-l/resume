@@ -34,21 +34,17 @@ const handleClick = () => {
       >
         <div :class="styles.contentWrapper">
           <div :class="styles.headerWrapper">
-            <h4 :class="styles.schoolName">{{ edu.schoolName }}</h4>
+            <h4 :class="styles.schoolName">
+              {{ edu.schoolName }}
+              <span>{{ edu.degree ? `  (${edu.degree})` : "" }}</span>
+            </h4>
+            <span>{{ edu.major }}</span>
             <span :class="styles.timeRange"
               >{{ edu.enrollmentTime }} - {{ edu.graduationTime }}</span
             >
           </div>
           <div :class="styles.detailsWrapper">
-            <span>{{ edu.degree }}</span>
-            <span>{{ edu.major }}</span>
-            <span v-if="edu.majorScore">成绩：{{ edu.majorScore }}</span>
-          </div>
-          <div
-            v-if="edu.majorCourses && edu.majorCourses.length"
-            :class="styles.courses"
-          >
-            主修课程：{{ edu.majorCourses.join("、") }}
+            <div v-html="edu.content"></div>
           </div>
         </div>
       </div>

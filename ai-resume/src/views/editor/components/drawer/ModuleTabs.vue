@@ -27,7 +27,7 @@ const { moduleOrder, currentModule } = storeToRefs(useResumeStore());
 
     <div class="flex-1 overflow-y-auto p-6">
       <div
-        class="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-6 min-h-full"
+        class="max-w-7xl mx-auto bg-white rounded-lg shadow-sm p-6 min-h-full"
       >
         <template v-for="item in moduleOrder" :key="item.moduleKey">
           <component

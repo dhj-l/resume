@@ -10,6 +10,7 @@ import SkillsSection from "@/views/editor/components/preview/SkillsSection.vue";
 import CertificatesSection from "@/views/editor/components/preview/CertificatesSection.vue";
 import SelfEvaluationSection from "@/views/editor/components/preview/SelfEvaluationSection.vue";
 import BasicInfoForm from "@/views/editor/components/drawer/BasicInfoForm.vue";
+import JobIntentionForm from "@/views/editor/components/drawer/JobIntentionForm.vue";
 import EducationForm from "@/views/editor/components/drawer/EducationForm.vue";
 import type { templateType } from "@/views/editor/components/preview/type";
 
@@ -36,7 +37,7 @@ export const useResumeStore = defineStore("resume", () => {
       moduleKey: "jobIntention",
       label: "求职意向",
       component: null,
-      formComponent: shallowRef(null),
+      formComponent: shallowRef(JobIntentionForm),
       isShow: true,
     },
     {
