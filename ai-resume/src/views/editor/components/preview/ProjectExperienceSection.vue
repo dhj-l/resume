@@ -43,9 +43,7 @@ const handleClick = () => {
           <div :class="styles.role">
             {{ project.description }}
           </div>
-          <p :class="styles.description">
-            {{ project.content }}
-          </p>
+          <p :class="styles.description" v-html="project.content"></p>
         </div>
       </template>
       <div v-else :class="styles.empty">暂无项目经历信息</div>

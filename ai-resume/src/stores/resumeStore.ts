@@ -13,6 +13,11 @@ import BasicInfoForm from "@/views/editor/components/drawer/BasicInfoForm.vue";
 import JobIntentionForm from "@/views/editor/components/drawer/JobIntentionForm.vue";
 import EducationForm from "@/views/editor/components/drawer/EducationForm.vue";
 import type { templateType } from "@/views/editor/components/preview/type";
+import WorkExperienceForm from "@/views/editor/components/drawer/WorkExperienceForm.vue";
+import ProjectExperienceForm from "@/views/editor/components/drawer/ProjectExperienceForm.vue";
+import SkillsForm from "@/views/editor/components/drawer/SkillsForm.vue";
+import CertificatesForm from "@/views/editor/components/drawer/CertificatesForm.vue";
+import SelfEvaluationForm from "@/views/editor/components/drawer/SelfEvaluationForm.vue";
 
 export const useResumeStore = defineStore("resume", () => {
   // 初始化简历数据
@@ -53,7 +58,7 @@ export const useResumeStore = defineStore("resume", () => {
       moduleKey: "workExperience",
       label: "工作经验",
       component: shallowRef(WorkExperienceSection),
-      formComponent: shallowRef(null),
+      formComponent: shallowRef(WorkExperienceForm),
       isShow: true,
     },
     {
@@ -61,7 +66,7 @@ export const useResumeStore = defineStore("resume", () => {
       moduleKey: "projectExperience",
       label: "项目经历",
       component: shallowRef(ProjectExperienceSection),
-      formComponent: shallowRef(null),
+      formComponent: shallowRef(ProjectExperienceForm),
       isShow: true,
     },
     {
@@ -69,7 +74,7 @@ export const useResumeStore = defineStore("resume", () => {
       moduleKey: "skills",
       label: "技能特长",
       component: shallowRef(SkillsSection),
-      formComponent: shallowRef(null),
+      formComponent: shallowRef(SkillsForm),
       isShow: true,
     },
     {
@@ -77,7 +82,7 @@ export const useResumeStore = defineStore("resume", () => {
       moduleKey: "certificates",
       label: "证书经历",
       component: shallowRef(CertificatesSection),
-      formComponent: shallowRef(null),
+      formComponent: shallowRef(CertificatesForm),
       isShow: true,
     },
     {
@@ -85,7 +90,7 @@ export const useResumeStore = defineStore("resume", () => {
       moduleKey: "selfEvaluation",
       label: "自我评价",
       component: shallowRef(SelfEvaluationSection),
-      formComponent: shallowRef(null),
+      formComponent: shallowRef(SelfEvaluationForm),
       isShow: true,
     },
   ]);

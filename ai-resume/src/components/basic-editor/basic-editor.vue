@@ -5,7 +5,7 @@
       <Editor
         :defaultConfig="editorConfig"
         v-model="valueHtml"
-        style="height: 300px; overflow-y: hidden; border-top: 1px solid #e5e5e5"
+        style="height: 301px; overflow-y: hidden; border-top: 1px solid #e5e5e5"
         @onCreated="handleCreated"
       />
     </div>

@@ -25,9 +25,7 @@ const handleClick = () => {
     <h3 :class="styles.title">
       {{ label || "自我评价" }}
     </h3>
-    <p v-if="data" :class="styles.content">
-      {{ data }}
-    </p>
+    <p v-if="data" :class="styles.content" v-html="data"></p>
     <div v-else :class="styles.empty">暂无自我评价信息</div>
   </div>
 </template>

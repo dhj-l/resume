@@ -18,10 +18,13 @@ export const mockResumeData: ResumeData = {
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
     politicalStatus: "中共党员",
     workYear: "3年",
+    age: "30",
   },
   jobIntention: {
     jobIntention: "前端开发工程师",
     intentionCity: "上海",
+    expectationSalary: "12k",
+    entryTime: "2023-01",
   },
   educationBackground: [
     {
@@ -30,8 +33,7 @@ export const mockResumeData: ResumeData = {
       major: "软件工程",
       enrollmentTime: "2016-09",
       graduationTime: "2020-06",
-      majorScore: "Top 10%",
-      majorCourses: ["数据结构", "算法设计", "Web开发技术"],
+      content: "专业排名 Top 10%，参与多个项目团队合作，获得项目负责人荣誉。",
     },
     {
       schoolName: "上海交通大学",
@@ -39,15 +41,15 @@ export const mockResumeData: ResumeData = {
       major: "软件工程",
       enrollmentTime: "2020-09",
       graduationTime: "2022-06",
-      majorScore: "Top 5%",
-      majorCourses: ["数据库原理", "软件项目管理", "前端开发技术"],
+      content: "专业排名 Top 5%，参与多个项目团队合作，获得项目负责人荣誉。",
     },
   ],
   workExperience: [
     {
       companyName: "某知名互联网公司",
       position: "前端开发工程师",
-      workTime: "2020-07 - 至今",
+      workTime: "2020-07",
+      dismissalTime: "2022-08",
       workDescription:
         "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
     },
