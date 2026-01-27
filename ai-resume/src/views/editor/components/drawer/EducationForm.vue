@@ -13,7 +13,7 @@ import {
   ArrowDownOutlined,
 } from "@ant-design/icons-vue";
 import type { EducationBackground } from "@/stores/type";
-import { h } from "vue";
+import { h, ref } from "vue";
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 
 const props = defineProps<{
@@ -28,6 +28,7 @@ const degreeOptions = [
   { label: "硕士", value: "硕士" },
   { label: "博士", value: "博士" },
 ];
+const lastEndTime = ref("");
 
 // TODO: 添加教育经历
 const handleAdd = () => {
@@ -46,9 +47,10 @@ const handleMove = (index: number, direction: "up" | "down") => {
 
 const handleTillNowChange = (index: number, checked: boolean) => {
   if (checked) {
+    lastEndTime.value = props.data[index]!.graduationTime as string;
     props.data[index]!.graduationTime = "至今";
   } else {
-    props.data[index]!.graduationTime = "";
+    props.data[index]!.graduationTime = lastEndTime.value;
   }
 };
 </script>

@@ -5,7 +5,7 @@ import { getCertificatesStyles } from "./CertificatesSection";
 import { computed } from "vue";
 
 const props = defineProps<{
-  data?: string[];
+  data?: string;
   label?: string;
   templateType: templateType;
 }>();
@@ -24,11 +24,6 @@ const handleClick = () => {
     <h3 :class="styles.title">
       {{ label || "荣誉证书" }}
     </h3>
-    <ul v-if="data && data.length" :class="styles.list">
-      <li v-for="(cert, index) in data" :key="index" :class="styles.listItem">
-        {{ cert }}
-      </li>
-    </ul>
-    <div v-else :class="styles.empty">暂无荣誉证书信息</div>
+    <div v-html="data"></div>
   </div>
 </template>

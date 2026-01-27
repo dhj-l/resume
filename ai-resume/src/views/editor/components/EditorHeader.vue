@@ -16,7 +16,7 @@ import { computed } from "vue";
 import type { templateType } from "./preview/type";
 
 const { currentTemplate } = storeToRefs(useResumeStore());
-const { setCurrentTemplate } = useResumeStore();
+const { setCurrentTemplate, saveResume } = useResumeStore();
 interface Props {
   resumeTitle?: string;
 }
@@ -39,8 +39,8 @@ const handleBack = () => {
 };
 
 // TODO: 处理保存草稿
-const handleSave = () => {
-  console.log("Save clicked");
+const handleSave = async () => {
+  await saveResume("69787013885a54a9f660796a");
 };
 
 // TODO: 处理导出PDF

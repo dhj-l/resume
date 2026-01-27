@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 import { useResumeStore } from "@/stores/resumeStore";
-import { computed } from "vue";
+import { ref, watch } from "vue";
 
-const store = useResumeStore();
-
-// 使用 computed 的 getter/setter 来实现双向绑定到 store
-const content = computed({
-  get: () => store.resumeData.selfEvaluation || "",
-  set: (val: string) => {
-    store.resumeData.selfEvaluation = val;
-  },
+const props = defineProps<{
+  data: string;
+}>();
+const { setResumeDataString } = useResumeStore();
+const content = ref(props.data);
+watch(content, (newVal) => {
+  setResumeDataString("selfEvaluation", newVal);
 });
 </script>
 

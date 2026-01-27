@@ -5,7 +5,7 @@ import { getSkillsStyles } from "./SkillsSection";
 import { computed } from "vue";
 
 const props = defineProps<{
-  data?: string[];
+  data?: string;
   label?: string;
   templateType: templateType;
 }>();
@@ -25,11 +25,10 @@ const handleClick = () => {
     <h3 :class="styles.title">
       {{ label || "技能特长" }}
     </h3>
-    <div v-if="data && data.length" :class="styles.listWrapper">
-      <span v-for="(skill, index) in data" :key="index" :class="styles.item">
-        {{ skill }}
-      </span>
-    </div>
-    <div v-else :class="styles.empty">暂无技能特长信息</div>
+    <div
+      v-if="data && data.length"
+      :class="styles.listWrapper"
+      v-html="data"
+    ></div>
   </div>
 </template>

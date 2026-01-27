@@ -18,6 +18,11 @@ import ProjectExperienceForm from "@/views/editor/components/drawer/ProjectExper
 import SkillsForm from "@/views/editor/components/drawer/SkillsForm.vue";
 import CertificatesForm from "@/views/editor/components/drawer/CertificatesForm.vue";
 import SelfEvaluationForm from "@/views/editor/components/drawer/SelfEvaluationForm.vue";
+import {
+  createResumeAPI,
+  getResumeDetailAPI,
+  updateResumeAPI,
+} from "@/api/resume/resume";
 
 export const useResumeStore = defineStore("resume", () => {
   // 初始化简历数据
@@ -96,15 +101,60 @@ export const useResumeStore = defineStore("resume", () => {
   ]);
   //控制抽屉展开/收起
   const isExpanded = ref(false);
+  //当前选中的模板
   const currentTemplate = ref<templateType>("default");
+  /**
+   * 设置当前选中的模块
+   * @param moduleKey 模块键值
+   */
   const setCurrentModel = (moduleKey: string) => {
     currentModule.value = moduleKey;
   };
+  /**
+   * 设置抽屉展开/收起状态
+   * @param value 展开状态值
+   */
   const setIsExpanded = (value: boolean) => {
     isExpanded.value = value;
   };
+  /**
+   * 设置当前选中的模板
+   * @param template 模板类型
+   */
   const setCurrentTemplate = (template: templateType) => {
     currentTemplate.value = template;
+  };
+  /**
+   * 修改简历字符串类型数据
+   * @param key 数据键值
+   * @param value 数据值
+   */
+  const setResumeDataString = (key: keyof ResumeData, value: any) => {
+    if (typeof resumeData.value[key] === "string") {
+      resumeData.value[key] = value;
+    }
+  };
+  /**
+   * 创建简历
+   */
+  const createResume = async () => {
+    const res = await createResumeAPI();
+    resumeData.value = res.data;
+  };
+  /**
+   * 保存简历(修改)
+   */
+  const saveResume = async (id: string) => {
+    const res = await updateResumeAPI(id, resumeData.value);
+    resumeData.value = res.data;
+  };
+
+  /**
+   * 获取简历详情
+   */
+  const getResumeDetail = async (id: string) => {
+    const res = await getResumeDetailAPI(id);
+    resumeData.value = res.data;
   };
   return {
     resumeData,
@@ -115,5 +165,9 @@ export const useResumeStore = defineStore("resume", () => {
     setCurrentModel,
     setIsExpanded,
     setCurrentTemplate,
+    setResumeDataString,
+    createResume,
+    saveResume,
+    getResumeDetail,
   };
 });

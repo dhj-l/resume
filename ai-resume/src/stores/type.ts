@@ -43,11 +43,11 @@ export interface ResumeData {
   /**
    * 技能特长
    */
-  skills?: string[];
+  skills?: string;
   /**
    * 荣誉证书
    */
-  certificates?: string[];
+  certificates?: string;
   /**
    * 项目经历
    */

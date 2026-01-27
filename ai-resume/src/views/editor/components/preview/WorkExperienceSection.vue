@@ -35,14 +35,15 @@ const handleClick = () => {
         >
           <div :class="styles.headerWrapper">
             <h4 :class="styles.companyName">{{ work.companyName }}</h4>
+            <div :class="styles.position">
+              {{ work.position }}
+            </div>
             <span :class="styles.timeRange">
               {{ work.workTime }}
               <span v-if="work.dismissalTime">- {{ work.dismissalTime }}</span>
             </span>
           </div>
-          <div :class="styles.position">
-            {{ work.position }}
-          </div>
+
           <p :class="styles.description" v-html="work.workDescription"></p>
         </div>
       </template>

@@ -6,7 +6,7 @@ import {
   ArrowDownOutlined,
 } from "@ant-design/icons-vue";
 import type { WorkExperience } from "@/stores/type";
-import { h } from "vue";
+import { h, ref } from "vue";
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 
 const props = defineProps<{
@@ -23,6 +23,8 @@ const handleAdd = () => {
   });
 };
 
+const lastEndTime = ref("");
+
 const handleDelete = (index: number) => {
   props.data.splice(index, 1);
 };
@@ -33,9 +35,10 @@ const handleMove = (index: number, direction: "up" | "down") => {
 
 const handleTillNowChange = (index: number, checked: boolean) => {
   if (checked) {
+    lastEndTime.value = props.data[index]!.dismissalTime as string;
     props.data[index]!.dismissalTime = "至今";
   } else {
-    props.data[index]!.dismissalTime = "";
+    props.data[index]!.dismissalTime = lastEndTime.value;
   }
 };
 </script>

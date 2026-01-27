@@ -6,13 +6,13 @@ import {
   ArrowDownOutlined,
 } from "@ant-design/icons-vue";
 import type { ProjectExperience } from "@/stores/type";
-import { h } from "vue";
+import { h, ref } from "vue";
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 
 const props = defineProps<{
   data: ProjectExperience[];
 }>();
-
+const lastEndTime = ref("");
 const handleAdd = () => {
   props.data.push({
     title: "",
@@ -33,9 +33,10 @@ const handleMove = (index: number, direction: "up" | "down") => {
 
 const handleTillNowChange = (index: number, checked: boolean) => {
   if (checked) {
+    lastEndTime.value = props.data[index]!.endTime as string;
     props.data[index]!.endTime = "至今";
   } else {
-    props.data[index]!.endTime = "";
+    props.data[index]!.endTime = lastEndTime.value;
   }
 };
 </script>

@@ -35,14 +35,15 @@ const handleClick = () => {
         >
           <div :class="styles.headerWrapper">
             <h4 :class="styles.projectName">{{ project.title }}</h4>
+            <div :class="styles.role">
+              {{ project.description }}
+            </div>
             <span :class="styles.timeRange">
               {{ project.startTime }}
               <span v-if="project.endTime">- {{ project.endTime }}</span>
             </span>
           </div>
-          <div :class="styles.role">
-            {{ project.description }}
-          </div>
+
           <p :class="styles.description" v-html="project.content"></p>
         </div>
       </template>

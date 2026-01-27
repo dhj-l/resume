@@ -1,51 +1,104 @@
 <template>
-  <div
-    class="resume-preview w-full max-w-[210mm] min-h-[297mm] bg-white shadow-lg mx-auto flex box-border overflow-hidden"
-  >
-    <!-- 左侧侧边栏 -->
+  <div class="relative mx-auto w-full max-w-[210mm]">
+    <!-- 计算层：隐藏 -->
     <div
-      class="w-[32%] bg-slate-50 p-6 flex flex-col gap-6 shrink-0 border-r border-gray-100"
+      class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none"
     >
-      <!-- 基本信息 -->
-      <BasicInfoSection
-        :data="resumeData!.basicInfo"
-        :label="basicInfoModule?.label"
-        :template-type="currentTemplate"
-      />
-
-      <!-- 侧边栏模块循环 -->
-      <template v-for="item in leftModules" :key="item.moduleKey">
-        <component
-          draggable="true"
-          :is="item.component"
-          :data="resumeData?.[item.moduleKey]"
-          :label="item.label"
-          :template-type="currentTemplate"
-          v-if="item.isShow && item.component"
-        />
-      </template>
+      <!-- 左侧计算层 -->
+      <div ref="leftContentRef" class="w-[32%] p-6 flex flex-col gap-6">
+        <div data-id="basicInfo">
+          <BasicInfoSection
+            :data="resumeData!.basicInfo"
+            :label="basicInfoModule?.label"
+            :template-type="currentTemplate"
+          />
+        </div>
+        <div
+          v-for="item in leftModules"
+          :key="item.moduleKey"
+          :data-id="item.moduleKey"
+        >
+          <component
+            :is="item.component"
+            :data="resumeData?.[item.moduleKey]"
+            :label="item.label"
+            :template-type="currentTemplate"
+            v-if="item.isShow && item.component"
+          />
+        </div>
+      </div>
+      <!-- 右侧计算层 -->
+      <div ref="rightContentRef" class="w-[68%] p-8 flex flex-col gap-6">
+        <div data-id="jobIntention">
+          <JobIntentionSection
+            :data="resumeData!.jobIntention"
+            :label="jobIntentionModule?.label"
+            :templateType="currentTemplate"
+          />
+        </div>
+        <div
+          v-for="item in rightModules"
+          :key="item.moduleKey"
+          :data-id="item.moduleKey"
+        >
+          <component
+            :is="item.component"
+            :data="resumeData?.[item.moduleKey]"
+            :label="item.label"
+            :templateType="currentTemplate"
+            v-if="item.isShow && item.component"
+          />
+        </div>
+      </div>
     </div>
 
-    <!-- 右侧主要内容 -->
-    <div class="flex-1 p-8 flex flex-col gap-6 min-w-0">
-      <!-- 求职意向 -->
-      <JobIntentionSection
-        :data="resumeData!.jobIntention"
-        :label="jobIntentionModule?.label"
-        :templateType="currentTemplate"
-      />
+    <!-- 展示层：分页 -->
+    <div
+      v-for="(page, index) in mergedPages"
+      :key="index"
+      class="w-full min-h-[297mm] bg-white shadow-lg mx-auto flex box-border overflow-hidden mb-8"
+    >
+      <!-- 左侧 -->
+      <div
+        class="w-[32%] bg-slate-50 p-6 flex flex-col gap-6 shrink-0 border-r border-gray-100"
+      >
+        <template v-for="moduleId in page.left" :key="moduleId">
+          <BasicInfoSection
+            v-if="moduleId === 'basicInfo'"
+            :data="resumeData!.basicInfo"
+            :label="basicInfoModule?.label"
+            :template-type="currentTemplate"
+          />
+          <component
+            v-else-if="getModuleByKey(moduleId)"
+            :is="getModuleByKey(moduleId)!.component"
+            :data="(resumeData as any)[moduleId]"
+            :label="getModuleByKey(moduleId)!.label"
+            :template-type="currentTemplate"
+            draggable="true"
+          />
+        </template>
+      </div>
 
-      <!-- 主内容模块循环 -->
-      <template v-for="item in rightModules" :key="item.moduleKey">
-        <component
-          draggable="true"
-          :is="item.component"
-          :data="resumeData?.[item.moduleKey]"
-          :label="item.label"
-          :templateType="currentTemplate"
-          v-if="item.isShow && item.component"
-        />
-      </template>
+      <!-- 右侧 -->
+      <div class="flex-1 p-8 flex flex-col gap-6 min-w-0">
+        <template v-for="moduleId in page.right" :key="moduleId">
+          <JobIntentionSection
+            v-if="moduleId === 'jobIntention'"
+            :data="resumeData!.jobIntention"
+            :label="jobIntentionModule?.label"
+            :templateType="currentTemplate"
+          />
+          <component
+            v-else-if="getModuleByKey(moduleId)"
+            :is="getModuleByKey(moduleId)!.component"
+            :data="(resumeData as any)[moduleId]"
+            :label="getModuleByKey(moduleId)!.label"
+            :templateType="currentTemplate"
+            draggable="true"
+          />
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -56,10 +109,11 @@ import JobIntentionSection from "@/views/editor/components/preview/JobIntentionS
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData } from "@/stores/type";
 import { storeToRefs } from "pinia";
-import { inject, computed } from "vue";
+import { inject, computed, ref } from "vue";
+import { usePagination } from "@/views/editor/hooks/usePagination";
 
 const { moduleOrder, currentTemplate } = storeToRefs(useResumeStore());
-const resumeData = inject<ResumeData>("resumeData");
+const resumeData = ref(inject<ResumeData>("resumeData")!);
 
 // 定义左右分栏的模块 key
 const leftModuleKeys = ["skills", "certificates", "selfEvaluation"];
@@ -90,14 +144,39 @@ const rightModules = computed(() => {
     rightModuleKeys.includes(item.moduleKey),
   );
 });
+
+// 根据 ID 获取模块配置
+const getModuleByKey = (key: string) => {
+  return moduleOrder.value.find((item) => item.moduleKey === key);
+};
+
+// 分页逻辑
+const leftContentRef = ref<HTMLElement | null>(null);
+const rightContentRef = ref<HTMLElement | null>(null);
+
+const { pages: leftPages } = usePagination(leftContentRef, resumeData, {
+  contentPadding: 48,
+  gap: 24,
+});
+const { pages: rightPages } = usePagination(rightContentRef, resumeData, {
+  contentPadding: 64,
+  gap: 24,
+});
+
+const mergedPages = computed(() => {
+  const maxLen = Math.max(leftPages.value.length, rightPages.value.length);
+  const result = [];
+  for (let i = 0; i < maxLen; i++) {
+    result.push({
+      left: leftPages.value[i] || [],
+      right: rightPages.value[i] || [],
+    });
+  }
+  return result;
+});
 </script>
 
 <style scoped>
-/* A4纸张比例模拟 */
-.resume-preview {
-  aspect-ratio: 210/297;
-}
-
 /* 针对侧边栏的基本信息样式微调 */
 :deep(.resume-section) {
   margin-bottom: 0 !important; /* 移除组件自带的 margin-bottom，由 flex gap 控制 */
