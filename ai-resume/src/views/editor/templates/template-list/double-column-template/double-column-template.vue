@@ -5,7 +5,16 @@
       class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none"
     >
       <!-- 左侧计算层 -->
-      <div ref="leftContentRef" class="w-[32%] p-6 flex flex-col gap-6">
+      <div
+        ref="leftContentRef"
+        class="w-[32%] flex flex-col"
+        :style="{
+          padding: resumeData.globalStyle.pageMargin,
+          gap: resumeData.globalStyle.moduleMargin,
+          fontSize: resumeData.globalStyle.fontSize,
+          lineHeight: resumeData.globalStyle.lineHeight,
+        }"
+      >
         <div data-id="basicInfo">
           <BasicInfoSection
             :data="resumeData!.basicInfo"
@@ -28,7 +37,16 @@
         </div>
       </div>
       <!-- 右侧计算层 -->
-      <div ref="rightContentRef" class="w-[68%] p-8 flex flex-col gap-6">
+      <div
+        ref="rightContentRef"
+        class="w-[68%] flex flex-col"
+        :style="{
+          padding: resumeData.globalStyle.pageMargin,
+          gap: resumeData.globalStyle.moduleMargin,
+          fontSize: resumeData.globalStyle.fontSize,
+          lineHeight: resumeData.globalStyle.lineHeight,
+        }"
+      >
         <div data-id="jobIntention">
           <JobIntentionSection
             :data="resumeData!.jobIntention"
@@ -57,10 +75,18 @@
       v-for="(page, index) in mergedPages"
       :key="index"
       class="w-full min-h-[297mm] bg-white shadow-lg mx-auto flex box-border overflow-hidden mb-8"
+      :style="{
+        fontSize: resumeData.globalStyle.fontSize,
+        lineHeight: resumeData.globalStyle.lineHeight,
+      }"
     >
       <!-- 左侧 -->
       <div
-        class="w-[32%] bg-slate-50 p-6 flex flex-col gap-6 shrink-0 border-r border-gray-100"
+        class="w-[32%] bg-slate-50 flex flex-col shrink-0 border-r border-gray-100"
+        :style="{
+          padding: resumeData.globalStyle.pageMargin,
+          gap: resumeData.globalStyle.moduleMargin,
+        }"
       >
         <template v-for="moduleId in page.left" :key="moduleId">
           <BasicInfoSection
@@ -81,7 +107,13 @@
       </div>
 
       <!-- 右侧 -->
-      <div class="flex-1 p-8 flex flex-col gap-6 min-w-0">
+      <div
+        class="flex-1 flex flex-col min-w-0"
+        :style="{
+          padding: resumeData.globalStyle.pageMargin,
+          gap: resumeData.globalStyle.moduleMargin,
+        }"
+      >
         <template v-for="moduleId in page.right" :key="moduleId">
           <JobIntentionSection
             v-if="moduleId === 'jobIntention'"
@@ -154,13 +186,21 @@ const getModuleByKey = (key: string) => {
 const leftContentRef = ref<HTMLElement | null>(null);
 const rightContentRef = ref<HTMLElement | null>(null);
 
+const moduleGap = computed(() => {
+  return parseFloat(resumeData.value.globalStyle.moduleMargin) || 0;
+});
+
+const pagePadding = computed(() => {
+  return (parseFloat(resumeData.value.globalStyle.pageMargin) || 0) * 2;
+});
+
 const { pages: leftPages } = usePagination(leftContentRef, resumeData, {
-  contentPadding: 48,
-  gap: 24,
+  contentPadding: pagePadding,
+  gap: moduleGap,
 });
 const { pages: rightPages } = usePagination(rightContentRef, resumeData, {
-  contentPadding: 64,
-  gap: 24,
+  contentPadding: pagePadding,
+  gap: moduleGap,
 });
 
 const mergedPages = computed(() => {

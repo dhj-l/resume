@@ -8,37 +8,43 @@ import {
 import type { WorkExperience } from "@/stores/type";
 import { h, ref } from "vue";
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
+import { useResumeStore } from "@/stores/resumeStore";
 
 const props = defineProps<{
   data: WorkExperience[];
 }>();
 
+const {
+  addWorkExperience,
+  removeWorkExperience,
+  updateWorkExperience,
+  moveWorkExperience,
+} = useResumeStore();
+
 const handleAdd = () => {
-  props.data.push({
-    companyName: "",
-    position: "",
-    workTime: "",
-    dismissalTime: "",
-    workDescription: "",
-  });
+  addWorkExperience();
 };
 
 const lastEndTime = ref("");
 
 const handleDelete = (index: number) => {
-  props.data.splice(index, 1);
+  removeWorkExperience(index);
 };
 
 const handleMove = (index: number, direction: "up" | "down") => {
-  console.log(index, direction, "移动");
+  moveWorkExperience(index, direction);
+};
+
+const update = (index: number, key: keyof WorkExperience, value: any) => {
+  updateWorkExperience(index, { [key]: value });
 };
 
 const handleTillNowChange = (index: number, checked: boolean) => {
   if (checked) {
     lastEndTime.value = props.data[index]!.dismissalTime as string;
-    props.data[index]!.dismissalTime = "至今";
+    update(index, "dismissalTime", "至今");
   } else {
-    props.data[index]!.dismissalTime = lastEndTime.value;
+    update(index, "dismissalTime", lastEndTime.value);
   }
 };
 </script>
@@ -57,7 +63,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
           <div class="flex flex-wrap gap-4 items-start">
             <FormItem label="公司名称" class="!mb-0">
               <Input
-                v-model:value="work.companyName"
+                :value="work.companyName"
+                @update:value="(val) => update(index, 'companyName', val)"
                 placeholder="请输入公司名称"
                 style="width: 180px"
               />
@@ -65,7 +72,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
 
             <FormItem label="职位名称" class="!mb-0">
               <Input
-                v-model:value="work.position"
+                :value="work.position"
+                @update:value="(val) => update(index, 'position', val)"
                 placeholder="请输入职位"
                 style="width: 180px"
               />
@@ -74,7 +82,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <FormItem label="在职时间" class="!mb-0">
               <div class="flex items-center gap-2">
                 <DatePicker
-                  v-model:value="work.workTime"
+                  :value="work.workTime"
+                  @update:value="(val) => update(index, 'workTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="入职时间"
@@ -83,7 +92,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
                 <span class="text-gray-400">-</span>
                 <DatePicker
                   v-if="work.dismissalTime !== '至今'"
-                  v-model:value="work.dismissalTime"
+                  :value="work.dismissalTime"
+                  @update:value="(val) => update(index, 'dismissalTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="离职时间"
@@ -107,7 +117,13 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <div
               class="border border-gray-300 rounded min-h-[150px] bg-gray-50 text-gray-400 flex flex-col items-center justify-center space-y-2"
             >
-              <BasicEditor class="w-full" v-model="work.workDescription" />
+              <BasicEditor
+                class="w-full"
+                :modelValue="work.workDescription"
+                @update:modelValue="
+                  (val) => update(index, 'workDescription', val)
+                "
+              />
             </div>
           </div>
         </div>

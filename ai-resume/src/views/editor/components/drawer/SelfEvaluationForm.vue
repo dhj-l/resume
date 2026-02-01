@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 import { useResumeStore } from "@/stores/resumeStore";
-import { ref, watch } from "vue";
 
-const props = defineProps<{
+defineProps<{
   data: string;
 }>();
 const { setResumeDataString } = useResumeStore();
-const content = ref(props.data);
-watch(content, (newVal) => {
-  setResumeDataString("selfEvaluation", newVal);
-});
+
+const update = (val: string) => {
+  setResumeDataString("selfEvaluation", val);
+};
 </script>
 
 <template>
@@ -18,7 +17,11 @@ watch(content, (newVal) => {
     <div
       class="border border-gray-300 rounded min-h-[300px] bg-gray-50 text-gray-400 flex flex-col"
     >
-      <BasicEditor class="w-full flex-1" v-model="content" />
+      <BasicEditor
+        class="w-full flex-1"
+        :modelValue="data"
+        @update:modelValue="update"
+      />
     </div>
   </div>
 </template>

@@ -1,6 +1,15 @@
 import { defineStore } from "pinia";
 import { ref, shallowRef } from "vue";
-import type { ModuleItem, ResumeData } from "./type";
+import type {
+  ModuleItem,
+  ResumeData,
+  BasicInfo,
+  JobIntention,
+  EducationBackground,
+  WorkExperience,
+  ProjectExperience,
+  GlobalStyle,
+} from "./type";
 import { mockResumeData } from "@/views/editor/data/mockData";
 
 import EducationBackgroundSection from "@/views/editor/components/preview/EducationBackgroundSection.vue";
@@ -156,6 +165,130 @@ export const useResumeStore = defineStore("resume", () => {
     const res = await getResumeDetailAPI(id);
     resumeData.value = res.data;
   };
+
+  const setGlobalStyle = (data: Partial<GlobalStyle>) => {
+    resumeData.value.globalStyle = {
+      ...resumeData.value.globalStyle,
+      ...data,
+    };
+  };
+
+  const setBasicInfo = (data: Partial<BasicInfo>) => {
+    resumeData.value.basicInfo = { ...resumeData.value.basicInfo, ...data };
+  };
+
+  const setJobIntention = (data: Partial<JobIntention>) => {
+    resumeData.value.jobIntention = {
+      ...resumeData.value.jobIntention,
+      ...data,
+    } as JobIntention;
+  };
+
+  // Education
+  const addEducation = () => {
+    resumeData.value.educationBackground.push({
+      schoolName: "",
+      major: "",
+      degree: "",
+      enrollmentTime: "",
+      graduationTime: "",
+      content: "",
+    });
+  };
+
+  const removeEducation = (index: number) => {
+    resumeData.value.educationBackground.splice(index, 1);
+  };
+
+  const updateEducation = (
+    index: number,
+    data: Partial<EducationBackground>,
+  ) => {
+    const item = resumeData.value.educationBackground[index];
+    if (item) {
+      resumeData.value.educationBackground[index] = { ...item, ...data };
+    }
+  };
+
+  const moveEducation = (index: number, direction: "up" | "down") => {
+    console.log("move", index, direction);
+  };
+
+  // Work Experience
+  const addWorkExperience = () => {
+    if (!resumeData.value.workExperience) resumeData.value.workExperience = [];
+    resumeData.value.workExperience.push({
+      companyName: "",
+      position: "",
+      workTime: "",
+      dismissalTime: "",
+      workDescription: "",
+    });
+  };
+
+  const removeWorkExperience = (index: number) => {
+    if (resumeData.value.workExperience) {
+      resumeData.value.workExperience.splice(index, 1);
+    }
+  };
+
+  const updateWorkExperience = (
+    index: number,
+    data: Partial<WorkExperience>,
+  ) => {
+    if (
+      resumeData.value.workExperience &&
+      resumeData.value.workExperience[index]
+    ) {
+      resumeData.value.workExperience[index] = {
+        ...resumeData.value.workExperience[index],
+        ...data,
+      };
+    }
+  };
+
+  const moveWorkExperience = (index: number, direction: "up" | "down") => {
+    console.log("move", index, direction);
+  };
+
+  // Project Experience
+  const addProjectExperience = () => {
+    if (!resumeData.value.projectExperience)
+      resumeData.value.projectExperience = [];
+    resumeData.value.projectExperience.push({
+      title: "",
+      description: "",
+      startTime: "",
+      endTime: "",
+      content: "",
+    });
+  };
+
+  const removeProjectExperience = (index: number) => {
+    if (resumeData.value.projectExperience) {
+      resumeData.value.projectExperience.splice(index, 1);
+    }
+  };
+
+  const updateProjectExperience = (
+    index: number,
+    data: Partial<ProjectExperience>,
+  ) => {
+    if (
+      resumeData.value.projectExperience &&
+      resumeData.value.projectExperience[index]
+    ) {
+      resumeData.value.projectExperience[index] = {
+        ...resumeData.value.projectExperience[index],
+        ...data,
+      };
+    }
+  };
+
+  const moveProjectExperience = (index: number, direction: "up" | "down") => {
+    console.log("move", index, direction);
+  };
+
   return {
     resumeData,
     currentModule,
@@ -169,5 +302,20 @@ export const useResumeStore = defineStore("resume", () => {
     createResume,
     saveResume,
     getResumeDetail,
+    setBasicInfo,
+    setJobIntention,
+    addEducation,
+    removeEducation,
+    updateEducation,
+    moveEducation,
+    addWorkExperience,
+    removeWorkExperience,
+    updateWorkExperience,
+    moveWorkExperience,
+    addProjectExperience,
+    removeProjectExperience,
+    updateProjectExperience,
+    moveProjectExperience,
+    setGlobalStyle,
   };
 });

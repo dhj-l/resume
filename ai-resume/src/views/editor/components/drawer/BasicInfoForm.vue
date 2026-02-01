@@ -10,14 +10,19 @@ import {
 } from "ant-design-vue";
 import { PlusOutlined } from "@ant-design/icons-vue";
 import type { BasicInfo } from "@/stores/type";
+import { useResumeStore } from "@/stores/resumeStore";
+import { uploadImage } from "@/utils/upload";
+import { computed } from "vue";
 
-defineProps<{
+const props = defineProps<{
   data: BasicInfo;
 }>();
 
-// TODO: 处理表单变化
-const handleChange = () => {
-  console.log("Form changed");
+const { setBasicInfo } = useResumeStore();
+
+// 处理表单变化
+const update = (key: keyof BasicInfo, value: any) => {
+  setBasicInfo({ [key]: value });
 };
 
 const genderOptions = [
@@ -37,6 +42,13 @@ const workYearOptions = [
   { label: "5-10年", value: "5-10年" },
   { label: "10年以上", value: "10年以上" },
 ];
+const fullAvatar = computed(() => {
+  return import.meta.env.VITE_DEFAULT_AVATAR + props.data.avatar;
+});
+const uploadHandle = async (file: File) => {
+  const url = await uploadImage(file);
+  update("avatar", url);
+};
 </script>
 
 <template>
@@ -48,17 +60,17 @@ const workYearOptions = [
           <Col :span="8">
             <FormItem label="姓名">
               <Input
-                v-model:value="data.name"
-                @change="handleChange"
+                :value="data.name"
+                @update:value="(val) => update('name', val)"
                 placeholder="请输入姓名"
               />
             </FormItem>
           </Col>
-          <Col :span="8" v-if="data.gender">
+          <Col :span="8">
             <FormItem label="性别">
               <Select
-                v-model:value="data.gender"
-                @change="handleChange"
+                :value="data.gender"
+                @update:value="(val) => update('gender', val)"
                 placeholder="请选择性别"
                 :options="genderOptions"
               />
@@ -67,8 +79,8 @@ const workYearOptions = [
           <Col :span="8">
             <FormItem label="工作年限">
               <Select
-                v-model:value="data.workYear"
-                @change="handleChange"
+                :value="data.workYear"
+                @update:value="(val) => update('workYear', val)"
                 placeholder="请选择工作年限"
                 :options="workYearOptions"
               />
@@ -77,8 +89,8 @@ const workYearOptions = [
           <Col :span="8">
             <FormItem label="年龄">
               <Input
-                v-model:value.number="data.age"
-                @change="handleChange"
+                :value="data.age"
+                @update:value="(val) => update('age', Number(val))"
                 placeholder="请输入年龄"
               />
             </FormItem>
@@ -86,8 +98,8 @@ const workYearOptions = [
           <Col :span="8">
             <FormItem label="手机号">
               <Input
-                v-model:value="data.phone"
-                @change="handleChange"
+                :value="data.phone"
+                @update:value="(val) => update('phone', val)"
                 placeholder="请输入手机号"
               />
             </FormItem>
@@ -95,8 +107,8 @@ const workYearOptions = [
           <Col :span="8">
             <FormItem label="邮箱">
               <Input
-                v-model:value="data.email"
-                @change="handleChange"
+                :value="data.email"
+                @update:value="(val) => update('email', val)"
                 placeholder="请输入邮箱"
               />
             </FormItem>
@@ -104,8 +116,8 @@ const workYearOptions = [
           <Col :span="8">
             <FormItem label="政治面貌">
               <Input
-                v-model:value="data.politicalStatus"
-                @change="handleChange"
+                :value="data.politicalStatus"
+                @update:value="(val) => update('politicalStatus', val)"
                 placeholder="例如：中共党员"
               />
             </FormItem>
@@ -122,10 +134,11 @@ const workYearOptions = [
               list-type="picture-card"
               class="avatar-uploader"
               :show-upload-list="false"
+              :beforeUpload="uploadHandle"
             >
               <img
                 v-if="data.avatar"
-                :src="data.avatar"
+                :src="fullAvatar"
                 alt="avatar"
                 class="w-full h-full object-cover rounded"
               />

@@ -8,35 +8,42 @@ import {
 import type { ProjectExperience } from "@/stores/type";
 import { h, ref } from "vue";
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
+import { useResumeStore } from "@/stores/resumeStore";
 
 const props = defineProps<{
   data: ProjectExperience[];
 }>();
+
+const {
+  addProjectExperience,
+  removeProjectExperience,
+  updateProjectExperience,
+  moveProjectExperience,
+} = useResumeStore();
+
 const lastEndTime = ref("");
 const handleAdd = () => {
-  props.data.push({
-    title: "",
-    description: "",
-    content: "",
-    startTime: "",
-    endTime: "",
-  });
+  addProjectExperience();
 };
 
 const handleDelete = (index: number) => {
-  props.data.splice(index, 1);
+  removeProjectExperience(index);
 };
 
 const handleMove = (index: number, direction: "up" | "down") => {
-  console.log(index, direction, "移动");
+  moveProjectExperience(index, direction);
+};
+
+const update = (index: number, key: keyof ProjectExperience, value: any) => {
+  updateProjectExperience(index, { [key]: value });
 };
 
 const handleTillNowChange = (index: number, checked: boolean) => {
   if (checked) {
     lastEndTime.value = props.data[index]!.endTime as string;
-    props.data[index]!.endTime = "至今";
+    update(index, "endTime", "至今");
   } else {
-    props.data[index]!.endTime = lastEndTime.value;
+    update(index, "endTime", lastEndTime.value);
   }
 };
 </script>
@@ -55,7 +62,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
           <div class="flex flex-wrap gap-4 items-start">
             <FormItem label="项目名称" class="!mb-0">
               <Input
-                v-model:value="project.title"
+                :value="project.title"
+                @update:value="(val) => update(index, 'title', val)"
                 placeholder="请输入项目名称"
                 style="width: 180px"
               />
@@ -63,7 +71,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
 
             <FormItem label="项目角色" class="!mb-0">
               <Input
-                v-model:value="project.description"
+                :value="project.description"
+                @update:value="(val) => update(index, 'description', val)"
                 placeholder="请输入项目角色"
                 style="width: 180px"
               />
@@ -72,7 +81,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <FormItem label="项目时间" class="!mb-0">
               <div class="flex items-center gap-2">
                 <DatePicker
-                  v-model:value="project.startTime"
+                  :value="project.startTime"
+                  @update:value="(val) => update(index, 'startTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="开始时间"
@@ -81,7 +91,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
                 <span class="text-gray-400">-</span>
                 <DatePicker
                   v-if="project.endTime !== '至今'"
-                  v-model:value="project.endTime"
+                  :value="project.endTime"
+                  @update:value="(val) => update(index, 'endTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="结束时间"
@@ -105,7 +116,11 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <div
               class="border border-gray-300 rounded min-h-[150px] bg-gray-50 text-gray-400 flex flex-col items-center justify-center space-y-2"
             >
-              <BasicEditor class="w-full" v-model="project.content" />
+              <BasicEditor
+                class="w-full"
+                :modelValue="project.content"
+                @update:modelValue="(val) => update(index, 'content', val)"
+              />
             </div>
           </div>
         </div>

@@ -8,12 +8,20 @@ import {
   SkinOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
-import { Button, Dropdown, Menu, MenuItem, Space } from "ant-design-vue";
+import {
+  Button,
+  Dropdown,
+  Menu,
+  MenuItem,
+  Popover,
+  Space,
+} from "ant-design-vue";
 import { templateList } from "../templates";
 import { useResumeStore } from "@/stores/resumeStore";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import type { templateType } from "./preview/type";
+import GlobalStyleSettings from "./GlobalStyleSettings.vue";
 
 const { currentTemplate } = storeToRefs(useResumeStore());
 const { setCurrentTemplate, saveResume } = useResumeStore();
@@ -46,11 +54,6 @@ const handleSave = async () => {
 // TODO: 处理导出PDF
 const handleExport = () => {
   console.log("Export PDF clicked");
-};
-
-// TODO: 处理全局样式设置
-const handleGlobalStyle = () => {
-  console.log("Global style settings clicked");
 };
 
 // TODO: 处理模板切换
@@ -118,10 +121,15 @@ const handleThemeChange = () => {
         <template #icon><FilePdfOutlined /></template>
         导出PDF
       </Button>
-      <Button @click="handleGlobalStyle">
-        <template #icon><SettingOutlined /></template>
-        全局设置
-      </Button>
+      <Popover trigger="click" placement="bottomRight">
+        <template #content>
+          <GlobalStyleSettings />
+        </template>
+        <Button>
+          <template #icon><SettingOutlined /></template>
+          全局设置
+        </Button>
+      </Popover>
     </Space>
   </header>
 </template>

@@ -49,12 +49,15 @@ const contentArray = computed(() => {
     },
   ];
 });
+const fullAvatar = computed(() => {
+  return import.meta.env.VITE_DEFAULT_AVATAR + props.data.avatar;
+});
 </script>
 
 <template>
   <div :class="styles.container" @click="handleClick">
     <div :class="styles.contentWrapper">
-      <img :src="data.avatar" alt="avatar" :class="styles.avatar" />
+      <img :src="fullAvatar" alt="avatar" :class="styles.avatar" />
       <div :class="styles.infoWrapper">
         <h1 :class="styles.name">
           {{ data.name }}

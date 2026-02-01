@@ -15,10 +15,14 @@ import {
 import type { EducationBackground } from "@/stores/type";
 import { h, ref } from "vue";
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
+import { useResumeStore } from "@/stores/resumeStore";
 
 const props = defineProps<{
   data: EducationBackground[];
 }>();
+
+const { addEducation, removeEducation, updateEducation, moveEducation } =
+  useResumeStore();
 
 const degreeOptions = [
   { label: "初中", value: "初中" },
@@ -30,27 +34,32 @@ const degreeOptions = [
 ];
 const lastEndTime = ref("");
 
-// TODO: 添加教育经历
+// 添加教育经历
 const handleAdd = () => {
-  console.log("Add education");
+  addEducation();
 };
 
-// TODO: 删除教育经历
+// 删除教育经历
 const handleDelete = (index: number) => {
-  console.log("Delete education", index);
+  removeEducation(index);
 };
 
-// TODO: 移动教育经历
+// 移动教育经历
 const handleMove = (index: number, direction: "up" | "down") => {
-  console.log("Move education", index, direction);
+  moveEducation(index, direction);
+};
+
+// 更新教育经历
+const update = (index: number, key: keyof EducationBackground, value: any) => {
+  updateEducation(index, { [key]: value });
 };
 
 const handleTillNowChange = (index: number, checked: boolean) => {
   if (checked) {
     lastEndTime.value = props.data[index]!.graduationTime as string;
-    props.data[index]!.graduationTime = "至今";
+    update(index, "graduationTime", "至今");
   } else {
-    props.data[index]!.graduationTime = lastEndTime.value;
+    update(index, "graduationTime", lastEndTime.value);
   }
 };
 </script>
@@ -69,7 +78,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
           <div class="flex flex-wrap gap-4 items-start">
             <FormItem label="学校名称" class="!mb-0">
               <Input
-                v-model:value="edu.schoolName"
+                :value="edu.schoolName"
+                @update:value="(val) => update(index, 'schoolName', val)"
                 placeholder="请输入学校名称"
                 style="width: 180px"
               />
@@ -77,7 +87,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
 
             <FormItem label="所学专业" class="!mb-0">
               <Input
-                v-model:value="edu.major"
+                :value="edu.major"
+                @update:value="(val) => update(index, 'major', val)"
                 placeholder="请输入专业"
                 style="width: 180px"
               />
@@ -86,7 +97,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <FormItem label="就读时间" class="!mb-0">
               <div class="flex items-center gap-2">
                 <DatePicker
-                  v-model:value="edu.enrollmentTime"
+                  :value="edu.enrollmentTime"
+                  @update:value="(val) => update(index, 'enrollmentTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="入学时间"
@@ -95,7 +107,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
                 <span class="text-gray-400">-</span>
                 <DatePicker
                   v-if="edu.graduationTime !== '至今'"
-                  v-model:value="edu.graduationTime"
+                  :value="edu.graduationTime"
+                  @update:value="(val) => update(index, 'graduationTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="毕业时间"
@@ -115,7 +128,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
 
             <FormItem label="学历" class="!mb-0">
               <Select
-                v-model:value="edu.degree"
+                :value="edu.degree"
+                @update:value="(val) => update(index, 'degree', val)"
                 :options="degreeOptions"
                 placeholder="请选择"
                 style="width: 100px"
@@ -128,7 +142,11 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <div
               class="border border-gray-300 rounded min-h-[150px] bg-gray-50 text-gray-400 flex flex-col items-center justify-center space-y-2"
             >
-              <BasicEditor class="w-full" v-model="edu.content" />
+              <BasicEditor
+                class="w-full"
+                :modelValue="edu.content"
+                @update:modelValue="(val) => update(index, 'content', val)"
+              />
             </div>
           </div>
         </div>

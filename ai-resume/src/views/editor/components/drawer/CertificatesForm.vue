@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 import { useResumeStore } from "@/stores/resumeStore";
-import { ref, watch } from "vue";
 const { setResumeDataString } = useResumeStore();
-const props = defineProps<{
+defineProps<{
   data: string;
 }>();
-const certificates = ref(props.data);
-watch(certificates, (newVal) => {
-  setResumeDataString("certificates", newVal);
-});
+
+const update = (val: string) => {
+  setResumeDataString("certificates", val);
+};
 </script>
 
 <template>
@@ -23,7 +22,7 @@ watch(certificates, (newVal) => {
           <div
             class="border border-gray-300 rounded min-h-[100px] bg-gray-50 text-gray-400 flex flex-col items-center justify-center space-y-2"
           >
-            <BasicEditor v-model="certificates" />
+            <BasicEditor :modelValue="data" @update:modelValue="update" />
           </div>
         </div>
       </div>

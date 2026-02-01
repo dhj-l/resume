@@ -3,12 +3,18 @@
     <!-- 计算层：用于计算每个模块的高度 -->
     <div
       ref="contentRef"
-      class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none p-8 box-border"
+      class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none box-border"
+      :style="{
+        padding: resumeData.globalStyle.pageMargin,
+        fontSize: resumeData.globalStyle.fontSize,
+        lineHeight: resumeData.globalStyle.lineHeight,
+      }"
     >
       <div
         v-for="item in activeModules"
         :key="item.moduleKey"
         :data-id="item.moduleKey"
+        :style="{ marginBottom: resumeData.globalStyle.moduleMargin }"
       >
         <component
           :is="getComponent(item)"
@@ -23,16 +29,25 @@
     <div
       v-for="(page, index) in pages"
       :key="index"
-      class="w-full min-h-[297mm] bg-white shadow-lg mb-8 p-8 box-border relative"
+      class="w-full min-h-[297mm] bg-white shadow-lg mb-8 box-border relative"
+      :style="{
+        padding: resumeData.globalStyle.pageMargin,
+        fontSize: resumeData.globalStyle.fontSize,
+        lineHeight: resumeData.globalStyle.lineHeight,
+      }"
     >
       <template v-for="moduleId in page" :key="moduleId">
-        <component
+        <div
           v-if="getModuleByKey(moduleId)"
-          :is="getComponent(getModuleByKey(moduleId)!)"
-          :data="(resumeData as any)[moduleId]"
-          :label="getModuleByKey(moduleId)!.label"
-          :templateType="currentTemplate"
-        />
+          :style="{ marginBottom: resumeData.globalStyle.moduleMargin }"
+        >
+          <component
+            :is="getComponent(getModuleByKey(moduleId)!)"
+            :data="(resumeData as any)[moduleId]"
+            :label="getModuleByKey(moduleId)!.label"
+            :templateType="currentTemplate"
+          />
+        </div>
       </template>
     </div>
   </div>
@@ -75,7 +90,15 @@ const getModuleByKey = (key: string) => {
 
 // 分页逻辑
 const contentRef = ref<HTMLElement | null>(null);
-const { pages } = usePagination(contentRef, resumeData);
+const contentPadding = computed(() => {
+  const marginStr = resumeData.value.globalStyle.pageMargin;
+  const margin = parseFloat(marginStr) || 0;
+  return margin * 2;
+});
+
+const { pages } = usePagination(contentRef, resumeData, {
+  contentPadding,
+});
 </script>
 
 <style scoped>

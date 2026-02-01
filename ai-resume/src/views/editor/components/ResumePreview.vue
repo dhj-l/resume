@@ -15,11 +15,34 @@ onMounted(() => {
   这里只展示模板，不涉及复杂的逻辑。
 -->
 <template>
-  <div>
+  <div class="resume-preview-wrapper">
     <template v-for="item in templateList" :key="item.value">
       <component :is="item.component" v-if="item.value === currentTemplate" />
     </template>
   </div>
 </template>
 
-<style scoped></style>
+<style>
+.resume-preview-wrapper {
+  ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+
+  ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+
+  :deep(li) {
+    line-height: 1.5;
+    margin-bottom: 4px;
+
+    p {
+      margin: 0;
+    }
+  }
+}
+</style>

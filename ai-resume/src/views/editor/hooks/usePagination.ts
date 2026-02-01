@@ -1,12 +1,21 @@
-import { ref, nextTick, watch, onMounted, onUnmounted, type Ref } from "vue";
+import {
+  ref,
+  nextTick,
+  watch,
+  onMounted,
+  onUnmounted,
+  type Ref,
+  unref,
+  type MaybeRef,
+} from "vue";
 
 // A4 纸张高度（像素），96 DPI
 // 297mm * 3.7795 px/mm ≈ 1123px
 const PAGE_HEIGHT = 1123;
 
 interface PaginationOptions {
-  contentPadding?: number; // 内容区域的垂直 padding 总和
-  gap?: number; // 元素间距
+  contentPadding?: MaybeRef<number>; // 内容区域的垂直 padding 总和
+  gap?: MaybeRef<number>; // 元素间距
 }
 
 export function usePagination(
@@ -18,10 +27,6 @@ export function usePagination(
   const pages = ref<string[][]>([[]]);
   const isCalculating = ref(true);
 
-  const contentPadding = options.contentPadding ?? 64; // 默认 p-8 * 2 = 64
-  const gap = options.gap ?? 0;
-  const availableHeight = PAGE_HEIGHT - contentPadding;
-
   let resizeObserver: ResizeObserver | null = null;
 
   const calculatePages = async () => {
@@ -29,6 +34,9 @@ export function usePagination(
 
     // 等待 DOM 更新
     await nextTick();
+
+    const contentPadding = unref(options.contentPadding) ?? 64; // 默认 p-8 * 2 = 64
+    const availableHeight = PAGE_HEIGHT - contentPadding;
 
     const children = Array.from(contentRef.value.children) as HTMLElement[];
     const newPages: string[][] = [];
@@ -113,7 +121,7 @@ export function usePagination(
 
   return {
     pages,
-    gap,
+
     isCalculating,
   };
 }

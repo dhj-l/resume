@@ -16,6 +16,7 @@
 import "@wangeditor/editor/dist/css/style.css";
 import { onBeforeUnmount, shallowRef } from "vue";
 import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
+import type { IToolbarConfig } from "@wangeditor/editor";
 
 // 编辑器实例，必须用 shallowRef，重要！
 const editorRef = shallowRef();
@@ -25,7 +26,17 @@ const valueHtml = defineModel({
   default: "<p>hello</p>",
 });
 
-const toolbarConfig = {};
+const toolbarConfig: Partial<IToolbarConfig> = {
+  excludeKeys: [
+    "fullScreen",
+    "insertTable",
+    "group-video",
+    "group-image",
+    "codeBlock",
+    "emotion",
+    "todo",
+  ],
+};
 const editorConfig = { placeholder: "请输入内容..." };
 
 const handleCreated = (editor: any) => {
