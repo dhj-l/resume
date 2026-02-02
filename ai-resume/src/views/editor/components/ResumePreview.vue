@@ -6,8 +6,9 @@ import { onMounted } from "vue";
 
 const { currentTemplate } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
+
 //挂载时根据当前id获取数据，这里先写死TODO
-onMounted(() => {
+onMounted(async () => {
   getResumeDetail("69787013885a54a9f660796a");
 });
 </script>
@@ -15,7 +16,7 @@ onMounted(() => {
   这里只展示模板，不涉及复杂的逻辑。
 -->
 <template>
-  <div class="resume-preview-wrapper">
+  <div class="resume-preview-wrapper" ref="currentTemplateRef">
     <template v-for="item in templateList" :key="item.value">
       <component :is="item.component" v-if="item.value === currentTemplate" />
     </template>

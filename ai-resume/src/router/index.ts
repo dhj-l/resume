@@ -18,6 +18,18 @@ const routes: RouteRecordRaw[] = [
         path: "/home",
         component: () => import("@/views/home/home.vue"),
       },
+      {
+        name: "templates",
+        path: "/templates",
+        component: () => import("@/views/template/TemplateListPage.vue"),
+        meta: { title: "模板列表" },
+      },
+      {
+        name: "template-details",
+        path: "/templates/:id",
+        component: () => import("@/views/template/TemplateDetailsPage.vue"),
+        meta: { title: "模板详情" },
+      },
     ],
   },
   {

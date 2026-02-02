@@ -24,9 +24,9 @@ export const getWorkExperienceStyles = (
     itemWrapper: "",
     headerWrapper: "flex flex-wrap justify-between items-baseline gap-2 mb-1",
     companyName: "font-bold text-gray-800 break-words",
-    timeRange: "text-sm text-gray-600 shrink-0",
-    position: "text-sm font-medium text-gray-700 mb-1",
-    description: "text-sm text-gray-600 leading-relaxed whitespace-pre-wrap",
+    timeRange: "text-gray-600 shrink-0", // Removed text-sm
+    position: "font-medium text-gray-700 mb-1", // Removed text-sm
+    description: "text-gray-600 leading-relaxed whitespace-pre-wrap", // Removed text-sm
     empty: "text-gray-400 italic",
   };
 
@@ -34,13 +34,13 @@ export const getWorkExperienceStyles = (
     case "double-column":
       return {
         ...commonStyles,
-        container: `${commonStyles.container} p-0 mb-0`,
+        container: `${commonStyles.container}`, // Removed p-0 mb-0
       };
     case "default":
     default:
       return {
         ...commonStyles,
-        container: `${commonStyles.container} p-4 mb-4`,
+        container: `${commonStyles.container}`, // Removed p-4 mb-4
       };
   }
 };

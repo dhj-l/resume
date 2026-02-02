@@ -15,7 +15,7 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
     container:
       "resume-section w-full hover:bg-blue-50 hover:border-blue-300 border border-transparent rounded cursor-pointer transition-all duration-200",
     title: "text-lg font-bold text-gray-800 border-b border-gray-300 pb-2 mb-3",
-    contentWrapper: "flex flex-wrap gap-4 sm:gap-8 text-sm text-gray-700",
+    contentWrapper: "flex flex-wrap gap-4 sm:gap-8 text-gray-700", // Removed text-sm
     item: "",
     label: "font-medium",
     value: "break-words",
@@ -26,15 +26,15 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
     case "double-column":
       return {
         ...commonStyles,
-        container: `${commonStyles.container} p-0 mb-0`,
+        container: `${commonStyles.container}`, // Removed p-0 mb-0
         // 双栏模式下可能需要调整间距
-        contentWrapper: "flex flex-wrap gap-4 text-sm text-gray-700",
+        contentWrapper: "flex flex-wrap gap-4 text-gray-700", // Removed text-sm
       };
     case "default":
     default:
       return {
         ...commonStyles,
-        container: `${commonStyles.container} p-4 mb-4`,
+        container: `${commonStyles.container}`, // Removed p-4 mb-4
       };
   }
 };

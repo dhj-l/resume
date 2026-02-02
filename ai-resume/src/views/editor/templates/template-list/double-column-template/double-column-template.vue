@@ -74,7 +74,7 @@
     <div
       v-for="(page, index) in mergedPages"
       :key="index"
-      class="w-full min-h-[297mm] bg-white shadow-lg mx-auto flex box-border overflow-hidden mb-8"
+      class="resume-page w-full min-h-[297mm] bg-white shadow-lg mx-auto flex box-border overflow-hidden mb-8"
       :style="{
         fontSize: resumeData.globalStyle.fontSize,
         lineHeight: resumeData.globalStyle.lineHeight,

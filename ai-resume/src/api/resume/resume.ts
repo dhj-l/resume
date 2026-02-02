@@ -16,3 +16,10 @@ export const updateResumeAPI = (id: string, data: ResumeData) => {
 export const getResumeDetailAPI = (id: string) => {
   return http.get<ResumeData>(`/resume/${id}`);
 };
+
+/**
+ * 下载简历
+ */
+export const downloadResumeAPI = ({ html = "", css = "" }) => {
+  return http.post(`/resume/download`, { html, css }, { responseType: "blob" });
+};

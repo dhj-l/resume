@@ -15,13 +15,21 @@ import {
   MenuItem,
   Popover,
   Space,
+  message,
 } from "ant-design-vue";
 import { templateList } from "../templates";
 import { useResumeStore } from "@/stores/resumeStore";
 import { storeToRefs } from "pinia";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { templateType } from "./preview/type";
 import GlobalStyleSettings from "./GlobalStyleSettings.vue";
+import {
+  extractEffectiveCssForElement,
+  getDomHtml,
+  getElement,
+} from "@/utils/dom";
+import { downloadResumeAPI } from "@/api/resume/resume";
+import { downloadPdf } from "@/utils/download";
 
 const { currentTemplate } = storeToRefs(useResumeStore());
 const { setCurrentTemplate, saveResume } = useResumeStore();
@@ -39,6 +47,7 @@ const currentTemplateLabel = computed(() => {
   return template?.label || "默认通用模板";
 });
 const router = useRouter();
+const exportLoading = ref(false);
 
 // TODO: 处理返回点击
 const handleBack = () => {
@@ -52,8 +61,34 @@ const handleSave = async () => {
 };
 
 // TODO: 处理导出PDF
-const handleExport = () => {
-  console.log("Export PDF clicked");
+const handleExport = async () => {
+  const element = getElement(".resume-preview-wrapper");
+  if (!element) return;
+
+  exportLoading.value = true;
+  try {
+    const html = getDomHtml(element);
+    const css = extractEffectiveCssForElement(element);
+    const exportCss =
+      css +
+      `
+      @page { margin: 0; }
+      body { margin: 0; padding: 0; }
+      .resume-page { margin-bottom: 0 !important; box-shadow: none !important; }
+    `;
+    const res: any = await downloadResumeAPI({
+      html,
+      css: exportCss,
+    });
+    // 调用下载函数
+    downloadPdf(res, props.resumeTitle);
+    message.success("导出成功");
+  } catch (error) {
+    console.error("Export failed:", error);
+    message.error("导出失败");
+  } finally {
+    exportLoading.value = false;
+  }
 };
 
 // TODO: 处理模板切换
@@ -117,7 +152,7 @@ const handleThemeChange = () => {
         <template #icon><SaveOutlined /></template>
         保存草稿
       </Button>
-      <Button type="primary" @click="handleExport">
+      <Button type="primary" @click="handleExport" :loading="exportLoading">
         <template #icon><FilePdfOutlined /></template>
         导出PDF
       </Button>

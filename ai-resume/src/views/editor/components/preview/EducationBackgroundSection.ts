@@ -26,9 +26,9 @@ export const getEducationBackgroundStyles = (
     contentWrapper: "flex-1 min-w-0",
     headerWrapper: "flex flex-wrap justify-between items-baseline gap-2 mb-1",
     schoolName: "font-bold text-gray-800 break-words",
-    timeRange: "text-sm text-gray-600 shrink-0",
-    detailsWrapper: "flex gap-4 text-sm text-gray-700",
-    courses: "mt-1 text-xs text-gray-500",
+    timeRange: "text-gray-600 shrink-0", // Removed text-sm
+    detailsWrapper: "flex gap-4 text-gray-700", // Removed text-sm
+    courses: "mt-1 text-gray-500", // Removed text-xs
     empty: "text-gray-400 italic",
   };
 
@@ -36,14 +36,14 @@ export const getEducationBackgroundStyles = (
     case "double-column":
       return {
         ...commonStyles,
-        container: `${commonStyles.container} p-0 mb-0`,
+        container: `${commonStyles.container}`, // Removed p-0 mb-0
         // 双栏模式下标题样式保持一致
       };
     case "default":
     default:
       return {
         ...commonStyles,
-        container: `${commonStyles.container} p-4 mb-4`,
+        container: `${commonStyles.container}`, // Removed p-4 mb-4
       };
   }
 };
