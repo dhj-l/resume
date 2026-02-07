@@ -1,1 +1,1 @@
-export type templateType = "default" | "double-column";
+export type templateType = "default" | "double-column" | "simple";

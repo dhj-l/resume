@@ -10,7 +10,7 @@ http.interceptors.request.use(
     //先写死，后面再改TODO
     config.headers.Authorization =
       "Bearer " +
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTc4NjYxYjc5YTM3NTUxY2Q1N2M1OTUiLCJ1c2VybmFtZSI6InRlczJ0MSIsImVtYWlsIjoiMzEzNDUwNDI1OEBxcS5jb20iLCJpYXQiOjE3Njk5NTI0OTgsImV4cCI6MTc3MDEyNTI5OH0.aNntVKgvVChpp21kuVWs2uDvUSCYFRxfEJikzmyfZnU";
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTc4NjYxYjc5YTM3NTUxY2Q1N2M1OTUiLCJ1c2VybmFtZSI6InRlczJ0MSIsImVtYWlsIjoiMzEzNDUwNDI1OEBxcS5jb20iLCJpYXQiOjE3NzA0NTI0OTUsImV4cCI6MTc3MDYyNTI5NX0.rjCHbNzfGFYExXEqH6ICdV4R09D2PmlPGrGY-Q2jxuY";
     return config;
   },
   (error) => {

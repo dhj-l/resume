@@ -36,6 +36,13 @@ export const getWorkExperienceStyles = (
         ...commonStyles,
         container: `${commonStyles.container}`, // Removed p-0 mb-0
       };
+    case "simple":
+      return {
+        ...commonStyles,
+        title:
+          "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
+        container: `${commonStyles.container}`,
+      };
     case "default":
     default:
       return {

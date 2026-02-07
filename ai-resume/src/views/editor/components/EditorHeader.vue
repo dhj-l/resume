@@ -25,18 +25,24 @@ import type { templateType } from "./preview/type";
 import GlobalStyleSettings from "./GlobalStyleSettings.vue";
 import {
   extractEffectiveCssForElement,
+  getDomCover,
   getDomHtml,
   getElement,
 } from "@/utils/dom";
 import { downloadResumeAPI } from "@/api/resume/resume";
 import { downloadPdf } from "@/utils/download";
+import { uploadImage } from "@/utils/upload";
 
-const { currentTemplate } = storeToRefs(useResumeStore());
-const { setCurrentTemplate, saveResume } = useResumeStore();
+const { currentTemplate, resumeData } = storeToRefs(useResumeStore());
+const { setCurrentTemplate, saveResume, setResumeDataString } =
+  useResumeStore();
 interface Props {
   resumeTitle?: string;
 }
-
+const pdfName = computed(() => {
+  const { basicInfo, jobIntention } = resumeData.value;
+  return basicInfo.name + "-" + jobIntention?.jobIntention;
+});
 const props = withDefaults(defineProps<Props>(), {
   resumeTitle: "未命名简历",
 });
@@ -57,6 +63,16 @@ const handleBack = () => {
 
 // TODO: 处理保存草稿
 const handleSave = async () => {
+  //获取当前简历封面
+  const element = getElement(".resume-preview-wrapper");
+  if (!element) return;
+  //获取当前简历封面数据
+  const coverFile = await getDomCover(element as HTMLElement);
+  //上传图片
+  const url = await uploadImage(coverFile);
+  if (!url) return;
+  //更新简历封面
+  setResumeDataString("cover", url);
   await saveResume("69787013885a54a9f660796a");
 };
 
@@ -81,7 +97,7 @@ const handleExport = async () => {
       css: exportCss,
     });
     // 调用下载函数
-    downloadPdf(res, props.resumeTitle);
+    downloadPdf(res, pdfName.value);
     message.success("导出成功");
   } catch (error) {
     console.error("Export failed:", error);

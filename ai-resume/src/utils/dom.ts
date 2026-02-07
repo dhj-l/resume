@@ -1,3 +1,5 @@
+import html2canvas from "html2canvas";
+
 export const extractEffectiveCssForElement = (element: Element) => {
   const matchedCss = [];
 
@@ -51,4 +53,21 @@ export const getDomHtml = (dom: Element) => {
 
 export const getElement = (className: string) => {
   return document.querySelector(className);
+};
+
+export const getDomCover = async (elemet: HTMLElement) => {
+  const cover = await html2canvas(elemet, {
+    scale: 2,
+    useCORS: true,
+  });
+  const coverImg = await new Promise((resolve) => {
+    cover.toBlob(resolve, "image/png", 1.0);
+  });
+  const file = new File([coverImg as BlobPart], "cover.png", {
+    type: "image/png",
+  });
+  console.log(file);
+
+  return file;
+  // cover.toBlob((blob) => {});
 };

@@ -10,7 +10,9 @@ interface JobIntentionStyles {
   empty: string;
 }
 
-export const getJobIntentionStyles = (type: templateType): JobIntentionStyles => {
+export const getJobIntentionStyles = (
+  type: templateType,
+): JobIntentionStyles => {
   const commonStyles = {
     container:
       "resume-section w-full hover:bg-blue-50 hover:border-blue-300 border border-transparent rounded cursor-pointer transition-all duration-200",
@@ -29,6 +31,13 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
         container: `${commonStyles.container}`, // Removed p-0 mb-0
         // 双栏模式下可能需要调整间距
         contentWrapper: "flex flex-wrap gap-4 text-gray-700", // Removed text-sm
+      };
+    case "simple":
+      return {
+        ...commonStyles,
+        title:
+          "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
+        container: `${commonStyles.container}`,
       };
     case "default":
     default:

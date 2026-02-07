@@ -60,6 +60,10 @@ export interface ResumeData {
    * 自我评价
    */
   selfEvaluation?: string;
+  /**
+   * 简历封面
+   */
+  cover?: string;
 }
 
 export interface JobIntention {

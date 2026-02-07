@@ -27,6 +27,13 @@ export const getSkillsStyles = (type: templateType): SkillsStyles => {
         listWrapper: "flex flex-wrap gap-2",
         item: "px-2 py-1 bg-white border border-gray-200 text-gray-600 rounded", // Removed text-xs
       };
+    case "simple":
+      return {
+        ...commonStyles,
+        title:
+          "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
+        container: `${commonStyles.container}`,
+      };
     case "default":
     default:
       return {

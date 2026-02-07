@@ -6,8 +6,6 @@ export interface ResumeTemplate {
   category: string; // 适用岗位类型
   usedCount: number; // 使用人数
   createdAt: string; // 创建时间，格式YYYY-MM-DD
-  description?: string; // 模板描述（详情页用）
-  tags?: string[]; // 标签数组
 }
 
 // 页面props（如果从父组件接收数据）
