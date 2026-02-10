@@ -11,5 +11,5 @@ export const loginAPI = (params: LoginParams) => {
  * 注册接口
  */
 export const registerAPI = (params: RegisterParams) => {
-  return http.post("/user/register", params);
+  return http.post("/user", params) as unknown as Promise<void>;
 };

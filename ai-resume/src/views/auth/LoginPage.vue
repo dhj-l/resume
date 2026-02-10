@@ -124,17 +124,15 @@ const formState = reactive({
   remember: true,
 });
 
-const handleLogin = async (values: any) => {
+const handleLogin = async () => {
   loading.value = true;
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    authStore.login("mock-token", {
-      name: values.email.split("@")[0],
-      email: values.email,
+    await authStore.login({
+      email: formState.email,
+      password: formState.password,
     });
     message.success("登录成功！");
-    router.push("/dashboard");
+    router.push("/home");
   } catch (error) {
     message.error("登录失败，请检查你的凭据。");
   } finally {
@@ -145,7 +143,7 @@ const handleLogin = async (values: any) => {
 const handleGuestAccess = () => {
   message.info("正在进入游客模式...");
   setTimeout(() => {
-    router.push("/dashboard");
+    router.push("/home");
   }, 1000);
 };
 </script>

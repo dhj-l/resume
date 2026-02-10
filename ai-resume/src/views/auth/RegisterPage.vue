@@ -15,6 +15,23 @@
       @finish="handleRegister"
     >
       <a-form-item
+        name="username"
+        label="用户名"
+        :rules="[{ required: true, message: '请输入你的用户名！' }]"
+      >
+        <a-input
+          v-model:value="formState.username"
+          placeholder="请输入用户名"
+          size="large"
+          class="!rounded-lg !py-2.5"
+        >
+          <template #prefix>
+            <UserOutlined class="text-gray-400" />
+          </template>
+        </a-input>
+      </a-form-item>
+
+      <a-form-item
         name="email"
         label="邮箱地址"
         :rules="[
@@ -108,14 +125,21 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
-import { MailOutlined, LockOutlined } from "@ant-design/icons-vue";
+import {
+  MailOutlined,
+  LockOutlined,
+  UserOutlined,
+} from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import type { Rule } from "ant-design-vue/es/form";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
+const authStore = useAuthStore();
 const loading = ref(false);
 
 const formState = reactive({
+  username: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -134,8 +158,11 @@ const validateConfirmPassword = async (_rule: Rule, value: string) => {
 const handleRegister = async () => {
   loading.value = true;
   try {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await authStore.register({
+      username: formState.username,
+      email: formState.email,
+      password: formState.password,
+    });
     message.success("账号创建成功！请登录。");
     router.push("/auth/login");
   } catch (error) {

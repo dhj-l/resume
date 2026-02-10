@@ -1,23 +1,9 @@
 <template>
-  <a-layout class="min-h-screen bg-[#f5f5f7]">
-    <a-layout-content>
-      <!-- Breadcrumb -->
-      <div class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-[80px] pt-6 pb-2">
-        <a-breadcrumb separator=">">
-          <a-breadcrumb-item>
-            <router-link
-              to="/"
-              class="text-[#8c8c8c] hover:text-[#1677ff] transition-colors"
-              >首页</router-link
-            >
-          </a-breadcrumb-item>
-          <a-breadcrumb-item class="text-[#8c8c8c]">模板列表</a-breadcrumb-item>
-        </a-breadcrumb>
-      </div>
-
+  <a-layout class="min-h-screen">
+    <a-layout-content class="bg-white">
       <!-- Header Section -->
       <div
-        class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-[80px] py-12 text-center"
+        class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-[80px] mt-20 py-12 text-center"
       >
         <h1 class="text-[32px] font-[600] text-[#1a1a1a] mb-3">专业简历模板</h1>
         <p class="text-[#8c8c8c] text-[16px]">
@@ -36,7 +22,7 @@
         >
           <TemplateCard
             v-for="template in templates"
-            :key="template.id"
+            :key="template._id"
             :template="template"
             @click="handleTemplateClick"
           />
@@ -80,15 +66,15 @@ import { useRouter } from "vue-router";
 import { FileOutlined } from "@ant-design/icons-vue";
 import { Empty } from "ant-design-vue";
 import TemplateCard from "./components/TemplateCard.vue";
-import type { ResumeTemplate } from "./types";
+import type { Template } from "@/api/templates/type";
 
 const router = useRouter();
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
 // Mock Data
-const templates = ref<ResumeTemplate[]>([
+const templates = ref<Partial<Template>[]>([
   {
-    id: "1",
+    _id: "1",
     name: "简约专业版",
     previewImage: "https://placehold.co/800x500/EBF4FF/1677FF?text=Minimal+Pro",
     category: "通用",
@@ -96,7 +82,7 @@ const templates = ref<ResumeTemplate[]>([
     createdAt: "2023-08-15",
   },
   {
-    id: "2",
+    _id: "2",
     name: "科技蓝风格",
     previewImage: "https://placehold.co/800x500/F0F9FF/0EA5E9?text=Tech+Blue",
     category: "技术岗",
@@ -104,7 +90,7 @@ const templates = ref<ResumeTemplate[]>([
     createdAt: "2023-09-01",
   },
   {
-    id: "3",
+    _id: "3",
     name: "创意设计风",
     previewImage:
       "https://placehold.co/800x500/FFF1F2/E11D48?text=Creative+Design",
@@ -113,7 +99,7 @@ const templates = ref<ResumeTemplate[]>([
     createdAt: "2023-09-10",
   },
   {
-    id: "4",
+    _id: "4",
     name: "商务精英版",
     previewImage:
       "https://placehold.co/800x500/F8FAFC/475569?text=Business+Elite",
@@ -122,7 +108,7 @@ const templates = ref<ResumeTemplate[]>([
     createdAt: "2023-08-20",
   },
   {
-    id: "5",
+    _id: "5",
     name: "极简黑白",
     previewImage: "https://placehold.co/800x500/F3F4F6/111827?text=Clean+BW",
     category: "产品岗",
@@ -130,7 +116,7 @@ const templates = ref<ResumeTemplate[]>([
     createdAt: "2023-10-01",
   },
   {
-    id: "6",
+    _id: "6",
     name: "学术研究版",
     previewImage: "https://placehold.co/800x500/ECFDF5/059669?text=Academic",
     category: "科研岗",

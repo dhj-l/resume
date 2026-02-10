@@ -1,7 +1,11 @@
 <template>
   <nav
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-    :class="[isScrolled ? 'bg-white/80 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6']"
+    :class="[
+      isScrolled
+        ? 'bg-white/80 backdrop-blur-md shadow-sm py-4'
+        : 'bg-transparent py-6',
+    ]"
   >
     <div class="container mx-auto px-4 flex items-center justify-between">
       <!-- Left: Logo -->
@@ -20,14 +24,18 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
+            <path
+              d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
+            />
             <path d="M14 2v4a2 2 0 0 0 2 2h4" />
             <path d="M10 9H8" />
             <path d="M16 13H8" />
             <path d="M16 17H8" />
           </svg>
         </div>
-        <span class="text-xl font-bold text-gray-900 tracking-tight">大学牲简历</span>
+        <span class="text-xl font-bold text-gray-900 tracking-tight"
+          >大学牲简历</span
+        >
       </router-link>
 
       <!-- Center: Navigation -->
@@ -54,14 +62,11 @@
             <div
               class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-lg transition-colors"
             >
-              <a-avatar
-                :src="authStore.userInfo?.avatar"
-                class="bg-primary-100 text-primary-600"
-              >
-                {{ authStore.userInfo?.name?.[0] || "U" }}
+              <a-avatar class="bg-primary-100 text-primary-600">
+                {{ authStore.userInfo?.username?.[0]?.toUpperCase() || "U" }}
               </a-avatar>
               <span class="text-sm font-medium text-gray-700">{{
-                authStore.userInfo?.name || "用户"
+                authStore.userInfo?.username || "用户"
               }}</span>
             </div>
             <template #overlay>

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { message } from "ant-design-vue";
 
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -7,10 +8,17 @@ export const http = axios.create({
 
 http.interceptors.request.use(
   (config) => {
-    //先写死，后面再改TODO
-    config.headers.Authorization =
-      "Bearer " +
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2OTc4NjYxYjc5YTM3NTUxY2Q1N2M1OTUiLCJ1c2VybmFtZSI6InRlczJ0MSIsImVtYWlsIjoiMzEzNDUwNDI1OEBxcS5jb20iLCJpYXQiOjE3NzA0NTI0OTUsImV4cCI6MTc3MDYyNTI5NX0.rjCHbNzfGFYExXEqH6ICdV4R09D2PmlPGrGY-Q2jxuY";
+    try {
+      const authStoreStr = localStorage.getItem("auth");
+      if (authStoreStr) {
+        const authStore = JSON.parse(authStoreStr);
+        if (authStore.token) {
+          config.headers.Authorization = "Bearer " + authStore.token;
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to retrieve auth token", e);
+    }
     return config;
   },
   (error) => {
@@ -22,7 +30,17 @@ http.interceptors.response.use(
   (response) => {
     return response.data;
   },
-  (error) => {
+  async (error) => {
+    if (error.response && error.response.status === 401) {
+      // Use dynamic imports to avoid circular dependencies
+      const { useAuthStore } = await import("@/stores/auth");
+      const { default: router } = await import("@/router");
+
+      const authStore = useAuthStore();
+      authStore.logout();
+      message.error("登录已过期，请重新登录");
+      router.push({ name: "Login" });
+    }
     return Promise.reject(error);
   },
 );
