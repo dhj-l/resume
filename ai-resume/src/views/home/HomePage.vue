@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-white font-sans text-slate-900">
+  <div class="min-h-screen bg-white font-sans text-slate-900 flex flex-col">
     <NavBar />
 
-    <main>
+    <main class="flex-grow">
       <router-view />
     </main>
 

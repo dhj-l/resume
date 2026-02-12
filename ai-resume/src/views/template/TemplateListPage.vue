@@ -52,9 +52,6 @@
             >
           </a-empty>
         </div>
-
-        <!-- Pagination Placeholder -->
-        <!-- <div class="mt-12 flex justify-center"> ... </div> -->
       </div>
     </a-layout-content>
   </a-layout>
@@ -71,59 +68,7 @@ import type { Template } from "@/api/templates/type";
 const router = useRouter();
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
-// Mock Data
-const templates = ref<Partial<Template>[]>([
-  {
-    _id: "1",
-    name: "简约专业版",
-    previewImage: "https://placehold.co/800x500/EBF4FF/1677FF?text=Minimal+Pro",
-    category: "通用",
-    usedCount: 1234,
-    createdAt: "2023-08-15",
-  },
-  {
-    _id: "2",
-    name: "科技蓝风格",
-    previewImage: "https://placehold.co/800x500/F0F9FF/0EA5E9?text=Tech+Blue",
-    category: "技术岗",
-    usedCount: 3456,
-    createdAt: "2023-09-01",
-  },
-  {
-    _id: "3",
-    name: "创意设计风",
-    previewImage:
-      "https://placehold.co/800x500/FFF1F2/E11D48?text=Creative+Design",
-    category: "设计岗",
-    usedCount: 2100,
-    createdAt: "2023-09-10",
-  },
-  {
-    _id: "4",
-    name: "商务精英版",
-    previewImage:
-      "https://placehold.co/800x500/F8FAFC/475569?text=Business+Elite",
-    category: "运营岗",
-    usedCount: 4500,
-    createdAt: "2023-08-20",
-  },
-  {
-    _id: "5",
-    name: "极简黑白",
-    previewImage: "https://placehold.co/800x500/F3F4F6/111827?text=Clean+BW",
-    category: "产品岗",
-    usedCount: 1800,
-    createdAt: "2023-10-01",
-  },
-  {
-    _id: "6",
-    name: "学术研究版",
-    previewImage: "https://placehold.co/800x500/ECFDF5/059669?text=Academic",
-    category: "科研岗",
-    usedCount: 980,
-    createdAt: "2023-09-25",
-  },
-]);
+const templates = ref<Template[]>([]);
 
 const handleTemplateClick = (id: string) => {
   router.push(`/templates/${id}`);

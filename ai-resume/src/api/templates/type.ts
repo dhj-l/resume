@@ -18,6 +18,29 @@ export interface Template {
   /** 更新时间 */
   updatedAt: string;
 }
+
+export interface TemplateDetails {
+  _id: string;
+  name: string;
+  previewImage: string;
+  category: string;
+  usedCount: number;
+  resume: {
+    _id: string;
+    userId: string;
+    title: string;
+  };
+  resumeId: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    _id: string;
+    username: string;
+    email: string;
+  };
+}
+
 export interface TemplateListResponse {
   total: number;
   list: Template[];
