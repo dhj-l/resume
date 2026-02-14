@@ -1,12 +1,9 @@
 import { http } from "@/http/request";
 import type { ResumeData } from "@/stores/type";
+import type { CreateResumeParams } from "./type";
 
-export const createResumeAPI = () => {
-  return http.post<ResumeData>("/resume");
-};
-
-export const getResumeInfoAPI = (id: string) => {
-  return http.get<ResumeData>(`/resume/${id}`);
+export const createResumeAPI = (data: CreateResumeParams = {}) => {
+  return http.post<ResumeData>("/resume", data);
 };
 
 export const updateResumeAPI = (id: string, data: ResumeData) => {

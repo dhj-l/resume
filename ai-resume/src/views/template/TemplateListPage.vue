@@ -16,8 +16,16 @@
 
       <!-- Template Grid -->
       <div class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-[80px] pb-24">
+        <!-- Loading State -->
         <div
-          v-if="templates.length > 0"
+          v-if="loading"
+          class="flex justify-center items-center min-h-[400px]"
+        >
+          <a-spin size="large" tip="正在加载模板..." />
+        </div>
+
+        <div
+          v-else-if="templates.length > 0"
           class="grid grid-cols-1 min-[900px]:grid-cols-2 min-[1200px]:grid-cols-3 gap-x-8 gap-y-[32px]"
         >
           <TemplateCard
@@ -58,21 +66,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { FileOutlined } from "@ant-design/icons-vue";
 import { Empty } from "ant-design-vue";
 import TemplateCard from "./components/TemplateCard.vue";
+import { getTemplateListAPI } from "@/api/templates/templates";
 import type { Template } from "@/api/templates/type";
 
 const router = useRouter();
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
 const templates = ref<Template[]>([]);
+const loading = ref(false);
+
+const fetchTemplates = async () => {
+  try {
+    loading.value = true;
+    const { data } = await getTemplateListAPI({
+      page: 1,
+      pageSize: 10,
+    });
+    templates.value = data.list;
+  } finally {
+    loading.value = false;
+  }
+};
 
 const handleTemplateClick = (id: string) => {
   router.push(`/templates/${id}`);
 };
+
+onMounted(() => {
+  fetchTemplates();
+});
 </script>
 
 <style scoped>

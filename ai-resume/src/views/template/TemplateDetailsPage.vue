@@ -97,20 +97,28 @@
 
         <!-- Actions -->
         <div class="mt-auto flex flex-col gap-3">
-          <button
+          <a-button
+            type="primary"
+            size="large"
+            block
+            :loading="isCreating"
             @click="handleUseTemplate"
-            class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md shadow-primary-600/10 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 text-sm"
+            class="flex items-center justify-center gap-2 h-12"
           >
-            <Edit3 class="w-4 h-4" />
-            <span>立即使用该模板</span>
-          </button>
+            <template #icon v-if="!isCreating">
+              <Edit3 class="w-4 h-4" />
+            </template>
+            {{ isCreating ? "正在创建..." : "立即使用该模板" }}
+          </a-button>
 
-          <button
+          <a-button
+            size="large"
+            block
             @click="router.push('/templates')"
-            class="w-full bg-white hover:bg-slate-50 text-slate-600 font-medium py-3 px-6 rounded-lg border border-slate-200 transition-colors flex items-center justify-center gap-2 text-sm"
+            class="flex items-center justify-center gap-2 h-12"
           >
             返回列表
-          </button>
+          </a-button>
         </div>
       </div>
     </div>
@@ -121,6 +129,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getTemplateByIdAPI } from "@/api/templates/templates";
+import { createResumeAPI } from "@/api/resume/resume";
 import type { TemplateDetails } from "@/api/templates/type";
 import { Calendar, Users, Edit3 } from "lucide-vue-next";
 import { getFullImageUrl } from "@/utils/image";
@@ -129,6 +138,7 @@ import { formatDate } from "@/utils/day";
 const route = useRoute();
 const router = useRouter();
 const loading = ref(true);
+const isCreating = ref(false);
 const error = ref("");
 const template = ref<TemplateDetails | null>(null);
 
@@ -149,14 +159,26 @@ const fetchTemplate = async () => {
   }
 };
 
-const handleUseTemplate = () => {
-  if (!template.value) return;
-  // TODO: Implement actual use template logic, e.g., redirect to editor
-  // For now, we'll redirect to editor with query param
-  router.push({
-    path: "/editor",
-    query: { templateId: template.value._id },
-  });
+const handleUseTemplate = async () => {
+  if (!template.value || isCreating.value) return;
+
+  try {
+    isCreating.value = true;
+    const { data } = await createResumeAPI({
+      templateId: template.value._id,
+    });
+
+    if (data && data._id) {
+      router.push({
+        path: "/editor",
+        query: { templateId: data._id },
+      });
+    }
+  } catch (err) {
+    console.error("Failed to create resume:", err);
+  } finally {
+    isCreating.value = false;
+  }
 };
 
 onMounted(() => {

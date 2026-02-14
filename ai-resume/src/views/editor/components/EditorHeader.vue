@@ -5,7 +5,7 @@ import {
   FilePdfOutlined,
   SettingOutlined,
   DownOutlined,
-  SkinOutlined,
+  UploadOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import {
@@ -23,6 +23,7 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import type { templateType } from "./preview/type";
 import GlobalStyleSettings from "./GlobalStyleSettings.vue";
+import PublishTemplateModal from "./PublishTemplateModal.vue";
 import {
   extractEffectiveCssForElement,
   getDomCover,
@@ -54,6 +55,11 @@ const currentTemplateLabel = computed(() => {
 });
 const router = useRouter();
 const exportLoading = ref(false);
+const publishModalRef = ref();
+
+const handleOpenPublishModal = () => {
+  publishModalRef.value?.open();
+};
 
 // TODO: 处理返回点击
 const handleBack = () => {
@@ -73,7 +79,7 @@ const handleSave = async () => {
   if (!url) return;
   //更新简历封面
   setResumeDataString("cover", url);
-  await saveResume("69787013885a54a9f660796a");
+  await saveResume();
 };
 
 // TODO: 处理导出PDF
@@ -168,6 +174,10 @@ const handleThemeChange = () => {
         <template #icon><SaveOutlined /></template>
         保存草稿
       </Button>
+      <Button @click="handleOpenPublishModal">
+        <template #icon><UploadOutlined /></template>
+        发布为模板
+      </Button>
       <Button type="primary" @click="handleExport" :loading="exportLoading">
         <template #icon><FilePdfOutlined /></template>
         导出PDF
@@ -182,6 +192,12 @@ const handleThemeChange = () => {
         </Button>
       </Popover>
     </Space>
+
+    <!-- Publish Template Modal -->
+    <PublishTemplateModal
+      ref="publishModalRef"
+      :resumeTitle="props.resumeTitle"
+    />
   </header>
 </template>
 

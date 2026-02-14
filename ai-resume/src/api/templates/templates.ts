@@ -12,3 +12,12 @@ export const getTemplateListAPI = (params?: TemplateListParams) => {
 export const getTemplateByIdAPI = (id: string) => {
   return http.get<TemplateDetails>(`/template/${id}`);
 };
+
+export const createTemplateAPI = (data: {
+  name: string;
+  previewImage?: string;
+  category: string;
+  resumeId: string;
+}) => {
+  return http.post<TemplateDetails>("/template", data);
+};

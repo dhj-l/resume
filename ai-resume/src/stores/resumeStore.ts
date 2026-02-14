@@ -153,8 +153,8 @@ export const useResumeStore = defineStore("resume", () => {
   /**
    * 保存简历(修改)
    */
-  const saveResume = async (id: string) => {
-    const res = await updateResumeAPI(id, resumeData.value);
+  const saveResume = async () => {
+    const res = await updateResumeAPI(resumeData.value._id, resumeData.value);
     resumeData.value = res.data;
   };
 
