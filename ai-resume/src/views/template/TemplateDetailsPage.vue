@@ -35,12 +35,7 @@
           />
         </div>
       </div>
-      const fullImageUrl = (url: string): string => { return
-      import.meta.env.VITE_DEFAULT_AVATAR + url; };const fullImageUrl = (url:
-      string): string => { return import.meta.env.VITE_DEFAULT_AVATAR + url;
-      };const fullImageUrl = (url: string): string => { return
-      import.meta.env.VITE_DEFAULT_AVATAR + url; };const fullImageUrl = (url:
-      string): string => { return import.meta.env.VITE_DEFAULT_AVATAR + url; };
+
       <!-- Right: Info -->
       <div class="lg:col-span-5 flex flex-col">
         <div class="mb-6">
