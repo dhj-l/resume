@@ -61,14 +61,14 @@
 
 ### 🚀 Phase 1: 核心功能闭环 (High Priority)
 
-- [ ] **完善 API 封装** (`src/api/resume/resume.ts`)
-  - [ ] 添加 `getUserResumesAPI`：获取当前用户所有简历。
-  - [ ] 添加 `deleteResumeAPI`：删除指定简历。
-- [ ] **实现“我的简历”列表页**
-  - [ ] 创建 `src/views/user/MyResumes.vue`。
-  - [ ] 展示简历卡片列表（包含标题、修改时间、操作按钮）。
-  - [ ] 实现跳转编辑、删除简历功能。
-  - [ ] 配置路由 `/user/resumes`。
+- [x] **完善 API 封装** (`src/api/resume/resume.ts`)
+  - [x] 添加 `getUserResumesAPI`：获取当前用户所有简历。
+  - [x] 添加 `deleteResumeAPI`：删除指定简历。
+- [x] **实现“我的简历”列表页**
+  - [x] 创建 `src/views/user/MyResumes.vue`。
+  - [x] 展示简历卡片列表（包含标题、修改时间、操作按钮）。
+  - [x] 实现跳转编辑、删除简历功能。
+  - [x] 配置路由 `/user/resumes`。
 - [ ] **优化编辑器初始化逻辑**
   - [ ] 修改路由配置，支持 `/editor/:id` 参数。
   - [ ] 在 `EditorPage.vue` 中添加 `onMounted` 逻辑：
