@@ -15,33 +15,34 @@ export interface ApiResponse<T> {
 }
 
 export const createResumeAPI = (data: CreateResumeParams = {}) => {
-  return http.post("/resume", data) as unknown as Promise<
-    ApiResponse<ResumeData>
-  >;
+  return http.post<ResumeData>("/resume", data);
 };
 
 export const updateResumeAPI = (id: string, data: ResumeData) => {
-  return http.patch(`/resume/${id}`, data) as unknown as Promise<
-    ApiResponse<ResumeData>
-  >;
+  return http.patch<ResumeData>(`/resume/${id}`, data);
 };
 
 export const getResumeDetailAPI = (id: string) => {
-  return http.get(`/resume/${id}`) as unknown as Promise<
-    ApiResponse<ResumeData>
-  >;
+  return http.get<ResumeData>(`/resume/${id}`);
 };
 
 export const getUserResumesAPI = () => {
-  return http.get("/resume") as unknown as Promise<
-    ApiResponse<UserResumeListItem[]>
-  >;
+  return http.get<UserResumeListItem[]>("/resume");
 };
 
 export const deleteResumeAPI = (id: string) => {
   return http.delete(`/resume/${id}`) as unknown as Promise<
     ApiResponse<DeleteResumeResult>
   >;
+};
+
+/**
+ * 复制简历
+ * @param id 简历ID
+ * @param title 新简历标题（可选）
+ */
+export const copyResumeAPI = (id: string, title?: string) => {
+  return http.post<ResumeData>(`/resume/${id}/copy`, { title });
 };
 
 /**

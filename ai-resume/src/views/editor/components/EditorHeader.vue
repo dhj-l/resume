@@ -6,6 +6,7 @@ import {
   SettingOutlined,
   DownOutlined,
   UploadOutlined,
+  SkinOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import {
@@ -67,7 +68,6 @@ const handleBack = () => {
   router.back();
 };
 
-// TODO: 处理保存草稿
 const handleSave = async () => {
   //获取当前简历封面
   const element = getElement(".resume-preview-wrapper");
@@ -80,6 +80,7 @@ const handleSave = async () => {
   //更新简历封面
   setResumeDataString("cover", url);
   await saveResume();
+  message.success("草稿保存成功");
 };
 
 // TODO: 处理导出PDF

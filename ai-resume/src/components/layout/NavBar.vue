@@ -71,7 +71,7 @@
             </div>
             <template #overlay>
               <a-menu>
-                <a-menu-item key="profile">
+                <a-menu-item key="profile" @click="handleProfileClick">
                   <UserOutlined /> 个人中心
                 </a-menu-item>
                 <a-menu-divider />
@@ -117,7 +117,7 @@ const navItems = [
   { name: "模板", path: "/templates" },
   { name: "定价", path: "/pricing" },
   { name: "我的模板", path: "/dashboard/templates", requiresAuth: true },
-  { name: "个人中心", path: "/dashboard/profile", requiresAuth: true },
+  { name: "我的简历", path: "/user/resumes", requiresAuth: true },
 ];
 
 const handleScroll = () => {
@@ -139,6 +139,10 @@ const handleStartCreating = () => {
 const handleLogout = () => {
   authStore.logout();
   router.push("/");
+};
+
+const handleProfileClick = () => {
+  router.push("/user/profile");
 };
 
 onMounted(() => {

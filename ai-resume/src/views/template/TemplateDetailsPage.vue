@@ -171,7 +171,7 @@ const handleUseTemplate = async () => {
     if (data && data._id) {
       router.push({
         path: "/editor",
-        query: { templateId: data._id },
+        query: { id: data._id },
       });
     }
   } catch (err) {

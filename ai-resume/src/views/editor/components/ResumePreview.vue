@@ -9,9 +9,9 @@ const { currentTemplate } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
 
 const route = useRoute();
-const templateId = route.query.templateId;
+const id = route.query.id;
 watch(
-  () => templateId,
+  () => id,
   (newVal) => {
     if (newVal) {
       getResumeDetail(newVal as string);
