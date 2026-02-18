@@ -101,6 +101,19 @@
             type="primary"
             size="large"
             block
+            class="flex items-center justify-center gap-2 h-12 bg-gradient-to-r from-violet-600 to-indigo-600 border-none hover:opacity-90 transition-opacity shadow-lg shadow-indigo-500/20"
+            @click="handleAiCreate"
+          >
+            <template #icon>
+              <Sparkles class="w-4 h-4" />
+            </template>
+            AI 帮我写
+          </a-button>
+
+          <a-button
+            type="primary"
+            size="large"
+            block
             :loading="isCreating"
             @click="handleUseTemplate"
             class="flex items-center justify-center gap-2 h-12"
@@ -122,6 +135,11 @@
         </div>
       </div>
     </div>
+    <AiCreateDialog
+      v-model:open="aiDialogOpen"
+      :loading="isAiCreating"
+      @submit="handleAiSubmit"
+    />
   </div>
 </template>
 
@@ -131,14 +149,17 @@ import { useRoute, useRouter } from "vue-router";
 import { getTemplateByIdAPI } from "@/api/templates/templates";
 import { createResumeAPI } from "@/api/resume/resume";
 import type { TemplateDetails } from "@/api/templates/type";
-import { Calendar, Users, Edit3 } from "lucide-vue-next";
+import { Calendar, Users, Edit3, Sparkles } from "lucide-vue-next";
 import { getFullImageUrl } from "@/utils/image";
 import { formatDate } from "@/utils/day";
+import AiCreateDialog from "./components/AiCreateDialog.vue";
 
 const route = useRoute();
 const router = useRouter();
 const loading = ref(true);
 const isCreating = ref(false);
+const isAiCreating = ref(false);
+const aiDialogOpen = ref(false);
 const error = ref("");
 const template = ref<TemplateDetails | null>(null);
 
@@ -178,6 +199,37 @@ const handleUseTemplate = async () => {
     console.error("Failed to create resume:", err);
   } finally {
     isCreating.value = false;
+  }
+};
+
+const handleAiCreate = () => {
+  aiDialogOpen.value = true;
+};
+
+const handleAiSubmit = async (data: any) => {
+  if (!template.value) return;
+
+  try {
+    isAiCreating.value = true;
+    // Pass collected data to creation API
+    // Note: ensure the backend supports 'aiContext' or similar field if needed
+    // For now we pass it as part of the params
+    const { data: resData } = await createResumeAPI({
+      templateId: template.value._id,
+      aiContext: data,
+    });
+
+    if (resData && resData._id) {
+      router.push({
+        path: "/editor",
+        query: { id: resData._id },
+      });
+      aiDialogOpen.value = false;
+    }
+  } catch (err) {
+    console.error("Failed to create AI resume:", err);
+  } finally {
+    isAiCreating.value = false;
   }
 };
 
