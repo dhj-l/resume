@@ -5,9 +5,9 @@
       ref="contentRef"
       class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none box-border"
       :style="{
-        padding: resumeData.globalStyle?.pageMargin || '12px',
-        fontSize: resumeData.globalStyle?.fontSize || '12px',
-        lineHeight: resumeData.globalStyle?.lineHeight || '20px',
+        padding: globalPageMargin,
+        fontSize: globalFontSize,
+        lineHeight: globalLineHeight,
       }"
     >
       <div
@@ -15,7 +15,7 @@
         :key="item.moduleKey"
         :data-id="item.moduleKey"
         :style="{
-          marginBottom: resumeData.globalStyle?.moduleMargin || '12px',
+          marginBottom: globalModuleMargin,
         }"
       >
         <component
@@ -33,16 +33,16 @@
       :key="index"
       class="resume-page w-full min-h-[297mm] bg-white shadow-lg mb-8 box-border relative"
       :style="{
-        padding: resumeData.globalStyle?.pageMargin || '12px',
-        fontSize: resumeData.globalStyle?.fontSize || '12px',
-        lineHeight: resumeData.globalStyle?.lineHeight || '20px',
+        padding: globalPageMargin,
+        fontSize: globalFontSize,
+        lineHeight: globalLineHeight,
       }"
     >
       <template v-for="moduleId in page" :key="moduleId">
         <div
           v-if="getModuleByKey(moduleId)"
           :style="{
-            marginBottom: resumeData.globalStyle?.moduleMargin || '12px',
+            marginBottom: globalModuleMargin,
           }"
         >
           <component
@@ -68,7 +68,14 @@ import { usePagination } from "@/views/editor/hooks/usePagination";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 
-const { moduleOrder, currentTemplateType } = storeToRefs(useResumeStore());
+const {
+  moduleOrder,
+  currentTemplateType,
+  globalPageMargin,
+  globalFontSize,
+  globalLineHeight,
+  globalModuleMargin,
+} = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
 // 映射特殊组件
@@ -95,7 +102,7 @@ const getModuleByKey = (key: string) => {
 // 分页逻辑
 const contentRef = ref<HTMLElement | null>(null);
 const contentPadding = computed(() => {
-  const marginStr = resumeData.value.globalStyle.pageMargin;
+  const marginStr = globalPageMargin.value;
   const margin = parseFloat(marginStr) || 0;
   return margin * 2;
 });

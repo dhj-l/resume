@@ -9,10 +9,10 @@
         ref="leftContentRef"
         class="w-[32%] flex flex-col"
         :style="{
-          padding: resumeData.globalStyle.pageMargin,
-          gap: resumeData.globalStyle.moduleMargin,
-          fontSize: resumeData.globalStyle.fontSize,
-          lineHeight: resumeData.globalStyle.lineHeight,
+          padding: globalPageMargin,
+          gap: globalModuleMargin,
+          fontSize: globalFontSize,
+          lineHeight: globalLineHeight,
         }"
       >
         <div data-id="basicInfo">
@@ -41,10 +41,10 @@
         ref="rightContentRef"
         class="w-[68%] flex flex-col"
         :style="{
-          padding: resumeData.globalStyle.pageMargin,
-          gap: resumeData.globalStyle.moduleMargin,
-          fontSize: resumeData.globalStyle.fontSize,
-          lineHeight: resumeData.globalStyle.lineHeight,
+          padding: globalPageMargin,
+          gap: globalModuleMargin,
+          fontSize: globalFontSize,
+          lineHeight: globalLineHeight,
         }"
       >
         <div data-id="jobIntention">
@@ -76,16 +76,16 @@
       :key="index"
       class="resume-page w-full min-h-[297mm] bg-white shadow-lg mx-auto flex box-border overflow-hidden mb-8"
       :style="{
-        fontSize: resumeData.globalStyle.fontSize,
-        lineHeight: resumeData.globalStyle.lineHeight,
+        fontSize: globalFontSize,
+        lineHeight: globalLineHeight,
       }"
     >
       <!-- 左侧 -->
       <div
         class="w-[32%] bg-slate-50 flex flex-col shrink-0 border-r border-gray-100"
         :style="{
-          padding: resumeData.globalStyle.pageMargin,
-          gap: resumeData.globalStyle.moduleMargin,
+          padding: globalPageMargin,
+          gap: globalModuleMargin,
         }"
       >
         <template v-for="moduleId in page.left" :key="moduleId">
@@ -110,8 +110,8 @@
       <div
         class="flex-1 flex flex-col min-w-0"
         :style="{
-          padding: resumeData.globalStyle.pageMargin,
-          gap: resumeData.globalStyle.moduleMargin,
+          padding: globalPageMargin,
+          gap: globalModuleMargin,
         }"
       >
         <template v-for="moduleId in page.right" :key="moduleId">
@@ -144,7 +144,14 @@ import { storeToRefs } from "pinia";
 import { inject, computed, ref } from "vue";
 import { usePagination } from "@/views/editor/hooks/usePagination";
 
-const { moduleOrder, currentTemplateType } = storeToRefs(useResumeStore());
+const {
+  moduleOrder,
+  currentTemplateType,
+  globalPageMargin,
+  globalFontSize,
+  globalLineHeight,
+  globalModuleMargin,
+} = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
 // 定义左右分栏的模块 key
@@ -153,6 +160,8 @@ const rightModuleKeys = [
   "educationBackground",
   "workExperience",
   "projectExperience",
+  "campusExperience",
+  "internshipExperience",
 ];
 
 // 获取基本信息和求职意向模块配置
@@ -187,11 +196,11 @@ const leftContentRef = ref<HTMLElement | null>(null);
 const rightContentRef = ref<HTMLElement | null>(null);
 
 const moduleGap = computed(() => {
-  return parseFloat(resumeData.value.globalStyle.moduleMargin) || 0;
+  return parseFloat(globalModuleMargin.value) || 0;
 });
 
 const pagePadding = computed(() => {
-  return (parseFloat(resumeData.value.globalStyle.pageMargin) || 0) * 2;
+  return (parseFloat(globalPageMargin.value) || 0) * 2;
 });
 
 const { pages: leftPages } = usePagination(leftContentRef, resumeData, {

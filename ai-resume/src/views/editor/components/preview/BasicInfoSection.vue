@@ -55,7 +55,11 @@ const fullAvatar = computed(() => {
 </script>
 
 <template>
-  <div :class="styles.container" @click="handleClick">
+  <!-- 
+    v-if="data": 确保仅在有基本信息数据时渲染组件
+    数据来源: props.data (BasicInfo 对象)
+  -->
+  <div v-if="data" :class="styles.container" @click="handleClick">
     <div :class="styles.contentWrapper">
       <img :src="fullAvatar" alt="avatar" :class="styles.avatar" />
       <div :class="styles.infoWrapper">

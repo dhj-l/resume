@@ -13,7 +13,9 @@ const props = defineProps<{
 
 const { setCurrentModel, setIsExpanded } = useResumeStore();
 
-const styles = computed(() => getInternshipExperienceStyles(props.templateType));
+const styles = computed(() =>
+  getInternshipExperienceStyles(props.templateType),
+);
 
 const handleClick = () => {
   setCurrentModel("internshipExperience");
@@ -22,7 +24,15 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div :class="styles.container" @click="handleClick">
+  <!-- 
+    v-if="data && data.length > 0": 仅在有实习经历数据时渲染
+    数据来源: props.data (InternshipExperience 数组)
+  -->
+  <div
+    v-if="data && data.length > 0"
+    :class="styles.container"
+    @click="handleClick"
+  >
     <h3 :class="styles.title">
       {{ label || "实习经历" }}
     </h3>

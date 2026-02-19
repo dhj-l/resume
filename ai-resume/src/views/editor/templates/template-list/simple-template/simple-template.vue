@@ -5,9 +5,9 @@
       ref="contentRef"
       class="absolute top-0 left-0 w-[210mm] opacity-0 -z-50 pointer-events-none box-border"
       :style="{
-        padding: resumeData.globalStyle.pageMargin,
-        fontSize: resumeData.globalStyle.fontSize,
-        lineHeight: resumeData.globalStyle.lineHeight,
+        padding: globalPageMargin,
+        fontSize: globalFontSize,
+        lineHeight: globalLineHeight,
       }"
     >
       <!-- 静态头部 -->
@@ -69,7 +69,7 @@
         v-for="item in activeModules"
         :key="item.moduleKey"
         :data-id="item.moduleKey"
-        :style="{ marginBottom: resumeData.globalStyle.moduleMargin }"
+        :style="{ marginBottom: globalModuleMargin }"
       >
         <component
           :is="getComponent(item)"
@@ -86,9 +86,9 @@
       :key="index"
       class="resume-page w-[210mm] min-h-[297mm] bg-white shadow-lg mb-8 box-border relative"
       :style="{
-        padding: resumeData.globalStyle.pageMargin,
-        fontSize: resumeData.globalStyle.fontSize,
-        lineHeight: resumeData.globalStyle.lineHeight,
+        padding: globalPageMargin,
+        fontSize: globalFontSize,
+        lineHeight: globalLineHeight,
       }"
     >
       <!-- 每一页都显示头部？通常只有第一页显示 -->
@@ -156,7 +156,7 @@
       <template v-for="moduleId in page" :key="moduleId">
         <div
           v-if="getModuleByKey(moduleId)"
-          :style="{ marginBottom: resumeData.globalStyle.moduleMargin }"
+          :style="{ marginBottom: globalModuleMargin }"
         >
           <component
             :is="getComponent(getModuleByKey(moduleId)!)"
@@ -181,7 +181,14 @@ import { usePagination } from "@/views/editor/hooks/usePagination";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 
-const { moduleOrder, currentTemplateType } = storeToRefs(useResumeStore());
+const {
+  moduleOrder,
+  currentTemplateType,
+  globalPageMargin,
+  globalFontSize,
+  globalLineHeight,
+  globalModuleMargin,
+} = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
 // 映射特殊组件
@@ -208,7 +215,7 @@ const getModuleByKey = (key: string) => {
 // 分页逻辑
 const contentRef = ref<HTMLElement | null>(null);
 const contentPadding = computed(() => {
-  const marginStr = resumeData.value.globalStyle.pageMargin;
+  const marginStr = globalPageMargin.value;
   const margin = parseFloat(marginStr) || 0;
   return margin * 2;
 });

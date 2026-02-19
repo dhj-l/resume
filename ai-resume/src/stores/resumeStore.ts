@@ -138,6 +138,24 @@ export const useResumeStore = defineStore("resume", () => {
   const currentTemplateType = computed(() => {
     return resumeData.value.type || "default";
   });
+
+  // 全局样式计算属性
+  const globalPageMargin = computed(() => {
+    return resumeData.value.globalStyle?.pageMargin || '12px';
+  });
+
+  const globalFontSize = computed(() => {
+    return resumeData.value.globalStyle?.fontSize || '12px';
+  });
+
+  const globalLineHeight = computed(() => {
+    return resumeData.value.globalStyle?.lineHeight || '20px';
+  });
+
+  const globalModuleMargin = computed(() => {
+    return resumeData.value.globalStyle?.moduleMargin || '12px';
+  });
+
   /**
    * 设置当前选中的模块
    * @param moduleKey 模块键值
@@ -402,6 +420,10 @@ export const useResumeStore = defineStore("resume", () => {
     moduleOrder,
     isExpanded,
     currentTemplateType,
+    globalPageMargin,
+    globalFontSize,
+    globalLineHeight,
+    globalModuleMargin,
     setCurrentModel,
     setIsExpanded,
     setCurrentTemplate,

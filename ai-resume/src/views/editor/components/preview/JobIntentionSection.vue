@@ -51,6 +51,10 @@ const isVisible = computed(() => {
 </script>
 
 <template>
+  <!-- 
+    v-if="isVisible": 仅在至少有一个求职意向字段有值时渲染
+    数据来源: props.data (JobIntention 对象)
+  -->
   <div :class="styles.container" @click="handleClick" v-if="isVisible">
     <h3 :class="styles.title">
       {{ label || "求职意向" }}

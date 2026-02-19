@@ -21,7 +21,11 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div :class="styles.container" @click="handleClick">
+  <!-- 
+    v-if="data": 仅在有技能特长内容时渲染
+    数据来源: props.data (HTML 字符串)
+  -->
+  <div v-if="data" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
       {{ label || "技能特长" }}
     </h3>

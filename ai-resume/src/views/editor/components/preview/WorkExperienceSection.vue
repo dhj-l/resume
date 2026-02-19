@@ -22,7 +22,15 @@ const handleClick = () => {
 </script>
 
 <template>
-  <div :class="styles.container" @click="handleClick">
+  <!-- 
+    v-if="data && data.length > 0": 仅在有工作经验数据时渲染
+    数据来源: props.data (WorkExperience 数组)
+  -->
+  <div
+    v-if="data && data.length > 0"
+    :class="styles.container"
+    @click="handleClick"
+  >
     <h3 :class="styles.title">
       {{ label || "工作经验" }}
     </h3>
