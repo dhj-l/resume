@@ -1,4 +1,5 @@
 import type { Component } from "vue";
+import type { templateType } from "@/views/editor/components/preview/type";
 
 /**
  * 简历数据接口
@@ -12,6 +13,10 @@ export interface ResumeData {
    * userId
    */
   userId: string;
+  /**
+   * 简历模板类型
+   */
+  type?: templateType;
   /**
    * 简历标题
    */

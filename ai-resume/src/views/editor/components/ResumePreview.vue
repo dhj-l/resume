@@ -5,7 +5,7 @@ import { storeToRefs } from "pinia";
 import { watch } from "vue";
 import { useRoute } from "vue-router";
 
-const { currentTemplate } = storeToRefs(useResumeStore());
+const { resumeData } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
 
 const route = useRoute();
@@ -28,7 +28,7 @@ watch(
 <template>
   <div class="resume-preview-wrapper" ref="currentTemplateRef">
     <template v-for="item in templateList" :key="item.value">
-      <component :is="item.component" v-if="item.value === currentTemplate" />
+      <component :is="item.component" v-if="item.value === resumeData.type" />
     </template>
   </div>
 </template>

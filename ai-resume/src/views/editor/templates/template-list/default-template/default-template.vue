@@ -5,22 +5,24 @@
       ref="contentRef"
       class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none box-border"
       :style="{
-        padding: resumeData.globalStyle.pageMargin,
-        fontSize: resumeData.globalStyle.fontSize,
-        lineHeight: resumeData.globalStyle.lineHeight,
+        padding: resumeData.globalStyle?.pageMargin || '12px',
+        fontSize: resumeData.globalStyle?.fontSize || '12px',
+        lineHeight: resumeData.globalStyle?.lineHeight || '20px',
       }"
     >
       <div
         v-for="item in activeModules"
         :key="item.moduleKey"
         :data-id="item.moduleKey"
-        :style="{ marginBottom: resumeData.globalStyle.moduleMargin }"
+        :style="{
+          marginBottom: resumeData.globalStyle?.moduleMargin || '12px',
+        }"
       >
         <component
           :is="getComponent(item)"
           :data="resumeData[item.moduleKey]"
           :label="item.label"
-          :templateType="currentTemplate"
+          :templateType="currentTemplateType"
         />
       </div>
     </div>
@@ -31,21 +33,23 @@
       :key="index"
       class="resume-page w-full min-h-[297mm] bg-white shadow-lg mb-8 box-border relative"
       :style="{
-        padding: resumeData.globalStyle.pageMargin,
-        fontSize: resumeData.globalStyle.fontSize,
-        lineHeight: resumeData.globalStyle.lineHeight,
+        padding: resumeData.globalStyle?.pageMargin || '12px',
+        fontSize: resumeData.globalStyle?.fontSize || '12px',
+        lineHeight: resumeData.globalStyle?.lineHeight || '20px',
       }"
     >
       <template v-for="moduleId in page" :key="moduleId">
         <div
           v-if="getModuleByKey(moduleId)"
-          :style="{ marginBottom: resumeData.globalStyle.moduleMargin }"
+          :style="{
+            marginBottom: resumeData.globalStyle?.moduleMargin || '12px',
+          }"
         >
           <component
             :is="getComponent(getModuleByKey(moduleId)!)"
             :data="(resumeData as any)[moduleId]"
             :label="getModuleByKey(moduleId)!.label"
-            :templateType="currentTemplate"
+            :templateType="currentTemplateType"
           />
         </div>
       </template>
@@ -64,7 +68,7 @@ import { usePagination } from "@/views/editor/hooks/usePagination";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 
-const { moduleOrder, currentTemplate } = storeToRefs(useResumeStore());
+const { moduleOrder, currentTemplateType } = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
 // 映射特殊组件

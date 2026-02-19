@@ -75,7 +75,7 @@
           :is="getComponent(item)"
           :data="resumeData[item.moduleKey]"
           :label="item.label"
-          :templateType="currentTemplate"
+          :templateType="currentTemplateType"
         />
       </div>
     </div>
@@ -162,7 +162,7 @@
             :is="getComponent(getModuleByKey(moduleId)!)"
             :data="(resumeData as any)[moduleId]"
             :label="getModuleByKey(moduleId)!.label"
-            :templateType="currentTemplate"
+            :templateType="currentTemplateType"
           />
         </div>
       </template>
@@ -181,7 +181,7 @@ import { usePagination } from "@/views/editor/hooks/usePagination";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 
-const { moduleOrder, currentTemplate } = storeToRefs(useResumeStore());
+const { moduleOrder, currentTemplateType } = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
 // 映射特殊组件

@@ -35,7 +35,7 @@ import { downloadResumeAPI } from "@/api/resume/resume";
 import { downloadPdf } from "@/utils/download";
 import { uploadImage } from "@/utils/upload";
 
-const { currentTemplate, resumeData } = storeToRefs(useResumeStore());
+const { resumeData } = storeToRefs(useResumeStore());
 const { setCurrentTemplate, saveResume, setResumeDataString } =
   useResumeStore();
 interface Props {
@@ -50,7 +50,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 const currentTemplateLabel = computed(() => {
   const template = templateList.find(
-    (item) => item.value === currentTemplate.value,
+    (item) => item.value === resumeData.value.type,
   );
   return template?.label || "默认通用模板";
 });

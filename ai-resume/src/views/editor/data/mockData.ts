@@ -3,6 +3,7 @@ import type { ResumeData } from "@/stores/type";
 export const mockResumeData: ResumeData = {
   _id: "1",
   userId: "user_123",
+  type: "default",
   title: "我的个人简历",
   globalStyle: {
     fontSize: "14px",
@@ -66,6 +67,23 @@ export const mockResumeData: ResumeData = {
   skills: "Vue3, TypeScript, Node.js, Webpack, Vite",
   certificates: "CET-6, 软考中级软件设计师",
   selfEvaluation: "热爱技术，善于钻研，具备良好的团队协作能力和抗压能力。",
-  campusExperience: [],
-  internshipExperience: [],
+  campusExperience: [
+    {
+      startTime: "2018-09",
+      endTime: "2020-06",
+      title: "上海交通大学",
+      description: "软件学院",
+      content: "参与多个项目团队合作，获得项目负责人荣誉。",
+    },
+  ],
+  internshipExperience: [
+    {
+      startTime: "2020-07",
+      endTime: "2020-08",
+      companyName: "某知名互联网公司",
+      position: "前端开发工程师",
+      description:
+        "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
+    },
+  ],
 };

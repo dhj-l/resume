@@ -5,3 +5,19 @@ export interface TemplateListProps {
   templates: Template[];
   loading?: boolean;
 }
+
+export interface AiCreateUserInfo {
+  name: string;
+  age?: number;
+  education?: string;
+  school: string;
+  major: string;
+  targetRole: string;
+  yearsOfExperience?: number;
+}
+
+export interface AiCreateFormData {
+  jd: string;
+  userInfo: AiCreateUserInfo;
+  supplementary: string;
+}

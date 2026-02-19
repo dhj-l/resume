@@ -19,7 +19,7 @@
           <BasicInfoSection
             :data="resumeData!.basicInfo"
             :label="basicInfoModule?.label"
-            :template-type="currentTemplate"
+            :template-type="currentTemplateType"
           />
         </div>
         <div
@@ -31,7 +31,7 @@
             :is="item.component"
             :data="resumeData?.[item.moduleKey]"
             :label="item.label"
-            :template-type="currentTemplate"
+            :template-type="currentTemplateType"
             v-if="item.isShow && item.component"
           />
         </div>
@@ -51,7 +51,7 @@
           <JobIntentionSection
             :data="resumeData!.jobIntention"
             :label="jobIntentionModule?.label"
-            :templateType="currentTemplate"
+            :templateType="currentTemplateType"
           />
         </div>
         <div
@@ -63,7 +63,7 @@
             :is="item.component"
             :data="resumeData?.[item.moduleKey]"
             :label="item.label"
-            :templateType="currentTemplate"
+            :templateType="currentTemplateType"
             v-if="item.isShow && item.component"
           />
         </div>
@@ -93,14 +93,14 @@
             v-if="moduleId === 'basicInfo'"
             :data="resumeData!.basicInfo"
             :label="basicInfoModule?.label"
-            :template-type="currentTemplate"
+            :template-type="currentTemplateType"
           />
           <component
             v-else-if="getModuleByKey(moduleId)"
             :is="getModuleByKey(moduleId)!.component"
             :data="(resumeData as any)[moduleId]"
             :label="getModuleByKey(moduleId)!.label"
-            :template-type="currentTemplate"
+            :template-type="currentTemplateType"
             draggable="true"
           />
         </template>
@@ -119,14 +119,14 @@
             v-if="moduleId === 'jobIntention'"
             :data="resumeData!.jobIntention"
             :label="jobIntentionModule?.label"
-            :templateType="currentTemplate"
+            :templateType="currentTemplateType"
           />
           <component
             v-else-if="getModuleByKey(moduleId)"
             :is="getModuleByKey(moduleId)!.component"
             :data="(resumeData as any)[moduleId]"
             :label="getModuleByKey(moduleId)!.label"
-            :templateType="currentTemplate"
+            :templateType="currentTemplateType"
             draggable="true"
           />
         </template>
@@ -144,7 +144,7 @@ import { storeToRefs } from "pinia";
 import { inject, computed, ref } from "vue";
 import { usePagination } from "@/views/editor/hooks/usePagination";
 
-const { moduleOrder, currentTemplate } = storeToRefs(useResumeStore());
+const { moduleOrder, currentTemplateType } = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
 // 定义左右分栏的模块 key

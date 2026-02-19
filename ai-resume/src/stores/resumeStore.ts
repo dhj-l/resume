@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, shallowRef } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import type {
   ModuleItem,
   ResumeData,
@@ -8,6 +8,8 @@ import type {
   EducationBackground,
   WorkExperience,
   ProjectExperience,
+  CampusExperience,
+  InternshipExperience,
   GlobalStyle,
 } from "./type";
 import { mockResumeData } from "@/views/editor/data/mockData";
@@ -15,6 +17,8 @@ import { mockResumeData } from "@/views/editor/data/mockData";
 import EducationBackgroundSection from "@/views/editor/components/preview/EducationBackgroundSection.vue";
 import WorkExperienceSection from "@/views/editor/components/preview/WorkExperienceSection.vue";
 import ProjectExperienceSection from "@/views/editor/components/preview/ProjectExperienceSection.vue";
+import CampusExperienceSection from "@/views/editor/components/preview/CampusExperienceSection.vue";
+import InternshipExperienceSection from "@/views/editor/components/preview/InternshipExperienceSection.vue";
 import SkillsSection from "@/views/editor/components/preview/SkillsSection.vue";
 import CertificatesSection from "@/views/editor/components/preview/CertificatesSection.vue";
 import SelfEvaluationSection from "@/views/editor/components/preview/SelfEvaluationSection.vue";
@@ -24,6 +28,8 @@ import EducationForm from "@/views/editor/components/drawer/EducationForm.vue";
 import type { templateType } from "@/views/editor/components/preview/type";
 import WorkExperienceForm from "@/views/editor/components/drawer/WorkExperienceForm.vue";
 import ProjectExperienceForm from "@/views/editor/components/drawer/ProjectExperienceForm.vue";
+import CampusExperienceForm from "@/views/editor/components/drawer/CampusExperienceForm.vue";
+import InternshipExperienceForm from "@/views/editor/components/drawer/InternshipExperienceForm.vue";
 import SkillsForm from "@/views/editor/components/drawer/SkillsForm.vue";
 import CertificatesForm from "@/views/editor/components/drawer/CertificatesForm.vue";
 import SelfEvaluationForm from "@/views/editor/components/drawer/SelfEvaluationForm.vue";
@@ -85,6 +91,22 @@ export const useResumeStore = defineStore("resume", () => {
     },
     {
       index: 5,
+      moduleKey: "campusExperience",
+      label: "校园经历",
+      component: shallowRef(CampusExperienceSection),
+      formComponent: shallowRef(CampusExperienceForm),
+      isShow: true,
+    },
+    {
+      index: 6,
+      moduleKey: "internshipExperience",
+      label: "实习经历",
+      component: shallowRef(InternshipExperienceSection),
+      formComponent: shallowRef(InternshipExperienceForm),
+      isShow: true,
+    },
+    {
+      index: 7,
       moduleKey: "skills",
       label: "技能特长",
       component: shallowRef(SkillsSection),
@@ -92,7 +114,7 @@ export const useResumeStore = defineStore("resume", () => {
       isShow: true,
     },
     {
-      index: 6,
+      index: 8,
       moduleKey: "certificates",
       label: "证书经历",
       component: shallowRef(CertificatesSection),
@@ -100,7 +122,7 @@ export const useResumeStore = defineStore("resume", () => {
       isShow: true,
     },
     {
-      index: 7,
+      index: 9,
       moduleKey: "selfEvaluation",
       label: "自我评价",
       component: shallowRef(SelfEvaluationSection),
@@ -110,8 +132,12 @@ export const useResumeStore = defineStore("resume", () => {
   ]);
   //控制抽屉展开/收起
   const isExpanded = ref(false);
-  //当前选中的模板
-  const currentTemplate = ref<templateType>("default");
+  /**
+   * 当前简历模板类型
+   */
+  const currentTemplateType = computed(() => {
+    return resumeData.value.type || "default";
+  });
   /**
    * 设置当前选中的模块
    * @param moduleKey 模块键值
@@ -131,7 +157,9 @@ export const useResumeStore = defineStore("resume", () => {
    * @param template 模板类型
    */
   const setCurrentTemplate = (template: templateType) => {
-    currentTemplate.value = template;
+    console.log(template);
+
+    resumeData.value.type = template;
   };
   /**
    * 修改简历字符串类型数据
@@ -289,12 +317,91 @@ export const useResumeStore = defineStore("resume", () => {
     console.log("move", index, direction);
   };
 
+  // Campus Experience
+  const addCampusExperience = () => {
+    if (!resumeData.value.campusExperience)
+      resumeData.value.campusExperience = [];
+    resumeData.value.campusExperience.push({
+      title: "",
+      description: "",
+      startTime: "",
+      endTime: "",
+      content: "",
+    });
+  };
+
+  const removeCampusExperience = (index: number) => {
+    if (resumeData.value.campusExperience) {
+      resumeData.value.campusExperience.splice(index, 1);
+    }
+  };
+
+  const updateCampusExperience = (
+    index: number,
+    data: Partial<CampusExperience>,
+  ) => {
+    if (
+      resumeData.value.campusExperience &&
+      resumeData.value.campusExperience[index]
+    ) {
+      resumeData.value.campusExperience[index] = {
+        ...resumeData.value.campusExperience[index],
+        ...data,
+      };
+    }
+  };
+
+  const moveCampusExperience = (index: number, direction: "up" | "down") => {
+    console.log("move", index, direction);
+  };
+
+  // Internship Experience
+  const addInternshipExperience = () => {
+    if (!resumeData.value.internshipExperience)
+      resumeData.value.internshipExperience = [];
+    resumeData.value.internshipExperience.push({
+      companyName: "",
+      position: "",
+      startTime: "",
+      endTime: "",
+      description: "",
+    });
+  };
+
+  const removeInternshipExperience = (index: number) => {
+    if (resumeData.value.internshipExperience) {
+      resumeData.value.internshipExperience.splice(index, 1);
+    }
+  };
+
+  const updateInternshipExperience = (
+    index: number,
+    data: Partial<InternshipExperience>,
+  ) => {
+    if (
+      resumeData.value.internshipExperience &&
+      resumeData.value.internshipExperience[index]
+    ) {
+      resumeData.value.internshipExperience[index] = {
+        ...resumeData.value.internshipExperience[index],
+        ...data,
+      };
+    }
+  };
+
+  const moveInternshipExperience = (
+    index: number,
+    direction: "up" | "down",
+  ) => {
+    console.log("move", index, direction);
+  };
+
   return {
     resumeData,
     currentModule,
     moduleOrder,
     isExpanded,
-    currentTemplate,
+    currentTemplateType,
     setCurrentModel,
     setIsExpanded,
     setCurrentTemplate,
@@ -316,6 +423,14 @@ export const useResumeStore = defineStore("resume", () => {
     removeProjectExperience,
     updateProjectExperience,
     moveProjectExperience,
+    addCampusExperience,
+    removeCampusExperience,
+    updateCampusExperience,
+    moveCampusExperience,
+    addInternshipExperience,
+    removeInternshipExperience,
+    updateInternshipExperience,
+    moveInternshipExperience,
     setGlobalStyle,
   };
 });

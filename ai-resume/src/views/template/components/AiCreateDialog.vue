@@ -149,10 +149,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, computed } from "vue";
 import { message } from "ant-design-vue";
 import { Sparkles } from "lucide-vue-next";
 import type { FormInstance } from "ant-design-vue";
+import type { AiCreateFormData } from "../types";
 
 interface Props {
   open: boolean;
@@ -257,16 +258,16 @@ const userInfoFields = [
   },
 ];
 
-const formData = reactive({
+const formData = ref<AiCreateFormData>({
   jd: "",
   userInfo: {
     name: "",
-    age: undefined as number | undefined,
-    education: undefined as string | undefined,
+    age: undefined,
+    education: undefined,
     school: "",
     major: "",
     targetRole: "",
-    yearsOfExperience: undefined as number | undefined,
+    yearsOfExperience: undefined,
   },
   supplementary: "",
 });
@@ -285,7 +286,7 @@ const handleCancel = () => {
 
 const nextStep = async () => {
   if (currentStep.value === 0) {
-    if (!formData.jd.trim()) {
+    if (!formData.value.jd.trim()) {
       message.warning("请先输入职位描述(JD)");
       return;
     }
@@ -308,9 +309,9 @@ const prevStep = () => {
 
 const handleSubmit = () => {
   emit("submit", {
-    jd: formData.jd,
-    userInfo: { ...formData.userInfo },
-    supplementary: formData.supplementary,
+    jd: formData.value.jd,
+    userInfo: { ...formData.value.userInfo },
+    supplementary: formData.value.supplementary,
   });
 };
 </script>
