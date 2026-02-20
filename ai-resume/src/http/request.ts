@@ -30,7 +30,11 @@ http.interceptors.request.use(
 http.interceptors.response.use(
   (response) => {
     const { code, message: msg } = response.data;
-    if (code === 200) {
+    //如果response.data为Blob类型，直接返回
+    if (response.data instanceof Blob) {
+      return response.data;
+    }
+    if (code >= 200 && code < 300) {
       return response.data;
     } else {
       message.error(msg || "请求失败");
