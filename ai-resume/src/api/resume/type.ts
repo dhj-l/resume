@@ -1,6 +1,7 @@
 export interface CreateResumeParams {
   templateId?: string;
   title?: string;
+  type?: string;
   globalStyle?: any;
   basicInfo?: any;
   [key: string]: any;

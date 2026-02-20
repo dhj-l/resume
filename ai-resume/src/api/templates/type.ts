@@ -29,6 +29,7 @@ export interface TemplateDetails {
     _id: string;
     userId: string;
     title: string;
+    type: string;
   };
   resumeId: string;
   userId: string;

@@ -101,10 +101,11 @@
             type="primary"
             size="large"
             block
+            :loading="isImporting"
             class="flex items-center justify-center gap-2 h-12 bg-gradient-to-r from-violet-600 to-indigo-600 border-none hover:opacity-90 transition-opacity shadow-lg shadow-indigo-500/20"
             @click="handleAiCreate"
           >
-            <template #icon>
+            <template #icon v-if="!isImporting">
               <Sparkles class="w-4 h-4" />
             </template>
             AI 帮我写
@@ -140,6 +141,19 @@
       :loading="isAiCreating"
       @submit="handleAiSubmit"
     />
+    <CreateModeDialog
+      v-model:open="createModeOpen"
+      @select="handleModeSelect"
+    />
+    <SelectResumeDialog
+      v-model:open="selectResumeOpen"
+      @submit="handleSelectResumeSubmit"
+      @create-new="handleCreateNew"
+    />
+    <UploadResumeDialog
+      v-model:open="uploadResumeOpen"
+      @submit="handleUploadResumeSubmit"
+    />
   </div>
 </template>
 
@@ -153,13 +167,24 @@ import { Calendar, Users, Edit3, Sparkles } from "lucide-vue-next";
 import { getFullImageUrl } from "@/utils/image";
 import { formatDate } from "@/utils/day";
 import AiCreateDialog from "./components/AiCreateDialog.vue";
+import CreateModeDialog from "./components/CreateModeDialog.vue";
+import SelectResumeDialog from "./components/SelectResumeDialog.vue";
+import UploadResumeDialog from "./components/UploadResumeDialog.vue";
+import { message } from "ant-design-vue";
 
 const route = useRoute();
 const router = useRouter();
 const loading = ref(true);
 const isCreating = ref(false);
 const isAiCreating = ref(false);
+const isImporting = ref(false); // For Select/Upload flows
+
+// Dialog states
+const createModeOpen = ref(false);
 const aiDialogOpen = ref(false);
+const selectResumeOpen = ref(false);
+const uploadResumeOpen = ref(false);
+
 const error = ref("");
 const template = ref<TemplateDetails | null>(null);
 
@@ -187,6 +212,7 @@ const handleUseTemplate = async () => {
     isCreating.value = true;
     const { data } = await createResumeAPI({
       templateId: template.value._id,
+      type: template.value.resume.type,
     });
 
     if (data && data._id) {
@@ -195,15 +221,24 @@ const handleUseTemplate = async () => {
         query: { id: data._id },
       });
     }
-  } catch (err) {
-    console.error("Failed to create resume:", err);
   } finally {
     isCreating.value = false;
   }
 };
 
 const handleAiCreate = () => {
-  aiDialogOpen.value = true;
+  createModeOpen.value = true;
+};
+
+const handleModeSelect = (mode: "manual" | "select" | "upload") => {
+  createModeOpen.value = false;
+  if (mode === "manual") {
+    aiDialogOpen.value = true;
+  } else if (mode === "select") {
+    selectResumeOpen.value = true;
+  } else if (mode === "upload") {
+    uploadResumeOpen.value = true;
+  }
 };
 
 const handleAiSubmit = async (data: any) => {
@@ -211,15 +246,13 @@ const handleAiSubmit = async (data: any) => {
 
   try {
     isAiCreating.value = true;
-    // Pass collected data to creation API
-    // Note: ensure the backend supports 'aiContext' or similar field if needed
-    // For now we pass it as part of the params
     const { data: resData } = await createResumeAPI({
       templateId: template.value._id,
       aiContext: data,
     });
 
     if (resData && resData._id) {
+      message.success("AI 简历生成成功");
       router.push({
         path: "/editor",
         query: { id: resData._id },
@@ -228,9 +261,46 @@ const handleAiSubmit = async (data: any) => {
     }
   } catch (err) {
     console.error("Failed to create AI resume:", err);
+    message.error("生成失败，请重试");
   } finally {
     isAiCreating.value = false;
   }
+};
+
+const handleSelectResumeSubmit = async (resumeId: string) => {
+  console.log("resumeId", resumeId);
+};
+
+const handleUploadResumeSubmit = async (data: any) => {
+  if (!template.value) return;
+
+  uploadResumeOpen.value = false; // Close dialog immediately
+  isImporting.value = true;
+
+  try {
+    const { data: newResume } = await createResumeAPI({
+      templateId: template.value._id,
+      ...data,
+    });
+
+    if (newResume && newResume._id) {
+      message.success("导入并创建成功");
+      router.push({
+        path: "/editor",
+        query: { id: newResume._id },
+      });
+    }
+  } catch (err) {
+    console.error("Failed to create from upload:", err);
+    message.error("创建失败，请重试");
+  } finally {
+    isImporting.value = false;
+  }
+};
+
+const handleCreateNew = () => {
+  selectResumeOpen.value = false;
+  aiDialogOpen.value = true; // Redirect to manual input
 };
 
 onMounted(() => {
