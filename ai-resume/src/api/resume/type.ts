@@ -21,3 +21,12 @@ export interface DeleteResumeResult {
   _id: string;
   title: string;
 }
+
+export interface AiResumeParams {
+  parseType: "upload" | "select" | "manual";
+  jobDescription: string;
+  templateType: string;
+  resumeContent?: string;
+  detailInfo?: any;
+  resumeId?: string;
+}

@@ -147,13 +147,16 @@
     />
     <SelectResumeDialog
       v-model:open="selectResumeOpen"
+      :submitting="isImporting"
       @submit="handleSelectResumeSubmit"
       @create-new="handleCreateNew"
     />
     <UploadResumeDialog
       v-model:open="uploadResumeOpen"
+      :submitting="isImporting"
       @submit="handleUploadResumeSubmit"
     />
+    <FullScreenLoading v-model:loading="isGlobalLoading" />
   </div>
 </template>
 
@@ -161,7 +164,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getTemplateByIdAPI } from "@/api/templates/templates";
-import { createResumeAPI } from "@/api/resume/resume";
+import { generateAiResumeAPI, createResumeAPI } from "@/api/resume/resume";
 import type { TemplateDetails } from "@/api/templates/type";
 import { Calendar, Users, Edit3, Sparkles } from "lucide-vue-next";
 import { getFullImageUrl } from "@/utils/image";
@@ -170,6 +173,7 @@ import AiCreateDialog from "./components/AiCreateDialog.vue";
 import CreateModeDialog from "./components/CreateModeDialog.vue";
 import SelectResumeDialog from "./components/SelectResumeDialog.vue";
 import UploadResumeDialog from "./components/UploadResumeDialog.vue";
+import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
 import { message } from "ant-design-vue";
 
 const route = useRoute();
@@ -178,6 +182,7 @@ const loading = ref(true);
 const isCreating = ref(false);
 const isAiCreating = ref(false);
 const isImporting = ref(false); // For Select/Upload flows
+const isGlobalLoading = ref(false); // Full screen loading state
 
 // Dialog states
 const createModeOpen = ref(false);
@@ -205,6 +210,13 @@ const fetchTemplate = async () => {
   }
 };
 
+const pushToEditor = (resumeId: string) => {
+  router.push({
+    path: "/editor",
+    query: { id: resumeId },
+  });
+};
+
 const handleUseTemplate = async () => {
   if (!template.value || isCreating.value) return;
 
@@ -216,10 +228,7 @@ const handleUseTemplate = async () => {
     });
 
     if (data && data._id) {
-      router.push({
-        path: "/editor",
-        query: { id: data._id },
-      });
+      pushToEditor(data._id);
     }
   } finally {
     isCreating.value = false;
@@ -242,59 +251,80 @@ const handleModeSelect = (mode: "manual" | "select" | "upload") => {
 };
 
 const handleAiSubmit = async (data: any) => {
-  if (!template.value) return;
+  if (!template.value || isGlobalLoading.value) return;
 
   try {
     isAiCreating.value = true;
-    const { data: resData } = await createResumeAPI({
-      templateId: template.value._id,
-      aiContext: data,
+    isGlobalLoading.value = true;
+    const { data: resData } = await generateAiResumeAPI({
+      parseType: "manual",
+      jobDescription: data.jd,
+      detailInfo: { ...data.userInfo, supplementary: data.supplementary },
+      templateType: template.value.resume.type,
     });
 
     if (resData && resData._id) {
       message.success("AI 简历生成成功");
-      router.push({
-        path: "/editor",
-        query: { id: resData._id },
-      });
+      pushToEditor(resData._id);
       aiDialogOpen.value = false;
     }
-  } catch (err) {
-    console.error("Failed to create AI resume:", err);
-    message.error("生成失败，请重试");
   } finally {
     isAiCreating.value = false;
+    isGlobalLoading.value = false;
   }
 };
 
-const handleSelectResumeSubmit = async (resumeId: string) => {
-  console.log("resumeId", resumeId);
-};
-
-const handleUploadResumeSubmit = async (data: any) => {
-  if (!template.value) return;
-
-  uploadResumeOpen.value = false; // Close dialog immediately
+const handleSelectResumeSubmit = async (payload: {
+  jd: string;
+  resumeId: string;
+}) => {
+  if (!template.value || isGlobalLoading.value) return;
   isImporting.value = true;
+  isGlobalLoading.value = true;
 
   try {
-    const { data: newResume } = await createResumeAPI({
-      templateId: template.value._id,
-      ...data,
+    const { data: resData } = await generateAiResumeAPI({
+      parseType: "select",
+      jobDescription: payload.jd,
+      resumeId: payload.resumeId,
+      templateType: template.value.resume.type,
     });
 
-    if (newResume && newResume._id) {
-      message.success("导入并创建成功");
-      router.push({
-        path: "/editor",
-        query: { id: newResume._id },
-      });
+    if (resData && resData._id) {
+      message.success("基于已有简历生成成功");
+      pushToEditor(resData._id);
+      selectResumeOpen.value = false;
     }
-  } catch (err) {
-    console.error("Failed to create from upload:", err);
-    message.error("创建失败，请重试");
   } finally {
     isImporting.value = false;
+    isGlobalLoading.value = false;
+  }
+};
+
+const handleUploadResumeSubmit = async (payload: {
+  resumeText: string;
+  jdText: string;
+}) => {
+  if (!template.value || isGlobalLoading.value) return;
+  isImporting.value = true;
+  isGlobalLoading.value = true;
+
+  try {
+    const { data: resData } = await generateAiResumeAPI({
+      parseType: "upload",
+      jobDescription: payload.jdText,
+      resumeContent: payload.resumeText,
+      templateType: template.value.resume.type,
+    });
+
+    if (resData && resData._id) {
+      message.success("生成成功");
+      pushToEditor(resData._id);
+      uploadResumeOpen.value = false;
+    }
+  } finally {
+    isImporting.value = false;
+    isGlobalLoading.value = false;
   }
 };
 

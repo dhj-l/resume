@@ -243,10 +243,9 @@ const userInfoFields = [
   {
     label: "工作年限",
     name: "yearsOfExperience",
-    component: "InputNumber",
-    placeholder: "0",
-    min: 0,
-    max: 50,
+    component: "Select",
+    placeholder: "请选择工作年限",
+    options: ["在校生", "1-3年", "3-5年", "5-10年", "10年以上"],
   },
   {
     label: "年龄",
@@ -318,19 +317,24 @@ const handleSubmit = () => {
 
 <style scoped>
 .ai-create-modal :deep(.ant-modal-content) {
-  @apply rounded-2xl overflow-hidden;
+  border-radius: 1rem;
+  overflow: hidden;
 }
 
 .ai-create-modal :deep(.ant-modal-header) {
-  @apply border-b border-slate-100 pb-4 mb-0;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .ai-create-modal :deep(.ant-steps-item-process .ant-steps-item-icon) {
-  @apply bg-primary-500 border-primary-500;
+  background-color: #3b82f6;
+  border-color: #3b82f6;
 }
 
 .ai-create-modal :deep(.ant-steps-item-finish .ant-steps-item-icon) {
-  @apply text-primary-500 border-primary-500;
+  color: #3b82f6;
+  border-color: #3b82f6;
 }
 
 .animate-fade-in {

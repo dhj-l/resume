@@ -1,6 +1,7 @@
 import { http } from "@/http/request";
 import type { ResumeData } from "@/stores/type";
 import type {
+  AiResumeParams,
   CreateResumeParams,
   DeleteResumeResult,
   UserResumeListItem,
@@ -50,4 +51,25 @@ export const copyResumeAPI = (id: string, title?: string) => {
  */
 export const downloadResumeAPI = ({ html = "", css = "" }) => {
   return http.post(`/resume/download`, { html, css }, { responseType: "blob" });
+};
+
+/**
+ * 解析简历
+ * @param file 简历文件
+ */
+export const parseResumeAPI = (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  return http.post<string>("/upload/resume", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+/**
+ * AI 生成简历
+ */
+export const generateAiResumeAPI = (data: AiResumeParams) => {
+  return http.post<{ _id: string }>("/resume-ai/generate", data);
 };
