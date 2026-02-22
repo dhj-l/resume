@@ -31,7 +31,7 @@
     <div
       v-for="(page, index) in pages"
       :key="index"
-      class="resume-page w-full min-h-[297mm] bg-white shadow-lg mb-8 box-border relative"
+      class="resume-page w-full h-[1122px] bg-white shadow-lg mb-8 box-border relative"
       :style="{
         padding: globalPageMargin,
         fontSize: globalFontSize,

@@ -26,7 +26,7 @@ export const getProjectExperienceStyles = (
     projectName: "font-bold text-gray-800 break-words",
     timeRange: "text-gray-600 shrink-0", // Removed text-sm
     role: "text-gray-700 mb-1 font-medium", // Removed text-sm
-    description: "text-gray-600 leading-relaxed whitespace-pre-wrap", // Removed text-sm
+    description: "text-gray-600 whitespace-pre-wrap",
     empty: "text-gray-400 italic",
   };
 

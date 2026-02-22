@@ -9,13 +9,24 @@ import {
   type MaybeRef,
 } from "vue";
 
-// A4 纸张高度（像素），96 DPI
-// 297mm * 3.7795 px/mm ≈ 1123px
-const PAGE_HEIGHT = 1123;
+const A4_HEIGHT_MM = 297;
+const MM_TO_PX = 3.779527559;
+const PAGE_HEIGHT = Math.round(A4_HEIGHT_MM * MM_TO_PX);
+const SAFE_PAGE_HEIGHT = 1122;
+
+const DEBUG_PAGINATION = true;
 
 interface PaginationOptions {
-  contentPadding?: MaybeRef<number>; // 内容区域的垂直 padding 总和
-  gap?: MaybeRef<number>; // 元素间距
+  contentPadding?: MaybeRef<number | string>;
+  gap?: MaybeRef<number>;
+  firstPageOffset?: MaybeRef<number>;
+}
+
+function parsePaddingValue(value: number | string | undefined): number {
+  if (value === undefined) return 24;
+  if (typeof value === "number") return value;
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 24 : parsed;
 }
 
 export function usePagination(
@@ -23,7 +34,6 @@ export function usePagination(
   resumeData: Ref<any>,
   options: PaginationOptions = {},
 ) {
-  // 存储分页结果，每页包含的模块 ID 列表
   const pages = ref<string[][]>([[]]);
   const isCalculating = ref(true);
 
@@ -32,19 +42,24 @@ export function usePagination(
   const calculatePages = async () => {
     if (!contentRef.value) return;
 
-    // 等待 DOM 更新
     await nextTick();
 
-    const contentPadding = unref(options.contentPadding) ?? 64; // 默认 p-8 * 2 = 64
-    const availableHeight = PAGE_HEIGHT - contentPadding;
+    const rawPadding = unref(options.contentPadding);
+    const contentPadding = parsePaddingValue(rawPadding);
+    const firstPageOffset = unref(options.firstPageOffset) ?? 0;
+    const effectivePageHeight = SAFE_PAGE_HEIGHT;
+    const availableHeight = effectivePageHeight - contentPadding;
+    const firstPageAvailableHeight = availableHeight - firstPageOffset;
 
     const children = Array.from(contentRef.value.children) as HTMLElement[];
     const newPages: string[][] = [];
     let currentPageItems: string[] = [];
     let currentPageHeight = 0;
+    let isFirstPage = true;
+
+    const moduleHeights: { id: string | undefined; height: number; marginTop: number; marginBottom: number }[] = [];
 
     for (const child of children) {
-      // 获取元素完整高度（包括 margin）
       const style = window.getComputedStyle(child);
       const marginTop = parseFloat(style.marginTop) || 0;
       const marginBottom = parseFloat(style.marginBottom) || 0;
@@ -52,18 +67,20 @@ export function usePagination(
         child.getBoundingClientRect().height + marginTop + marginBottom;
 
       const id = child.dataset.id;
+      moduleHeights.push({ id, height, marginTop, marginBottom });
 
       if (!id) continue;
 
-      // 如果当前页高度 + 新元素高度 > 可用高度
-      // 并且当前页已经有元素了（避免第一个元素就过高导致死循环）
+      const currentAvailableHeight = isFirstPage ? firstPageAvailableHeight : availableHeight;
+
       if (
-        currentPageHeight + height > availableHeight &&
+        currentPageHeight + height > currentAvailableHeight &&
         currentPageItems.length > 0
       ) {
         newPages.push(currentPageItems);
         currentPageItems = [];
         currentPageHeight = 0;
+        isFirstPage = false;
       }
 
       currentPageItems.push(id);
@@ -74,9 +91,22 @@ export function usePagination(
       newPages.push(currentPageItems);
     }
 
-    // 如果没有内容，至少有一页
     if (newPages.length === 0) {
       newPages.push([]);
+    }
+
+    if (DEBUG_PAGINATION) {
+      console.log('[Pagination] ========== 分页计算 ==========');
+      console.log('[Pagination] A4高度(mm):', A4_HEIGHT_MM);
+      console.log('[Pagination] MM转PX系数:', MM_TO_PX);
+      console.log('[Pagination] 计算页面高度:', PAGE_HEIGHT);
+      console.log('[Pagination] 安全页面高度:', SAFE_PAGE_HEIGHT);
+      console.log('[Pagination] 原始padding值:', rawPadding);
+      console.log('[Pagination] 解析后padding:', contentPadding);
+      console.log('[Pagination] 可用高度:', availableHeight);
+      console.log('[Pagination] 模块高度详情:', moduleHeights);
+      console.log('[Pagination] 分页结果:', newPages);
+      console.log('[Pagination] ==============================');
     }
 
     pages.value = newPages;

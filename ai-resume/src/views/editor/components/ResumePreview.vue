@@ -5,7 +5,7 @@ import { storeToRefs } from "pinia";
 import { watch } from "vue";
 import { useRoute } from "vue-router";
 
-const { resumeData } = storeToRefs(useResumeStore());
+const { resumeData, globalLineHeight } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
 
 const route = useRoute();
@@ -26,7 +26,11 @@ watch(
   这里只展示模板，不涉及复杂的逻辑。
 -->
 <template>
-  <div class="resume-preview-wrapper" ref="currentTemplateRef">
+  <div
+    class="resume-preview-wrapper"
+    ref="currentTemplateRef"
+    :style="{ lineHeight: globalLineHeight }"
+  >
     <template v-for="item in templateList" :key="item.value">
       <component :is="item.component" v-if="item.value === resumeData.type" />
     </template>
@@ -39,16 +43,18 @@ watch(
     list-style-type: disc;
     padding-left: 20px;
     margin: 8px 0;
+    line-height: inherit;
   }
 
   ol {
     list-style-type: decimal;
     padding-left: 20px;
     margin: 8px 0;
+    line-height: inherit;
   }
 
   :deep(li) {
-    line-height: 1.5;
+    line-height: inherit;
     margin-bottom: 4px;
 
     p {

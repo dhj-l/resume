@@ -84,7 +84,7 @@
     <div
       v-for="(page, index) in pages"
       :key="index"
-      class="resume-page w-[210mm] min-h-[297mm] bg-white shadow-lg mb-8 box-border relative"
+      class="resume-page w-[210mm] h-[1122px] bg-white shadow-lg mb-8 box-border relative"
       :style="{
         padding: globalPageMargin,
         fontSize: globalFontSize,
@@ -222,6 +222,7 @@ const contentPadding = computed(() => {
 
 const { pages } = usePagination(contentRef, resumeData, {
   contentPadding,
+  firstPageOffset: 100,
 });
 </script>
 

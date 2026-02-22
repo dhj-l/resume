@@ -1,15 +1,14 @@
 import html2canvas from "html2canvas";
 
 export const extractEffectiveCssForElement = (element: Element) => {
-  const matchedCss = [];
+  const matchedCss: string[] = [];
+  const processedSelectors = new Set<string>();
 
-  // 遍历所有样式表
   for (const styleSheet of document.styleSheets) {
     let rules;
     try {
-      rules = styleSheet.cssRules;
+      rules = styleSheet.cssRules || styleSheet.rules;
     } catch (e) {
-      // 忽略跨域的 stylesheet
       continue;
     }
 
@@ -19,24 +18,65 @@ export const extractEffectiveCssForElement = (element: Element) => {
       if (rule.type === CSSRule.STYLE_RULE) {
         const selectorText = (rule as CSSStyleRule).selectorText;
 
-        // 过滤掉 shadow 相关的类名
-        if (selectorText.includes("shadow")) continue;
+        if (
+          selectorText.includes("shadow") ||
+          selectorText.includes("::-webkit-") ||
+          selectorText.includes(":hover") ||
+          selectorText.includes(":focus")
+        ) {
+          continue;
+        }
 
-        // 判断这个选择器是否命中目标元素或其子元素
+        if (processedSelectors.has(selectorText)) continue;
+
         try {
-          // 检查是否命中当前元素
-          if (element.matches(selectorText)) {
+          if (
+            element.matches(selectorText) ||
+            element.querySelectorAll(selectorText).length > 0
+          ) {
             matchedCss.push(rule.cssText);
-            continue;
-          }
-
-          // 检查是否命中子元素
-          if (element.querySelectorAll(selectorText).length > 0) {
-            matchedCss.push(rule.cssText);
+            processedSelectors.add(selectorText);
           }
         } catch (e) {
-          // 有些选择器解析会报错，比如 ::-webkit-scrollbar，跳过即可
           continue;
+        }
+      } else if (rule.type === CSSRule.MEDIA_RULE) {
+        const mediaRule = rule as CSSMediaRule;
+        const mediaCss: string[] = [];
+        let hasMatchingRule = false;
+
+        for (const mediaRuleItem of Array.from(mediaRule.cssRules)) {
+          if (mediaRuleItem.type === CSSRule.STYLE_RULE) {
+            const styleRule = mediaRuleItem as CSSStyleRule;
+            const selectorText = styleRule.selectorText;
+
+            if (
+              selectorText.includes("shadow") ||
+              selectorText.includes("::-webkit-") ||
+              selectorText.includes(":hover") ||
+              selectorText.includes(":focus")
+            ) {
+              continue;
+            }
+
+            try {
+              if (
+                element.matches(selectorText) ||
+                element.querySelectorAll(selectorText).length > 0
+              ) {
+                mediaCss.push(styleRule.cssText);
+                hasMatchingRule = true;
+              }
+            } catch (e) {
+              continue;
+            }
+          }
+        }
+
+        if (hasMatchingRule && mediaCss.length > 0) {
+          matchedCss.push(
+            `@media ${mediaRule.conditionText} { ${mediaCss.join(" ")} }`
+          );
         }
       }
     }

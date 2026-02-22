@@ -14,7 +14,7 @@ export const getSelfEvaluationStyles = (
     container:
       "resume-section w-full hover:bg-blue-50 hover:border-blue-300 border border-transparent rounded cursor-pointer transition-all duration-200",
     title: "text-lg font-bold text-gray-800 border-b border-gray-300 pb-2 mb-3",
-    content: "text-gray-700 leading-relaxed whitespace-pre-wrap", // Removed text-sm
+    content: "text-gray-700 whitespace-pre-wrap",
     empty: "text-gray-400 italic",
   };
 
@@ -24,7 +24,7 @@ export const getSelfEvaluationStyles = (
         ...commonStyles,
         container: `${commonStyles.container}`, // Removed p-0 mb-0
         title: "text-lg font-bold text-gray-800 mb-3", // 移除下划线
-        content: "text-gray-600 leading-relaxed", // Removed text-sm
+        content: "text-gray-600",
       };
     case "simple":
       return {

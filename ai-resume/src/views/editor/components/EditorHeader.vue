@@ -95,9 +95,40 @@ const handleExport = async () => {
     const exportCss =
       css +
       `
-      @page { margin: 0; }
-      body { margin: 0; padding: 0; }
-      .resume-page { margin-bottom: 0 !important; box-shadow: none !important; }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+
+      html, body {
+        width: 210mm;
+        height: 297mm;
+        margin: 0;
+        padding: 0;
+      }
+
+      .resume-page {
+        width: 210mm !important;
+        min-height: 297mm !important;
+        height: auto !important;
+        margin-bottom: 0 !important;
+        box-shadow: none !important;
+        page-break-after: always;
+        page-break-inside: avoid;
+      }
+
+      .resume-page:last-child {
+        page-break-after: auto;
+      }
+
+      .resume-section {
+        page-break-inside: avoid;
+      }
     `;
     const res: any = await downloadResumeAPI({
       html,

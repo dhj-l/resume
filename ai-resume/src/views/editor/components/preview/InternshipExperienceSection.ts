@@ -26,7 +26,7 @@ export const getInternshipExperienceStyles = (
     companyName: "font-bold text-gray-800 break-words",
     timeRange: "text-gray-600 shrink-0",
     position: "font-medium text-gray-700 mb-1",
-    description: "text-gray-600 leading-relaxed whitespace-pre-wrap",
+    description: "text-gray-600 whitespace-pre-wrap",
     empty: "text-gray-400 italic",
   };
 
