@@ -11,6 +11,7 @@ import type {
   CampusExperience,
   InternshipExperience,
   GlobalStyle,
+  ModuleOrderConfig,
 } from "./type";
 import { mockResumeData } from "@/views/editor/data/mockData";
 
@@ -39,177 +40,168 @@ import {
   updateResumeAPI,
 } from "@/api/resume/resume";
 
+const DEFAULT_MODULE_ORDER: ModuleItem[] = [
+  {
+    moduleKey: "basicInfo",
+    label: "基本信息",
+    component: null,
+    formComponent: shallowRef(BasicInfoForm),
+    isShow: true,
+    globalSort: 0,
+  },
+  {
+    moduleKey: "jobIntention",
+    label: "求职意向",
+    component: null,
+    formComponent: shallowRef(JobIntentionForm),
+    isShow: true,
+    globalSort: 1,
+  },
+  {
+    moduleKey: "educationBackground",
+    label: "教育背景",
+    component: shallowRef(EducationBackgroundSection),
+    formComponent: shallowRef(EducationForm),
+    isShow: true,
+    globalSort: 2,
+  },
+  {
+    moduleKey: "workExperience",
+    label: "工作经验",
+    component: shallowRef(WorkExperienceSection),
+    formComponent: shallowRef(WorkExperienceForm),
+    isShow: true,
+    globalSort: 3,
+  },
+  {
+    moduleKey: "projectExperience",
+    label: "项目经历",
+    component: shallowRef(ProjectExperienceSection),
+    formComponent: shallowRef(ProjectExperienceForm),
+    isShow: true,
+    globalSort: 4,
+  },
+  {
+    moduleKey: "campusExperience",
+    label: "校园经历",
+    component: shallowRef(CampusExperienceSection),
+    formComponent: shallowRef(CampusExperienceForm),
+    isShow: true,
+    globalSort: 5,
+  },
+  {
+    moduleKey: "internshipExperience",
+    label: "实习经历",
+    component: shallowRef(InternshipExperienceSection),
+    formComponent: shallowRef(InternshipExperienceForm),
+    isShow: true,
+    globalSort: 6,
+  },
+  {
+    moduleKey: "skills",
+    label: "技能特长",
+    component: shallowRef(SkillsSection),
+    formComponent: shallowRef(SkillsForm),
+    isShow: true,
+    globalSort: 7,
+  },
+  {
+    moduleKey: "certificates",
+    label: "证书经历",
+    component: shallowRef(CertificatesSection),
+    formComponent: shallowRef(CertificatesForm),
+    isShow: true,
+    globalSort: 8,
+  },
+  {
+    moduleKey: "selfEvaluation",
+    label: "自我评价",
+    component: shallowRef(SelfEvaluationSection),
+    formComponent: shallowRef(SelfEvaluationForm),
+    isShow: true,
+    globalSort: 9,
+  },
+];
+
+const FIXED_MODULES = ["basicInfo", "jobIntention"] as const;
+
+const isFixedModule = (moduleKey: string): boolean => {
+  return FIXED_MODULES.includes(moduleKey as any);
+};
+
 export const useResumeStore = defineStore("resume", () => {
-  // 初始化简历数据
   const resumeData = ref<ResumeData>(mockResumeData);
-  //当前模块
   const currentModule = ref<string>("basicInfo");
-  //控制模块排序数组
-  const moduleOrder = ref<ModuleItem[]>([
-    {
-      index: 0,
-      moduleKey: "basicInfo",
-      label: "基本信息",
-      /**
-       * null代表是固定模块，不能删除
-       */
-      component: null,
-      formComponent: shallowRef(BasicInfoForm),
-      isShow: true,
-    },
-    {
-      index: 1,
-      moduleKey: "jobIntention",
-      label: "求职意向",
-      component: null,
-      formComponent: shallowRef(JobIntentionForm),
-      isShow: true,
-    },
-    {
-      index: 2,
-      moduleKey: "educationBackground",
-      label: "教育背景",
-      component: shallowRef(EducationBackgroundSection),
-      formComponent: shallowRef(EducationForm),
-      isShow: true,
-    },
-    {
-      index: 3,
-      moduleKey: "workExperience",
-      label: "工作经验",
-      component: shallowRef(WorkExperienceSection),
-      formComponent: shallowRef(WorkExperienceForm),
-      isShow: true,
-    },
-    {
-      index: 4,
-      moduleKey: "projectExperience",
-      label: "项目经历",
-      component: shallowRef(ProjectExperienceSection),
-      formComponent: shallowRef(ProjectExperienceForm),
-      isShow: true,
-    },
-    {
-      index: 5,
-      moduleKey: "campusExperience",
-      label: "校园经历",
-      component: shallowRef(CampusExperienceSection),
-      formComponent: shallowRef(CampusExperienceForm),
-      isShow: true,
-    },
-    {
-      index: 6,
-      moduleKey: "internshipExperience",
-      label: "实习经历",
-      component: shallowRef(InternshipExperienceSection),
-      formComponent: shallowRef(InternshipExperienceForm),
-      isShow: true,
-    },
-    {
-      index: 7,
-      moduleKey: "skills",
-      label: "技能特长",
-      component: shallowRef(SkillsSection),
-      formComponent: shallowRef(SkillsForm),
-      isShow: true,
-    },
-    {
-      index: 8,
-      moduleKey: "certificates",
-      label: "证书经历",
-      component: shallowRef(CertificatesSection),
-      formComponent: shallowRef(CertificatesForm),
-      isShow: true,
-    },
-    {
-      index: 9,
-      moduleKey: "selfEvaluation",
-      label: "自我评价",
-      component: shallowRef(SelfEvaluationSection),
-      formComponent: shallowRef(SelfEvaluationForm),
-      isShow: true,
-    },
-  ]);
-  //控制抽屉展开/收起
+  const moduleOrder = ref<ModuleItem[]>([...DEFAULT_MODULE_ORDER]);
   const isExpanded = ref(false);
-  /**
-   * 当前简历模板类型
-   */
+
   const currentTemplateType = computed(() => {
     return resumeData.value.type || "default";
   });
 
-  // 全局样式计算属性
   const globalPageMargin = computed(() => {
-    return resumeData.value.globalStyle?.pageMargin || '12px';
+    return resumeData.value.globalStyle?.pageMargin || "12px";
   });
 
   const globalFontSize = computed(() => {
-    return resumeData.value.globalStyle?.fontSize || '12px';
+    return resumeData.value.globalStyle?.fontSize || "12px";
   });
 
   const globalLineHeight = computed(() => {
-    return resumeData.value.globalStyle?.lineHeight || '20px';
+    return resumeData.value.globalStyle?.lineHeight || "20px";
   });
 
   const globalModuleMargin = computed(() => {
-    return resumeData.value.globalStyle?.moduleMargin || '12px';
+    return resumeData.value.globalStyle?.moduleMargin || "12px";
   });
 
-  /**
-   * 设置当前选中的模块
-   * @param moduleKey 模块键值
-   */
   const setCurrentModel = (moduleKey: string) => {
     currentModule.value = moduleKey;
   };
-  /**
-   * 设置抽屉展开/收起状态
-   * @param value 展开状态值
-   */
+
   const setIsExpanded = (value: boolean) => {
     isExpanded.value = value;
   };
-  /**
-   * 设置当前选中的模板
-   * @param template 模板类型
-   */
+
   const setCurrentTemplate = (template: templateType) => {
     console.log(template);
-
     resumeData.value.type = template;
   };
-  /**
-   * 修改简历字符串类型数据
-   * @param key 数据键值
-   * @param value 数据值
-   */
+
   const setResumeDataString = (key: keyof ResumeData, value: any) => {
     if (typeof resumeData.value[key] === "string") {
       resumeData.value[key] = value;
     }
   };
-  /**
-   * 创建简历
-   */
+
   const createResume = async () => {
     const res = await createResumeAPI();
     resumeData.value = res.data;
   };
-  /**
-   * 保存简历(修改)
-   */
+
   const saveResume = async () => {
     const res = await updateResumeAPI(resumeData.value._id, resumeData.value);
     resumeData.value = res.data;
   };
 
-  /**
-   * 获取简历详情
-   */
+  const initializeModuleOrder = (config?: ModuleOrderConfig[]) => {
+    if (config && config.length > 0) {
+      config.forEach((item) => {
+        const module = moduleOrder.value.find(
+          (m) => m.moduleKey === item.moduleKey,
+        );
+        if (module) {
+          module.globalSort = item.globalSort;
+        }
+      });
+    }
+    moduleOrder.value.sort((a, b) => a.globalSort - b.globalSort);
+  };
+
   const getResumeDetail = async (id: string) => {
     const res = await getResumeDetailAPI(id);
     resumeData.value = res.data;
+    initializeModuleOrder(res.data.moduleOrderConfig);
   };
 
   const setGlobalStyle = (data: Partial<GlobalStyle>) => {
@@ -230,7 +222,6 @@ export const useResumeStore = defineStore("resume", () => {
     } as JobIntention;
   };
 
-  // Education
   const addEducation = () => {
     resumeData.value.educationBackground.push({
       schoolName: "",
@@ -260,7 +251,6 @@ export const useResumeStore = defineStore("resume", () => {
     console.log("move", index, direction);
   };
 
-  // Work Experience
   const addWorkExperience = () => {
     if (!resumeData.value.workExperience) resumeData.value.workExperience = [];
     resumeData.value.workExperience.push({
@@ -297,7 +287,6 @@ export const useResumeStore = defineStore("resume", () => {
     console.log("move", index, direction);
   };
 
-  // Project Experience
   const addProjectExperience = () => {
     if (!resumeData.value.projectExperience)
       resumeData.value.projectExperience = [];
@@ -335,7 +324,6 @@ export const useResumeStore = defineStore("resume", () => {
     console.log("move", index, direction);
   };
 
-  // Campus Experience
   const addCampusExperience = () => {
     if (!resumeData.value.campusExperience)
       resumeData.value.campusExperience = [];
@@ -373,7 +361,6 @@ export const useResumeStore = defineStore("resume", () => {
     console.log("move", index, direction);
   };
 
-  // Internship Experience
   const addInternshipExperience = () => {
     if (!resumeData.value.internshipExperience)
       resumeData.value.internshipExperience = [];
@@ -412,6 +399,24 @@ export const useResumeStore = defineStore("resume", () => {
     direction: "up" | "down",
   ) => {
     console.log("move", index, direction);
+  };
+
+  const swapModuleOrder = (moduleKeyA: string, moduleKeyB: string) => {
+    // if (isFixedModule(moduleKeyA) || isFixedModule(moduleKeyB)) {
+    //   return false;
+    // }
+    // const indexA = moduleOrder.value.findIndex(
+    //   (m) => m.moduleKey === moduleKeyA,
+    // );
+    // const indexB = moduleOrder.value.findIndex(
+    //   (m) => m.moduleKey === moduleKeyB,
+    // );
+    // if (indexA === -1 || indexB === -1) return false;
+    // const tempGlobalSort = moduleOrder.value[indexA].globalSort;
+    // moduleOrder.value[indexA].globalSort = moduleOrder.value[indexB].globalSort;
+    // moduleOrder.value[indexB].globalSort = tempGlobalSort;
+    // moduleOrder.value.sort((a, b) => a.globalSort - b.globalSort);
+    // return true;
   };
 
   return {
@@ -454,5 +459,7 @@ export const useResumeStore = defineStore("resume", () => {
     updateInternshipExperience,
     moveInternshipExperience,
     setGlobalStyle,
+    swapModuleOrder,
+    initializeModuleOrder,
   };
 });

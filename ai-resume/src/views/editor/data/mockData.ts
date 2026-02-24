@@ -86,4 +86,16 @@ export const mockResumeData: ResumeData = {
         "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
     },
   ],
+  moduleOrderConfig: [
+    { moduleKey: "basicInfo", globalSort: 0 },
+    { moduleKey: "jobIntention", globalSort: 1 },
+    { moduleKey: "educationBackground", globalSort: 2 },
+    { moduleKey: "workExperience", globalSort: 3 },
+    { moduleKey: "projectExperience", globalSort: 4 },
+    { moduleKey: "campusExperience", globalSort: 5 },
+    { moduleKey: "internshipExperience", globalSort: 6 },
+    { moduleKey: "skills", globalSort: 7 },
+    { moduleKey: "certificates", globalSort: 8 },
+    { moduleKey: "selfEvaluation", globalSort: 9 },
+  ],
 };

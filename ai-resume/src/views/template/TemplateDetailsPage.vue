@@ -128,6 +128,19 @@
           <a-button
             size="large"
             block
+            :loading="isImportingResume"
+            @click="handleImportResume"
+            class="flex items-center justify-center gap-2 h-12"
+          >
+            <template #icon v-if="!isImportingResume">
+              <Upload class="w-4 h-4" />
+            </template>
+            导入已有简历
+          </a-button>
+
+          <a-button
+            size="large"
+            block
             @click="router.push('/templates')"
             class="flex items-center justify-center gap-2 h-12"
           >
@@ -156,6 +169,11 @@
       :submitting="isImporting"
       @submit="handleUploadResumeSubmit"
     />
+    <ImportResumeDialog
+      v-model:open="importResumeOpen"
+      :submitting="isImportingResume"
+      @submit="handleImportResumeSubmit"
+    />
     <FullScreenLoading v-model:loading="isGlobalLoading" />
   </div>
 </template>
@@ -164,15 +182,20 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { getTemplateByIdAPI } from "@/api/templates/templates";
-import { generateAiResumeAPI, createResumeAPI } from "@/api/resume/resume";
+import {
+  generateAiResumeAPI,
+  createResumeAPI,
+  importResumeAPI,
+} from "@/api/resume/resume";
 import type { TemplateDetails } from "@/api/templates/type";
-import { Calendar, Users, Edit3, Sparkles } from "lucide-vue-next";
+import { Calendar, Users, Edit3, Sparkles, Upload } from "lucide-vue-next";
 import { getFullImageUrl } from "@/utils/image";
 import { formatDate } from "@/utils/day";
 import AiCreateDialog from "./components/AiCreateDialog.vue";
 import CreateModeDialog from "./components/CreateModeDialog.vue";
 import SelectResumeDialog from "./components/SelectResumeDialog.vue";
 import UploadResumeDialog from "./components/UploadResumeDialog.vue";
+import ImportResumeDialog from "./components/ImportResumeDialog.vue";
 import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
 import { message } from "ant-design-vue";
 
@@ -181,14 +204,15 @@ const router = useRouter();
 const loading = ref(true);
 const isCreating = ref(false);
 const isAiCreating = ref(false);
-const isImporting = ref(false); // For Select/Upload flows
-const isGlobalLoading = ref(false); // Full screen loading state
+const isImporting = ref(false);
+const isImportingResume = ref(false);
+const isGlobalLoading = ref(false);
 
-// Dialog states
 const createModeOpen = ref(false);
 const aiDialogOpen = ref(false);
 const selectResumeOpen = ref(false);
 const uploadResumeOpen = ref(false);
+const importResumeOpen = ref(false);
 
 const error = ref("");
 const template = ref<TemplateDetails | null>(null);
@@ -330,7 +354,34 @@ const handleUploadResumeSubmit = async (payload: {
 
 const handleCreateNew = () => {
   selectResumeOpen.value = false;
-  aiDialogOpen.value = true; // Redirect to manual input
+  aiDialogOpen.value = true;
+};
+
+const handleImportResume = () => {
+  importResumeOpen.value = true;
+};
+
+const handleImportResumeSubmit = async (payload: { resumeText: string }) => {
+  if (!template.value || isGlobalLoading.value) return;
+  isImportingResume.value = true;
+  isGlobalLoading.value = true;
+
+  try {
+    const { data: resData } = await importResumeAPI({
+      templateType: template.value.resume.type,
+      templateId: template.value._id,
+      resumeContent: payload.resumeText,
+    });
+
+    if (resData && resData._id) {
+      message.success("简历导入成功");
+      pushToEditor(resData._id);
+      importResumeOpen.value = false;
+    }
+  } finally {
+    isImportingResume.value = false;
+    isGlobalLoading.value = false;
+  }
 };
 
 onMounted(() => {

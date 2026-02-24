@@ -1,6 +1,7 @@
 import { http } from "@/http/request";
 import type { ResumeData } from "@/stores/type";
 import type {
+  AIResumeParams,
   AiResumeParams,
   CreateResumeParams,
   DeleteResumeResult,
@@ -72,4 +73,11 @@ export const parseResumeAPI = (file: File) => {
  */
 export const generateAiResumeAPI = (data: AiResumeParams) => {
   return http.post<{ _id: string }>("/resume-ai/generate", data);
+};
+
+/**
+ * 导入简历
+ */
+export const importResumeAPI = (data: AIResumeParams) => {
+  return http.post<{ _id: string }>("/resume-ai/parse", data);
 };

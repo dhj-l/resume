@@ -30,3 +30,9 @@ export interface AiResumeParams {
   detailInfo?: any;
   resumeId?: string;
 }
+
+export interface AIResumeParams {
+  templateType: string;
+  templateId: string;
+  resumeContent: string;
+}
