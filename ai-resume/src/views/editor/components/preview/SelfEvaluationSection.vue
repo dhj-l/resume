@@ -3,9 +3,10 @@ import { useResumeStore } from "@/stores/resumeStore";
 import type { templateType } from "./type";
 import { getSelfEvaluationStyles } from "./SelfEvaluationSection";
 import { computed } from "vue";
+import type { SortableModule } from "@/stores/type";
 
 const props = defineProps<{
-  data?: string;
+  data?: SortableModule;
   label?: string;
   templateType: templateType;
 }>();
@@ -25,11 +26,11 @@ const handleClick = () => {
     v-if="data": 仅在有自我评价内容时渲染
     数据来源: props.data (HTML 字符串)
   -->
-  <div v-if="data" :class="styles.container" @click="handleClick">
+  <div v-if="data?.content" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
       {{ label || "自我评价" }}
     </h3>
-    <p v-if="data" :class="styles.content" v-html="data"></p>
+    <p v-if="data?.content" :class="styles.content" v-html="data.content"></p>
     <div v-else :class="styles.empty">暂无自我评价信息</div>
   </div>
 </template>

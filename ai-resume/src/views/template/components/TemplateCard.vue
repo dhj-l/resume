@@ -5,14 +5,14 @@
   >
     <!-- Template Preview Image (70%) -->
     <div
-      class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-6"
+      class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-2"
     >
       <!-- Placeholder or Image -->
       <img
         v-if="template.previewImage"
         :src="getFullImageUrl(template.previewImage)"
         :alt="template.name"
-        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 shadow-sm rounded-sm"
+        class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 shadow-sm rounded-sm"
       />
       <div
         v-else

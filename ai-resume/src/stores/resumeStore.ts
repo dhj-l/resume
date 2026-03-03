@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { computed, ref, shallowRef } from "vue";
+import { computed, ref, shallowRef, watch } from "vue";
 import type {
   ModuleItem,
   ResumeData,
@@ -11,7 +11,7 @@ import type {
   CampusExperience,
   InternshipExperience,
   GlobalStyle,
-  ModuleOrderConfig,
+  SortableModule,
 } from "./type";
 import { mockResumeData } from "@/views/editor/data/mockData";
 
@@ -129,6 +129,34 @@ const isFixedModule = (moduleKey: string): boolean => {
   return FIXED_MODULES.includes(moduleKey as any);
 };
 
+const getGlobalSortFromResumeData = (
+  resumeData: ResumeData,
+  moduleKey: string,
+): number => {
+  const moduleData = (resumeData as any)[moduleKey];
+
+  if (moduleData === null || moduleData === undefined) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+
+  if (Array.isArray(moduleData)) {
+    if (moduleData.length === 0) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+    return moduleData[0]?.globalSort ?? Number.MAX_SAFE_INTEGER;
+  }
+
+  if (typeof moduleData === "object") {
+    const keys = Object.keys(moduleData);
+    if (keys.length === 0) {
+      return Number.MAX_SAFE_INTEGER;
+    }
+    return moduleData.globalSort ?? Number.MAX_SAFE_INTEGER;
+  }
+
+  return Number.MAX_SAFE_INTEGER;
+};
+
 export const useResumeStore = defineStore("resume", () => {
   const resumeData = ref<ResumeData>(mockResumeData);
   const currentModule = ref<string>("basicInfo");
@@ -184,25 +212,50 @@ export const useResumeStore = defineStore("resume", () => {
     resumeData.value = res.data;
   };
 
-  const initializeModuleOrder = (config?: ModuleOrderConfig[]) => {
-    if (config && config.length > 0) {
-      config.forEach((item) => {
-        const module = moduleOrder.value.find(
-          (m) => m.moduleKey === item.moduleKey,
-        );
-        if (module) {
-          module.globalSort = item.globalSort;
-        }
-      });
-    }
-    moduleOrder.value.sort((a, b) => a.globalSort - b.globalSort);
+  const initializeModuleOrder = () => {
+    syncModuleOrderWithResumeData();
+  };
+
+  const syncModuleOrderWithResumeData = () => {
+    moduleOrder.value.forEach((module) => {
+      module.globalSort = getGlobalSortFromResumeData(
+        resumeData.value,
+        module.moduleKey,
+      );
+    });
+
+    const basicInfoModule = moduleOrder.value.find(
+      (m) => m.moduleKey === "basicInfo",
+    );
+    const jobIntentionModule = moduleOrder.value.find(
+      (m) => m.moduleKey === "jobIntention",
+    );
+    const otherModules = moduleOrder.value.filter(
+      (m) => !isFixedModule(m.moduleKey),
+    );
+
+    otherModules.sort((a, b) => a.globalSort - b.globalSort);
+
+    moduleOrder.value = [
+      ...(basicInfoModule ? [basicInfoModule] : []),
+      ...(jobIntentionModule ? [jobIntentionModule] : []),
+      ...otherModules,
+    ];
   };
 
   const getResumeDetail = async (id: string) => {
     const res = await getResumeDetailAPI(id);
     resumeData.value = res.data;
-    initializeModuleOrder(res.data.moduleOrderConfig);
+    initializeModuleOrder();
   };
+
+  watch(
+    () => resumeData.value,
+    () => {
+      syncModuleOrderWithResumeData();
+    },
+    { deep: true },
+  );
 
   const setGlobalStyle = (data: Partial<GlobalStyle>) => {
     resumeData.value.globalStyle = {
@@ -222,8 +275,29 @@ export const useResumeStore = defineStore("resume", () => {
     } as JobIntention;
   };
 
+  const setSkills = (data: Partial<SortableModule>) => {
+    resumeData.value.skills = {
+      ...resumeData.value.skills,
+      ...data,
+    } as SortableModule;
+  };
+
+  const setCertificates = (data: Partial<SortableModule>) => {
+    resumeData.value.certificates = {
+      ...resumeData.value.certificates,
+      ...data,
+    } as SortableModule;
+  };
+
+  const setSelfEvaluation = (data: Partial<SortableModule>) => {
+    resumeData.value.selfEvaluation = {
+      ...resumeData.value.selfEvaluation,
+      ...data,
+    } as SortableModule;
+  };
+
   const addEducation = () => {
-    resumeData.value.educationBackground.push({
+    addItem("educationBackground", {
       schoolName: "",
       major: "",
       degree: "",
@@ -247,13 +321,60 @@ export const useResumeStore = defineStore("resume", () => {
     }
   };
 
+  const moveItem = (
+    key: keyof ResumeData,
+    index: number,
+    direction: "up" | "down",
+  ) => {
+    const list = resumeData.value[key] as any;
+    if (!list || list.length <= 1) return;
+
+    let targetIndex: number;
+    if (direction === "up") {
+      if (index === 0) return;
+      targetIndex = index - 1;
+    } else {
+      if (index === list.length - 1) return;
+      targetIndex = index + 1;
+    }
+
+    const tempLocalSort = list[index]?.localSort ?? 0;
+    list[index]!.localSort = list[targetIndex]?.localSort ?? 0;
+    list[targetIndex]!.localSort = tempLocalSort;
+
+    list.sort((a: any, b: any) => (a.localSort ?? 0) - (b.localSort ?? 0));
+  };
+
+  const addItem = (key: keyof ResumeData, initialData: any) => {
+    let list = resumeData.value[key] as any;
+    if (!list) {
+      list = [];
+      (resumeData.value as any)[key] = list;
+    }
+
+    const newLocalSort =
+      list.length > 0
+        ? Math.max(...list.map((item: any) => item.localSort ?? 0)) + 1
+        : 0;
+
+    const newItem = {
+      ...initialData,
+      localSort: newLocalSort,
+    };
+
+    if (list.length > 0 && list[0]?.globalSort !== undefined) {
+      newItem.globalSort = list[0].globalSort;
+    }
+
+    list.push(newItem);
+  };
+
   const moveEducation = (index: number, direction: "up" | "down") => {
-    console.log("move", index, direction);
+    moveItem("educationBackground", index, direction);
   };
 
   const addWorkExperience = () => {
-    if (!resumeData.value.workExperience) resumeData.value.workExperience = [];
-    resumeData.value.workExperience.push({
+    addItem("workExperience", {
       companyName: "",
       position: "",
       workTime: "",
@@ -284,13 +405,11 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const moveWorkExperience = (index: number, direction: "up" | "down") => {
-    console.log("move", index, direction);
+    moveItem("workExperience", index, direction);
   };
 
   const addProjectExperience = () => {
-    if (!resumeData.value.projectExperience)
-      resumeData.value.projectExperience = [];
-    resumeData.value.projectExperience.push({
+    addItem("projectExperience", {
       title: "",
       description: "",
       startTime: "",
@@ -321,13 +440,11 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const moveProjectExperience = (index: number, direction: "up" | "down") => {
-    console.log("move", index, direction);
+    moveItem("projectExperience", index, direction);
   };
 
   const addCampusExperience = () => {
-    if (!resumeData.value.campusExperience)
-      resumeData.value.campusExperience = [];
-    resumeData.value.campusExperience.push({
+    addItem("campusExperience", {
       title: "",
       description: "",
       startTime: "",
@@ -358,13 +475,11 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const moveCampusExperience = (index: number, direction: "up" | "down") => {
-    console.log("move", index, direction);
+    moveItem("campusExperience", index, direction);
   };
 
   const addInternshipExperience = () => {
-    if (!resumeData.value.internshipExperience)
-      resumeData.value.internshipExperience = [];
-    resumeData.value.internshipExperience.push({
+    addItem("internshipExperience", {
       companyName: "",
       position: "",
       startTime: "",
@@ -398,25 +513,55 @@ export const useResumeStore = defineStore("resume", () => {
     index: number,
     direction: "up" | "down",
   ) => {
-    console.log("move", index, direction);
+    moveItem("internshipExperience", index, direction);
+  };
+
+  const changeGlobalSort = (moduleKeyA: string, moduleKeyB: string) => {
+    const moduleA = (resumeData.value as any)[moduleKeyA];
+    const moduleB = (resumeData.value as any)[moduleKeyB];
+
+    const tempGlobalSortA = Array.isArray(moduleA)
+      ? moduleA[0]?.globalSort || 0
+      : moduleA?.globalSort || 0;
+    const tempGlobalSortB = Array.isArray(moduleB)
+      ? moduleB[0]?.globalSort || 0
+      : moduleB?.globalSort || 0;
+    if (Array.isArray(moduleA)) {
+      moduleA.forEach((item) => {
+        item.globalSort = tempGlobalSortB;
+      });
+    } else {
+      moduleA.globalSort = tempGlobalSortB;
+    }
+    if (Array.isArray(moduleB)) {
+      moduleB.forEach((item) => {
+        item.globalSort = tempGlobalSortA;
+      });
+    } else {
+      moduleB.globalSort = tempGlobalSortA;
+    }
   };
 
   const swapModuleOrder = (moduleKeyA: string, moduleKeyB: string) => {
-    // if (isFixedModule(moduleKeyA) || isFixedModule(moduleKeyB)) {
-    //   return false;
-    // }
-    // const indexA = moduleOrder.value.findIndex(
-    //   (m) => m.moduleKey === moduleKeyA,
-    // );
-    // const indexB = moduleOrder.value.findIndex(
-    //   (m) => m.moduleKey === moduleKeyB,
-    // );
-    // if (indexA === -1 || indexB === -1) return false;
-    // const tempGlobalSort = moduleOrder.value[indexA].globalSort;
-    // moduleOrder.value[indexA].globalSort = moduleOrder.value[indexB].globalSort;
-    // moduleOrder.value[indexB].globalSort = tempGlobalSort;
-    // moduleOrder.value.sort((a, b) => a.globalSort - b.globalSort);
-    // return true;
+    if (isFixedModule(moduleKeyA) || isFixedModule(moduleKeyB)) {
+      return false;
+    }
+    const indexA = moduleOrder.value.findIndex(
+      (m) => m.moduleKey === moduleKeyA,
+    );
+    const indexB = moduleOrder.value.findIndex(
+      (m) => m.moduleKey === moduleKeyB,
+    );
+    if (indexA === -1 || indexB === -1) return false;
+    const tempGlobalSort = moduleOrder.value[indexA]?.globalSort;
+    moduleOrder.value[indexA]!.globalSort =
+      moduleOrder.value[indexB]?.globalSort || 0;
+    moduleOrder.value[indexB]!.globalSort = tempGlobalSort || 0;
+    moduleOrder.value.sort((a, b) => a.globalSort - b.globalSort);
+
+    changeGlobalSort(moduleKeyA, moduleKeyB);
+    syncModuleOrderWithResumeData();
+    return true;
   };
 
   return {
@@ -438,6 +583,9 @@ export const useResumeStore = defineStore("resume", () => {
     getResumeDetail,
     setBasicInfo,
     setJobIntention,
+    setSkills,
+    setCertificates,
+    setSelfEvaluation,
     addEducation,
     removeEducation,
     updateEducation,

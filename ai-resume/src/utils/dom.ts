@@ -75,7 +75,7 @@ export const extractEffectiveCssForElement = (element: Element) => {
 
         if (hasMatchingRule && mediaCss.length > 0) {
           matchedCss.push(
-            `@media ${mediaRule.conditionText} { ${mediaCss.join(" ")} }`
+            `@media ${mediaRule.conditionText} { ${mediaCss.join(" ")} }`,
           );
         }
       }
@@ -95,10 +95,16 @@ export const getElement = (className: string) => {
   return document.querySelector(className);
 };
 
-export const getDomCover = async (elemet: HTMLElement) => {
+export const getDomCover = async (elemet: HTMLElement, height?: number) => {
+  const elementHeight = elemet.offsetHeight;
+  const captureHeight =
+    height && elementHeight > height ? height : elementHeight;
+
   const cover = await html2canvas(elemet, {
     scale: 2,
     useCORS: true,
+    windowHeight: captureHeight,
+    height: captureHeight,
   });
   const coverImg = await new Promise((resolve) => {
     cover.toBlob(resolve, "image/png", 1.0);
@@ -106,8 +112,6 @@ export const getDomCover = async (elemet: HTMLElement) => {
   const file = new File([coverImg as BlobPart], "cover.png", {
     type: "image/png",
   });
-  console.log(file);
 
   return file;
-  // cover.toBlob((blob) => {});
 };

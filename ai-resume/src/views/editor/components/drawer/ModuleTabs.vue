@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { Tabs, TabPane } from "ant-design-vue";
+import { Tabs, TabPane, Button } from "ant-design-vue";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons-vue";
 import type { ResumeData } from "@/stores/type";
 import { storeToRefs } from "pinia";
 import { useResumeStore } from "@/stores/resumeStore";
@@ -7,7 +8,59 @@ import { useResumeStore } from "@/stores/resumeStore";
 defineProps<{
   resumeData: ResumeData;
 }>();
+
 const { moduleOrder, currentModule } = storeToRefs(useResumeStore());
+const resumeStore = useResumeStore();
+const { swapModuleOrder } = resumeStore;
+
+const FIXED_MODULES = ["basicInfo", "jobIntention"];
+
+const isFixedModule = (moduleKey: string) => {
+  return FIXED_MODULES.includes(moduleKey);
+};
+
+const moveModuleLeft = (moduleKey: string) => {
+  const currentIndex = moduleOrder.value.findIndex(
+    (m) => m.moduleKey === moduleKey,
+  );
+  if (currentIndex <= 0) return;
+
+  const prevModule = moduleOrder.value[currentIndex - 1];
+  if (isFixedModule(prevModule?.moduleKey || "")) return;
+
+  swapModuleOrder(moduleKey, prevModule?.moduleKey || "");
+};
+
+const moveModuleRight = (moduleKey: string) => {
+  const currentIndex = moduleOrder.value.findIndex(
+    (m) => m.moduleKey === moduleKey,
+  );
+  if (currentIndex < 0 || currentIndex >= moduleOrder.value.length - 1) return;
+
+  const nextModule = moduleOrder.value[currentIndex + 1];
+  if (isFixedModule(nextModule?.moduleKey || "")) return;
+
+  swapModuleOrder(moduleKey, nextModule?.moduleKey || "");
+};
+
+const canMoveLeft = (moduleKey: string) => {
+  const currentIndex = moduleOrder.value.findIndex(
+    (m) => m.moduleKey === moduleKey,
+  );
+  if (currentIndex <= 0) return false;
+  const prevModule = moduleOrder.value[currentIndex - 1];
+  return !isFixedModule(prevModule?.moduleKey || "");
+};
+
+const canMoveRight = (moduleKey: string) => {
+  const currentIndex = moduleOrder.value.findIndex(
+    (m) => m.moduleKey === moduleKey,
+  );
+  if (currentIndex < 0 || currentIndex >= moduleOrder.value.length - 1)
+    return false;
+  const nextModule = moduleOrder.value[currentIndex + 1];
+  return !isFixedModule(nextModule?.moduleKey || "");
+};
 </script>
 
 <template>
@@ -20,9 +73,36 @@ const { moduleOrder, currentModule } = storeToRefs(useResumeStore());
       <TabPane
         v-for="item in moduleOrder"
         :key="item.moduleKey"
-        :tab="item.label"
         :name="item.moduleKey"
-      />
+      >
+        <template #tab>
+          <div class="flex items-center gap-1">
+            <template v-if="!isFixedModule(item.moduleKey)">
+              <Button
+                type="text"
+                size="small"
+                :disabled="!canMoveLeft(item.moduleKey)"
+                @click.stop="moveModuleLeft(item.moduleKey)"
+                class="sort-btn"
+              >
+                <LeftOutlined />
+              </Button>
+            </template>
+            <span>{{ item.label }}</span>
+            <template v-if="!isFixedModule(item.moduleKey)">
+              <Button
+                type="text"
+                size="small"
+                :disabled="!canMoveRight(item.moduleKey)"
+                @click.stop="moveModuleRight(item.moduleKey)"
+                class="sort-btn"
+              >
+                <RightOutlined />
+              </Button>
+            </template>
+          </div>
+        </template>
+      </TabPane>
     </Tabs>
 
     <div class="flex-1 overflow-y-auto p-6">
@@ -48,5 +128,31 @@ const { moduleOrder, currentModule } = storeToRefs(useResumeStore());
 <style scoped>
 :deep(.ant-tabs-nav) {
   margin-bottom: 0;
+}
+
+.sort-btn {
+  padding: 0 2px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  font-size: 10px !important;
+  opacity: 0;
+  transition:
+    opacity 0.2s,
+    color 0.2s;
+  color: rgba(0, 0, 0, 0.45);
+}
+
+:deep(.ant-tabs-tab:hover) .sort-btn {
+  opacity: 1;
+}
+
+.sort-btn:hover:not(:disabled) {
+  color: #1890ff !important;
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+.sort-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 </style>

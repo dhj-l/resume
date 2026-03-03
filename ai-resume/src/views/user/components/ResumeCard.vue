@@ -3,13 +3,13 @@
     class="group relative bg-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border border-[#f0f0f0] flex flex-col h-full"
   >
     <div
-      class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-6"
+      class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-2"
     >
       <img
         v-if="resume.cover"
         :src="coverUrl"
         :alt="resume.title || '简历封面'"
-        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 shadow-sm rounded-sm"
+        class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 shadow-sm rounded-sm"
       />
       <div
         v-else

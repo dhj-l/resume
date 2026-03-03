@@ -69,15 +69,19 @@ const handleBack = () => {
 };
 
 const handleSave = async () => {
-  //获取当前简历封面
   const element = getElement(".resume-preview-wrapper");
   if (!element) return;
-  //获取当前简历封面数据
-  const coverFile = await getDomCover(element as HTMLElement);
-  //上传图片
+
+  const elementHeight = (element as HTMLElement).offsetHeight;
+  const COVER_HEIGHT_THRESHOLD = 1200;
+
+  const coverFile = await getDomCover(
+    element as HTMLElement,
+    elementHeight > COVER_HEIGHT_THRESHOLD ? COVER_HEIGHT_THRESHOLD : undefined,
+  );
+
   const url = await uploadImage(coverFile);
   if (!url) return;
-  //更新简历封面
   setResumeDataString("cover", url);
   await saveResume();
   message.success("草稿保存成功");

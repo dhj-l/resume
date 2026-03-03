@@ -3,9 +3,10 @@ import { useResumeStore } from "@/stores/resumeStore";
 import type { templateType } from "./type";
 import { getSkillsStyles } from "./SkillsSection";
 import { computed } from "vue";
+import type { SortableModule } from "@/stores/type";
 
 const props = defineProps<{
-  data?: string;
+  data?: SortableModule;
   label?: string;
   templateType: templateType;
 }>();
@@ -25,14 +26,14 @@ const handleClick = () => {
     v-if="data": 仅在有技能特长内容时渲染
     数据来源: props.data (HTML 字符串)
   -->
-  <div v-if="data" :class="styles.container" @click="handleClick">
+  <div v-if="data?.content" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
       {{ label || "技能特长" }}
     </h3>
     <div
-      v-if="data && data.length"
+      v-if="data?.content"
       :class="styles.listWrapper"
-      v-html="data"
+      v-html="data.content"
     ></div>
   </div>
 </template>

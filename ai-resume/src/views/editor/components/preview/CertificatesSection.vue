@@ -3,9 +3,10 @@ import { useResumeStore } from "@/stores/resumeStore";
 import type { templateType } from "./type";
 import { getCertificatesStyles } from "./CertificatesSection";
 import { computed } from "vue";
+import type { SortableModule } from "@/stores/type";
 
 const props = defineProps<{
-  data?: string;
+  data?: SortableModule;
   label?: string;
   templateType: templateType;
 }>();
@@ -22,11 +23,11 @@ const handleClick = () => {
 const isVisible = computed(() => {
   if (!props.data) return false;
   // 1. 移除所有 HTML 标签
-  let content = props.data.replace(/<[^>]+>/g, "");
+  let content = props.data.content?.replace(/<[^>]+>/g, "");
   // 2. 移除常见 HTML 实体空格 (&nbsp;) 和普通空白字符
-  content = content.replace(/&nbsp;/g, "").replace(/\s/g, "");
+  content = content?.replace(/&nbsp;/g, "").replace(/\s/g, "");
   // 3. 检查剩余内容是否为空
-  return content.trim().length > 0;
+  return content!.trim().length > 0;
 });
 </script>
 
@@ -39,6 +40,6 @@ const isVisible = computed(() => {
     <h3 :class="styles.title">
       {{ label || "荣誉证书" }}
     </h3>
-    <div v-html="data"></div>
+    <div v-html="data?.content"></div>
   </div>
 </template>

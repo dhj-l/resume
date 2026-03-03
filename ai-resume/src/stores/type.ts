@@ -1,9 +1,15 @@
 import type { Component } from "vue";
 import type { templateType } from "@/views/editor/components/preview/type";
 
-export interface ModuleOrderConfig {
-  moduleKey: keyof ResumeData;
-  globalSort: number;
+/**
+ * 可排序模块接口
+ * 用于 skills、certificates、selfEvaluation 等简单模块
+ */
+export interface SortableModule {
+  /** 模块内容 */
+  content?: string;
+  /** 全局排序字段，代表当前模块在简历内的排序位置 */
+  globalSort?: number;
 }
 
 export interface ResumeData {
@@ -17,13 +23,12 @@ export interface ResumeData {
   educationBackground: EducationBackground[];
   workExperience?: WorkExperience[];
   campusExperience?: CampusExperience[];
-  skills?: string;
-  certificates?: string;
+  skills?: SortableModule;
+  certificates?: SortableModule;
   projectExperience?: ProjectExperience[];
   internshipExperience?: InternshipExperience[];
-  selfEvaluation?: string;
+  selfEvaluation?: SortableModule;
   cover?: string;
-  moduleOrderConfig?: ModuleOrderConfig[];
 }
 
 export interface JobIntention {
@@ -39,6 +44,10 @@ export interface InternshipExperience {
   companyName: string;
   position: string;
   description: string;
+  /** 全局排序字段，代表当前模块在简历内的排序位置 */
+  globalSort?: number;
+  /** 局部排序字段，当模块为数组时，代表每一项在数组内的排序位置 */
+  localSort?: number;
 }
 
 export interface ProjectExperience {
@@ -47,6 +56,10 @@ export interface ProjectExperience {
   title: string;
   description: string;
   content: string;
+  /** 全局排序字段，代表当前模块在简历内的排序位置 */
+  globalSort?: number;
+  /** 局部排序字段，当模块为数组时，代表每一项在数组内的排序位置 */
+  localSort?: number;
 }
 
 export interface CampusExperience {
@@ -55,6 +68,10 @@ export interface CampusExperience {
   title: string;
   description: string;
   content: string;
+  /** 全局排序字段，代表当前模块在简历内的排序位置 */
+  globalSort?: number;
+  /** 局部排序字段，当模块为数组时，代表每一项在数组内的排序位置 */
+  localSort?: number;
 }
 
 export interface WorkExperience {
@@ -63,6 +80,10 @@ export interface WorkExperience {
   workTime: string;
   dismissalTime?: string;
   workDescription: string;
+  /** 全局排序字段，代表当前模块在简历内的排序位置 */
+  globalSort?: number;
+  /** 局部排序字段，当模块为数组时，代表每一项在数组内的排序位置 */
+  localSort?: number;
 }
 
 export interface EducationBackground {
@@ -72,6 +93,10 @@ export interface EducationBackground {
   enrollmentTime: string;
   graduationTime: string;
   content: string;
+  /** 全局排序字段，代表当前模块在简历内的排序位置 */
+  globalSort?: number;
+  /** 局部排序字段，当模块为数组时，代表每一项在数组内的排序位置 */
+  localSort?: number;
 }
 
 export interface BasicInfo {

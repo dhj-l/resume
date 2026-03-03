@@ -35,6 +35,7 @@ export const mockResumeData: ResumeData = {
       enrollmentTime: "2016-09",
       graduationTime: "2020-06",
       content: "专业排名 Top 10%，参与多个项目团队合作，获得项目负责人荣誉。",
+      localSort: 0,
     },
     {
       schoolName: "上海交通大学",
@@ -43,6 +44,7 @@ export const mockResumeData: ResumeData = {
       enrollmentTime: "2020-09",
       graduationTime: "2022-06",
       content: "专业排名 Top 5%，参与多个项目团队合作，获得项目负责人荣誉。",
+      localSort: 1,
     },
   ],
   workExperience: [
@@ -53,6 +55,7 @@ export const mockResumeData: ResumeData = {
       dismissalTime: "2022-08",
       workDescription:
         "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
+      localSort: 0,
     },
   ],
   projectExperience: [
@@ -62,11 +65,21 @@ export const mockResumeData: ResumeData = {
       title: "企业级后台管理系统",
       description: "基于Vue3+Element Plus的大型后台管理系统",
       content: "负责系统架构设计，封装通用组件，实现权限管理模块。",
+      localSort: 0,
     },
   ],
-  skills: "Vue3, TypeScript, Node.js, Webpack, Vite",
-  certificates: "CET-6, 软考中级软件设计师",
-  selfEvaluation: "热爱技术，善于钻研，具备良好的团队协作能力和抗压能力。",
+  skills: {
+    content: "Vue3, TypeScript, Node.js, Webpack, Vite",
+    globalSort: 7,
+  },
+  certificates: {
+    content: "CET-6, 软考中级软件设计师",
+    globalSort: 8,
+  },
+  selfEvaluation: {
+    content: "热爱技术，善于钻研，具备良好的团队协作能力和抗压能力。",
+    globalSort: 9,
+  },
   campusExperience: [
     {
       startTime: "2018-09",
@@ -74,6 +87,7 @@ export const mockResumeData: ResumeData = {
       title: "上海交通大学",
       description: "软件学院",
       content: "参与多个项目团队合作，获得项目负责人荣誉。",
+      localSort: 0,
     },
   ],
   internshipExperience: [
@@ -84,18 +98,7 @@ export const mockResumeData: ResumeData = {
       position: "前端开发工程师",
       description:
         "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
+      localSort: 0,
     },
-  ],
-  moduleOrderConfig: [
-    { moduleKey: "basicInfo", globalSort: 0 },
-    { moduleKey: "jobIntention", globalSort: 1 },
-    { moduleKey: "educationBackground", globalSort: 2 },
-    { moduleKey: "workExperience", globalSort: 3 },
-    { moduleKey: "projectExperience", globalSort: 4 },
-    { moduleKey: "campusExperience", globalSort: 5 },
-    { moduleKey: "internshipExperience", globalSort: 6 },
-    { moduleKey: "skills", globalSort: 7 },
-    { moduleKey: "certificates", globalSort: 8 },
-    { moduleKey: "selfEvaluation", globalSort: 9 },
   ],
 };

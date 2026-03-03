@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 import { useResumeStore } from "@/stores/resumeStore";
-const { setResumeDataString } = useResumeStore();
+import type { SortableModule } from "@/stores/type";
+const { setCertificates } = useResumeStore();
 defineProps<{
-  data: string;
+  data: SortableModule;
 }>();
 
 const update = (val: string) => {
-  setResumeDataString("certificates", val);
+  setCertificates({ content: val });
 };
 </script>
 
@@ -22,7 +23,10 @@ const update = (val: string) => {
           <div
             class="border border-gray-300 rounded min-h-[100px] bg-gray-50 text-gray-400 flex flex-col items-center justify-center space-y-2"
           >
-            <BasicEditor :modelValue="data" @update:modelValue="update" />
+            <BasicEditor
+              :modelValue="data.content"
+              @update:modelValue="update"
+            />
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ import {
   DeleteOutlined,
   PlusOutlined,
   ArrowDownOutlined,
+  ArrowUpOutlined,
 } from "@ant-design/icons-vue";
 import type { EducationBackground } from "@/stores/type";
 import { h, ref } from "vue";
@@ -153,6 +154,15 @@ const handleTillNowChange = (index: number, checked: boolean) => {
 
         <!-- 右侧操作按钮 -->
         <div class="flex flex-col gap-2 pt-1">
+          <Button
+            type="primary"
+            size="small"
+            :icon="h(ArrowUpOutlined)"
+            @click="handleMove(index, 'up')"
+            :disabled="index === 0"
+          >
+            上移
+          </Button>
           <Button
             type="primary"
             size="small"

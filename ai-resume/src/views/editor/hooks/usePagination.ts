@@ -9,12 +9,7 @@ import {
   type MaybeRef,
 } from "vue";
 
-const A4_HEIGHT_MM = 297;
-const MM_TO_PX = 3.779527559;
-const PAGE_HEIGHT = Math.round(A4_HEIGHT_MM * MM_TO_PX);
 const SAFE_PAGE_HEIGHT = 1122;
-
-const DEBUG_PAGINATION = true;
 
 interface PaginationOptions {
   contentPadding?: MaybeRef<number | string>;
@@ -57,7 +52,12 @@ export function usePagination(
     let currentPageHeight = 0;
     let isFirstPage = true;
 
-    const moduleHeights: { id: string | undefined; height: number; marginTop: number; marginBottom: number }[] = [];
+    const moduleHeights: {
+      id: string | undefined;
+      height: number;
+      marginTop: number;
+      marginBottom: number;
+    }[] = [];
 
     for (const child of children) {
       const style = window.getComputedStyle(child);
@@ -71,7 +71,9 @@ export function usePagination(
 
       if (!id) continue;
 
-      const currentAvailableHeight = isFirstPage ? firstPageAvailableHeight : availableHeight;
+      const currentAvailableHeight = isFirstPage
+        ? firstPageAvailableHeight
+        : availableHeight;
 
       if (
         currentPageHeight + height > currentAvailableHeight &&
@@ -93,20 +95,6 @@ export function usePagination(
 
     if (newPages.length === 0) {
       newPages.push([]);
-    }
-
-    if (DEBUG_PAGINATION) {
-      console.log('[Pagination] ========== 分页计算 ==========');
-      console.log('[Pagination] A4高度(mm):', A4_HEIGHT_MM);
-      console.log('[Pagination] MM转PX系数:', MM_TO_PX);
-      console.log('[Pagination] 计算页面高度:', PAGE_HEIGHT);
-      console.log('[Pagination] 安全页面高度:', SAFE_PAGE_HEIGHT);
-      console.log('[Pagination] 原始padding值:', rawPadding);
-      console.log('[Pagination] 解析后padding:', contentPadding);
-      console.log('[Pagination] 可用高度:', availableHeight);
-      console.log('[Pagination] 模块高度详情:', moduleHeights);
-      console.log('[Pagination] 分页结果:', newPages);
-      console.log('[Pagination] ==============================');
     }
 
     pages.value = newPages;
