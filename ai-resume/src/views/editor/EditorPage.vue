@@ -8,6 +8,7 @@ import { storeToRefs } from "pinia";
 import { useResumeStore } from "@/stores/resumeStore";
 import { provide } from "vue";
 const { resumeData } = storeToRefs(useResumeStore());
+
 provide("resumeData", resumeData);
 </script>
 
