@@ -122,7 +122,7 @@ const DEFAULT_MODULE_ORDER: ModuleItem[] = [
     globalSort: 9,
   },
 ];
-
+const MAX_GLOBAL_SORT = Number.MAX_SAFE_INTEGER;
 const FIXED_MODULES = ["basicInfo", "jobIntention"] as const;
 
 const isFixedModule = (moduleKey: string): boolean => {
@@ -136,25 +136,25 @@ const getGlobalSortFromResumeData = (
   const moduleData = (resumeData as any)[moduleKey];
 
   if (moduleData === null || moduleData === undefined) {
-    return Number.MAX_SAFE_INTEGER;
+    return MAX_GLOBAL_SORT;
   }
 
   if (Array.isArray(moduleData)) {
     if (moduleData.length === 0) {
-      return Number.MAX_SAFE_INTEGER;
+      return MAX_GLOBAL_SORT;
     }
-    return moduleData[0]?.globalSort ?? Number.MAX_SAFE_INTEGER;
+    return moduleData[0]?.globalSort ?? MAX_GLOBAL_SORT;
   }
 
   if (typeof moduleData === "object") {
     const keys = Object.keys(moduleData);
     if (keys.length === 0) {
-      return Number.MAX_SAFE_INTEGER;
+      return MAX_GLOBAL_SORT;
     }
-    return moduleData.globalSort ?? Number.MAX_SAFE_INTEGER;
+    return moduleData.globalSort ?? MAX_GLOBAL_SORT;
   }
 
-  return Number.MAX_SAFE_INTEGER;
+  return MAX_GLOBAL_SORT;
 };
 
 export const useResumeStore = defineStore("resume", () => {
@@ -192,7 +192,6 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const setCurrentTemplate = (template: templateType) => {
-    console.log(template);
     resumeData.value.type = template;
   };
 
@@ -250,7 +249,16 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   watch(
-    () => resumeData.value,
+    () => [
+      resumeData.value.educationBackground,
+      resumeData.value.workExperience,
+      resumeData.value.projectExperience,
+      resumeData.value.campusExperience,
+      resumeData.value.internshipExperience,
+      resumeData.value.skills,
+      resumeData.value.certificates,
+      resumeData.value.selfEvaluation,
+    ],
     () => {
       syncModuleOrderWithResumeData();
     },
@@ -308,17 +316,14 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const removeEducation = (index: number) => {
-    resumeData.value.educationBackground.splice(index, 1);
+    removeItem("educationBackground", index);
   };
 
   const updateEducation = (
     index: number,
     data: Partial<EducationBackground>,
   ) => {
-    const item = resumeData.value.educationBackground[index];
-    if (item) {
-      resumeData.value.educationBackground[index] = { ...item, ...data };
-    }
+    updateItem("educationBackground", index, data);
   };
 
   const moveItem = (
@@ -343,6 +348,19 @@ export const useResumeStore = defineStore("resume", () => {
     list[targetIndex]!.localSort = tempLocalSort;
 
     list.sort((a: any, b: any) => (a.localSort ?? 0) - (b.localSort ?? 0));
+  };
+
+  const removeItem = (key: keyof ResumeData, index: number) => {
+    const list = resumeData.value[key] as any;
+    if (!list || list.length === 0) return;
+    if (index < 0 || index >= list.length) return;
+    list.splice(index, 1);
+  };
+
+  const updateItem = (key: keyof ResumeData, index: number, data: any) => {
+    const list = resumeData.value[key] as any;
+    if (!list || !list[index]) return;
+    list[index] = { ...list[index], ...data };
   };
 
   const addItem = (key: keyof ResumeData, initialData: any) => {
@@ -384,24 +402,14 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const removeWorkExperience = (index: number) => {
-    if (resumeData.value.workExperience) {
-      resumeData.value.workExperience.splice(index, 1);
-    }
+    removeItem("workExperience", index);
   };
 
   const updateWorkExperience = (
     index: number,
     data: Partial<WorkExperience>,
   ) => {
-    if (
-      resumeData.value.workExperience &&
-      resumeData.value.workExperience[index]
-    ) {
-      resumeData.value.workExperience[index] = {
-        ...resumeData.value.workExperience[index],
-        ...data,
-      };
-    }
+    updateItem("workExperience", index, data);
   };
 
   const moveWorkExperience = (index: number, direction: "up" | "down") => {
@@ -419,24 +427,14 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const removeProjectExperience = (index: number) => {
-    if (resumeData.value.projectExperience) {
-      resumeData.value.projectExperience.splice(index, 1);
-    }
+    removeItem("projectExperience", index);
   };
 
   const updateProjectExperience = (
     index: number,
     data: Partial<ProjectExperience>,
   ) => {
-    if (
-      resumeData.value.projectExperience &&
-      resumeData.value.projectExperience[index]
-    ) {
-      resumeData.value.projectExperience[index] = {
-        ...resumeData.value.projectExperience[index],
-        ...data,
-      };
-    }
+    updateItem("projectExperience", index, data);
   };
 
   const moveProjectExperience = (index: number, direction: "up" | "down") => {
@@ -454,24 +452,14 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const removeCampusExperience = (index: number) => {
-    if (resumeData.value.campusExperience) {
-      resumeData.value.campusExperience.splice(index, 1);
-    }
+    removeItem("campusExperience", index);
   };
 
   const updateCampusExperience = (
     index: number,
     data: Partial<CampusExperience>,
   ) => {
-    if (
-      resumeData.value.campusExperience &&
-      resumeData.value.campusExperience[index]
-    ) {
-      resumeData.value.campusExperience[index] = {
-        ...resumeData.value.campusExperience[index],
-        ...data,
-      };
-    }
+    updateItem("campusExperience", index, data);
   };
 
   const moveCampusExperience = (index: number, direction: "up" | "down") => {
@@ -489,24 +477,14 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const removeInternshipExperience = (index: number) => {
-    if (resumeData.value.internshipExperience) {
-      resumeData.value.internshipExperience.splice(index, 1);
-    }
+    removeItem("internshipExperience", index);
   };
 
   const updateInternshipExperience = (
     index: number,
     data: Partial<InternshipExperience>,
   ) => {
-    if (
-      resumeData.value.internshipExperience &&
-      resumeData.value.internshipExperience[index]
-    ) {
-      resumeData.value.internshipExperience[index] = {
-        ...resumeData.value.internshipExperience[index],
-        ...data,
-      };
-    }
+    updateItem("internshipExperience", index, data);
   };
 
   const moveInternshipExperience = (
