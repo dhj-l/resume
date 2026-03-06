@@ -36,6 +36,18 @@
           />
         </div>
 
+        <div v-if="templates.length > 0" class="flex justify-center mt-8">
+          <a-pagination
+            v-model:current="page"
+            v-model:page-size="pageSize"
+            :total="total"
+            :show-size-changer="false"
+            :show-quick-jumper="true"
+            :show-total="(total: number) => `共 ${total} 条`"
+            @change="handlePageChange"
+          />
+        </div>
+
         <!-- Empty State -->
         <div
           v-else
@@ -78,19 +90,27 @@ const router = useRouter();
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
 const templates = ref<Template[]>([]);
+const total = ref(0);
 const loading = ref(false);
+const page = ref(1);
+const pageSize = ref(6);
 
 const fetchTemplates = async () => {
   try {
     loading.value = true;
     const { data } = await getTemplateListAPI({
-      page: 1,
-      pageSize: 10,
+      page: page.value,
+      pageSize: pageSize.value,
     });
     templates.value = data.list;
+    total.value = data.total;
   } finally {
     loading.value = false;
   }
+};
+
+const handlePageChange = () => {
+  fetchTemplates();
 };
 
 const handleTemplateClick = (id: string) => {

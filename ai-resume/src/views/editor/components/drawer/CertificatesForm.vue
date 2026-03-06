@@ -24,6 +24,7 @@ const update = (val: string) => {
             class="border border-gray-300 rounded min-h-[100px] bg-gray-50 text-gray-400 flex flex-col items-center justify-center space-y-2"
           >
             <BasicEditor
+              class="w-full"
               :modelValue="data.content"
               @update:modelValue="update"
             />

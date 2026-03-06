@@ -7,6 +7,7 @@ import {
   DownOutlined,
   UploadOutlined,
   SkinOutlined,
+  EditOutlined,
 } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 import {
@@ -17,11 +18,12 @@ import {
   Popover,
   Space,
   message,
+  Input,
 } from "ant-design-vue";
 import { templateList } from "../templates";
 import { useResumeStore } from "@/stores/resumeStore";
 import { storeToRefs } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, nextTick } from "vue";
 import type { templateType } from "./preview/type";
 import GlobalStyleSettings from "./GlobalStyleSettings.vue";
 import PublishTemplateModal from "./PublishTemplateModal.vue";
@@ -41,6 +43,11 @@ const { setCurrentTemplate, saveResume, setResumeDataString } =
 interface Props {
   resumeTitle?: string;
 }
+
+const resumeTitle = computed(() => {
+  return props.resumeTitle || "未命名简历";
+});
+
 const pdfName = computed(() => {
   const { basicInfo, jobIntention } = resumeData.value;
   return basicInfo.name + "-" + jobIntention?.jobIntention;
@@ -48,6 +55,11 @@ const pdfName = computed(() => {
 const props = withDefaults(defineProps<Props>(), {
   resumeTitle: "未命名简历",
 });
+
+const emit = defineEmits<{
+  "update:resumeTitle": [value: string];
+}>();
+
 const currentTemplateLabel = computed(() => {
   const template = templateList.find(
     (item) => item.value === resumeData.value.type,
@@ -57,6 +69,10 @@ const currentTemplateLabel = computed(() => {
 const router = useRouter();
 const exportLoading = ref(false);
 const publishModalRef = ref();
+
+const isEditingTitle = ref(false);
+const editingTitleValue = ref("");
+const titleInputRef = ref<InstanceType<typeof Input> | null>(null);
 
 const handleOpenPublishModal = () => {
   publishModalRef.value?.open();
@@ -158,6 +174,50 @@ const handleTemplateChange = (key: templateType) => {
 const handleThemeChange = () => {
   console.log("Theme toggle clicked");
 };
+
+const validateTitle = (title: string): string => {
+  const trimmedTitle = title.trim();
+  if (!trimmedTitle) {
+    return "未命名简历";
+  }
+  return trimmedTitle;
+};
+
+const startEditingTitle = () => {
+  editingTitleValue.value = resumeTitle.value;
+  isEditingTitle.value = true;
+};
+
+const handleTransitionAfterEnter = () => {
+  nextTick(() => {
+    (titleInputRef.value as any)?.focus();
+  });
+};
+
+const saveTitle = () => {
+  const validatedTitle = validateTitle(editingTitleValue.value);
+  if (validatedTitle !== resumeTitle.value) {
+    emit("update:resumeTitle", validatedTitle);
+  }
+  isEditingTitle.value = false;
+};
+
+const cancelEditingTitle = () => {
+  editingTitleValue.value = resumeTitle.value;
+  isEditingTitle.value = false;
+};
+
+const handleTitleBlur = () => {
+  saveTitle();
+};
+
+const handleTitleKeydown = (e: KeyboardEvent) => {
+  if (e.key === "Enter") {
+    saveTitle();
+  } else if (e.key === "Escape") {
+    cancelEditingTitle();
+  }
+};
 </script>
 
 <template>
@@ -175,7 +235,36 @@ const handleThemeChange = () => {
       </Button>
       <div class="flex flex-col">
         <span class="text-xs text-gray-500">简历编辑</span>
-        <span class="font-medium text-gray-800">{{ resumeTitle }}</span>
+        <div class="relative">
+          <Transition
+            name="title-fade"
+            mode="out-in"
+            @after-enter="handleTransitionAfterEnter"
+          >
+            <div
+              v-if="!isEditingTitle"
+              @click="startEditingTitle"
+              class="font-medium text-gray-800 truncate w-[220px] cursor-pointer hover:text-blue-600 transition-colors duration-200 flex items-center group"
+            >
+              <span class="truncate">{{ resumeTitle }}</span>
+              <EditOutlined
+                class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-xs"
+              />
+            </div>
+            <Input
+              v-else
+              v-model:value="editingTitleValue"
+              class="w-[220px]"
+              placeholder="输入简历标题"
+              @blur="handleTitleBlur"
+              @keydown="handleTitleKeydown"
+              :maxlength="50"
+              show-count
+              :autofocus="true"
+              ref="titleInputRef"
+            />
+          </Transition>
+        </div>
       </div>
     </div>
 
@@ -238,5 +327,22 @@ const handleThemeChange = () => {
 </template>
 
 <style scoped>
-/* 自定义样式补充 */
+.title-fade-enter-active,
+.title-fade-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.title-fade-enter-from,
+.title-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.title-fade-enter-to,
+.title-fade-leave-from {
+  opacity: 1;
+  transform: translateY(0);
+}
 </style>

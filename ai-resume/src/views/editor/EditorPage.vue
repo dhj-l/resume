@@ -7,15 +7,24 @@ import EditDrawer from "./components/EditDrawer.vue";
 import { storeToRefs } from "pinia";
 import { useResumeStore } from "@/stores/resumeStore";
 import { provide } from "vue";
+
 const { resumeData } = storeToRefs(useResumeStore());
+const { setResumeDataString } = useResumeStore();
 
 provide("resumeData", resumeData);
+
+const handleTitleUpdate = (newTitle: string) => {
+  setResumeDataString("title", newTitle);
+};
 </script>
 
 <template>
   <Layout class="min-h-screen bg-gray-100 flex flex-col overflow-hidden">
     <!-- 顶部导航 -->
-    <EditorHeader :resume-title="resumeData.title" />
+    <EditorHeader
+      :resume-title="resumeData.title"
+      @update:resume-title="handleTitleUpdate"
+    />
 
     <!-- 中间内容区 -->
     <Layout.Content

@@ -5,7 +5,7 @@ import type {
   AiResumeParams,
   CreateResumeParams,
   DeleteResumeResult,
-  UserResumeListItem,
+  UserResumeListResponse,
 } from "./type";
 
 export interface ApiResponse<T> {
@@ -28,8 +28,11 @@ export const getResumeDetailAPI = (id: string) => {
   return http.get<ResumeData>(`/resume/${id}`);
 };
 
-export const getUserResumesAPI = () => {
-  return http.get<UserResumeListItem[]>("/resume");
+export const getUserResumesAPI = (query: {
+  page?: number;
+  pageSize?: number;
+}) => {
+  return http.get<UserResumeListResponse>("/resume", { params: query });
 };
 
 export const deleteResumeAPI = (id: string) => {

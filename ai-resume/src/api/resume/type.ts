@@ -17,6 +17,11 @@ export interface UserResumeListItem {
   cover?: string;
 }
 
+export interface UserResumeListResponse {
+  total: number;
+  list: UserResumeListItem[];
+}
+
 export interface DeleteResumeResult {
   _id: string;
   title: string;

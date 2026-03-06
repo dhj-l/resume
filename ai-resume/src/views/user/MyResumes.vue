@@ -28,18 +28,24 @@
             v-for="item in resumes"
             :key="item._id"
             :resume="item"
-            :edit-loading="
-              actionLoadingId === item._id && actionType === 'edit'
-            "
-            :delete-loading="
-              actionLoadingId === item._id && actionType === 'delete'
-            "
-            :copy-loading="
-              actionLoadingId === item._id && actionType === 'copy'
-            "
+            :edit-loading="getTypeLoading(item._id, 'edit')"
+            :delete-loading="getTypeLoading(item._id, 'delete')"
+            :copy-loading="getTypeLoading(item._id, 'copy')"
             @edit="handleEdit"
             @delete="(payload) => handleDelete(payload.id, payload.title)"
             @copy="handleCopy"
+          />
+        </div>
+
+        <div v-if="resumes.length > 0" class="flex justify-center mt-8">
+          <a-pagination
+            v-model:current="page"
+            v-model:page-size="pageSize"
+            :total="total"
+            :show-size-changer="false"
+            :show-quick-jumper="true"
+            :show-total="(total: number) => `共 ${total} 条`"
+            @change="handlePageChange"
           />
         </div>
 
@@ -89,19 +95,30 @@ const router = useRouter();
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
 
 const resumes = ref<UserResumeListItem[]>([]);
+const total = ref(0);
 const loading = ref(false);
 const actionLoadingId = ref<string>("");
 const actionType = ref<"edit" | "delete" | "copy" | "">("");
+const page = ref(1);
+const pageSize = ref(6);
 
 const fetchResumes = async (options?: { showLoading?: boolean }) => {
   const showLoading = options?.showLoading ?? true;
   if (showLoading) loading.value = true;
   try {
-    const { data } = await getUserResumesAPI();
-    resumes.value = data;
+    const { data } = await getUserResumesAPI({
+      page: page.value,
+      pageSize: pageSize.value,
+    });
+    resumes.value = data.list;
+    total.value = data.total;
   } finally {
     if (showLoading) loading.value = false;
   }
+};
+
+const handlePageChange = () => {
+  fetchResumes({ showLoading: true });
 };
 
 const handleEdit = async (id: string) => {
@@ -156,6 +173,10 @@ const handleDelete = (id: string, title: string) => {
       }
     },
   });
+};
+
+const getTypeLoading = (id: string, type: string) => {
+  return actionLoadingId.value === id && actionType.value === type;
 };
 
 onMounted(() => {
