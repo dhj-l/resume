@@ -36,12 +36,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/user/MyResumes.vue"),
         meta: { title: "我的简历", requiresAuth: true },
       },
-      {
-        name: "UserProfile",
-        path: "/user/profile",
-        component: () => import("@/views/user/UserProfile.vue"),
-        meta: { title: "个人中心", requiresAuth: true },
-      },
     ],
   },
   {

@@ -34,7 +34,7 @@
           </svg>
         </div>
         <span class="text-xl font-bold text-gray-900 tracking-tight"
-          >大学牲简历</span
+          >大学生简历</span
         >
       </router-link>
 
@@ -71,8 +71,11 @@
             </div>
             <template #overlay>
               <a-menu>
-                <a-menu-item key="profile" @click="handleProfileClick">
-                  <UserOutlined /> 个人中心
+                <a-menu-item
+                  key="change-password"
+                  @click="handleChangePasswordClick"
+                >
+                  <LockOutlined /> 修改密码
                 </a-menu-item>
                 <a-menu-divider />
                 <a-menu-item key="logout" @click="handleLogout">
@@ -100,23 +103,29 @@
       </div>
     </div>
   </nav>
+
+  <ChangePasswordModal
+    v-model:open="changePasswordModalVisible"
+    @success="handleChangePasswordSuccess"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
-import { UserOutlined, LogoutOutlined } from "@ant-design/icons-vue";
+import { LockOutlined, LogoutOutlined } from "@ant-design/icons-vue";
+import ChangePasswordModal from "@/components/common/ChangePasswordModal.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const isScrolled = ref(false);
 
+const changePasswordModalVisible = ref(false);
+
 const navItems = [
   { name: "首页", path: "/" },
   { name: "模板", path: "/templates" },
-  { name: "定价", path: "/pricing" },
-  { name: "我的模板", path: "/dashboard/templates", requiresAuth: true },
   { name: "我的简历", path: "/user/resumes", requiresAuth: true },
 ];
 
@@ -133,7 +142,7 @@ const handleNavClick = (item: any) => {
 };
 
 const handleStartCreating = () => {
-  router.push("/dashboard/templates");
+  router.push("/templates");
 };
 
 const handleLogout = () => {
@@ -141,8 +150,13 @@ const handleLogout = () => {
   router.push("/");
 };
 
-const handleProfileClick = () => {
-  router.push("/user/profile");
+const handleChangePasswordClick = () => {
+  changePasswordModalVisible.value = true;
+};
+
+const handleChangePasswordSuccess = () => {
+  authStore.logout();
+  router.push("/auth/login");
 };
 
 onMounted(() => {
