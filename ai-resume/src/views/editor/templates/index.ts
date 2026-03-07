@@ -2,6 +2,7 @@ import type { TemplateItem } from "./type";
 import DefaultTemplate from "./template-list/default-template/default-template.vue";
 import DoubleColumnTemplate from "./template-list/double-column-template/double-column-template.vue";
 import SimpleTemplate from "./template-list/simple-template/simple-template.vue";
+// import BlueTemplate from "./template-list/blue-template/blue-template.vue";
 
 export const templateList: TemplateItem[] = [
   {
@@ -15,7 +16,7 @@ export const templateList: TemplateItem[] = [
     component: DoubleColumnTemplate,
   },
   {
-    label: "简约求职版（通用 / 校招 / 社招）",
+    label: "简约求职版",
     value: "simple",
     component: SimpleTemplate,
   },

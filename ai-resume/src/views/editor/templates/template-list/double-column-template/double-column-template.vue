@@ -216,12 +216,13 @@ const mergedPages = computed(() => {
   const maxLen = Math.max(leftPages.value.length, rightPages.value.length);
   const result = [];
   for (let i = 0; i < maxLen; i++) {
-    result.push({
+    const page = {
       left: leftPages.value[i] || [],
       right: rightPages.value[i] || [],
-    });
+    };
+    result.push(page);
   }
-  return result;
+  return result.filter((page) => page.left.length > 0 || page.right.length > 0);
 });
 </script>
 

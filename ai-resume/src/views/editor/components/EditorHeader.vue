@@ -23,7 +23,7 @@ import {
 import { templateList } from "../templates";
 import { useResumeStore } from "@/stores/resumeStore";
 import { storeToRefs } from "pinia";
-import { computed, ref, nextTick } from "vue";
+import { computed, ref, nextTick, onMounted, onUnmounted } from "vue";
 import type { templateType } from "./preview/type";
 import GlobalStyleSettings from "./GlobalStyleSettings.vue";
 import PublishTemplateModal from "./PublishTemplateModal.vue";
@@ -80,27 +80,42 @@ const handleOpenPublishModal = () => {
 
 // TODO: 处理返回点击
 const handleBack = () => {
-  console.log("Back clicked");
   router.back();
 };
 
 const handleSave = async () => {
-  const element = getElement(".resume-preview-wrapper");
-  if (!element) return;
-
-  const elementHeight = (element as HTMLElement).offsetHeight;
-  const COVER_HEIGHT_THRESHOLD = 1200;
-
-  const coverFile = await getDomCover(
-    element as HTMLElement,
-    elementHeight > COVER_HEIGHT_THRESHOLD ? COVER_HEIGHT_THRESHOLD : undefined,
-  );
-
-  const url = await uploadImage(coverFile);
-  if (!url) return;
-  setResumeDataString("cover", url);
-  await saveResume();
+  await autoSave(true);
   message.success("草稿保存成功");
+};
+
+/**
+ * 是否更新封面
+ * @param isUpdateCover 是否更新封面
+ */
+const autoSave = async (isUpdateCover: boolean = false) => {
+  //如果是更新封面，或者没有封面，才需要更新封面
+  if (isUpdateCover || !resumeData.value.cover) {
+    const element = getElement(".resume-preview-wrapper");
+    if (!element) return;
+
+    const elementHeight = (element as HTMLElement).offsetHeight;
+    const COVER_HEIGHT_THRESHOLD = 1200;
+
+    const coverFile = await getDomCover(
+      element as HTMLElement,
+      elementHeight > COVER_HEIGHT_THRESHOLD
+        ? COVER_HEIGHT_THRESHOLD
+        : undefined,
+    );
+
+    const url = await uploadImage(coverFile);
+    if (url) {
+      setResumeDataString("cover", url);
+    } else {
+      message.error("封面上传失败");
+    }
+  }
+  await saveResume();
 };
 
 // TODO: 处理导出PDF
@@ -218,6 +233,19 @@ const handleTitleKeydown = (e: KeyboardEvent) => {
     cancelEditingTitle();
   }
 };
+
+let timer: number | null = null;
+onMounted(() => {
+  timer = setInterval(() => {
+    autoSave();
+  }, 12000);
+});
+
+onUnmounted(() => {
+  if (timer) {
+    clearInterval(timer);
+  }
+});
 </script>
 
 <template>
