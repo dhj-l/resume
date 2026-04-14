@@ -8,11 +8,12 @@
 </template>
 
 <script setup lang="ts">
-import HeroSection from "@/components/home/HeroSection.vue";
-import FeatureShowcase from "@/components/home/FeatureShowcase.vue";
-import TemplateGallery from "@/components/home/TemplateGallery.vue";
-import DataTrust from "@/components/home/DataTrust.vue";
 import { onMounted } from "vue";
+
+import DataTrust from "@/components/home/DataTrust.vue";
+import FeatureShowcase from "@/components/home/FeatureShowcase.vue";
+import HeroSection from "@/components/home/HeroSection.vue";
+import TemplateGallery from "@/components/home/TemplateGallery.vue";
 
 onMounted(() => {
   const observer = new IntersectionObserver(

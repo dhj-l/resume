@@ -7,13 +7,7 @@
     </div>
 
     <!-- Login Form -->
-    <a-form
-      layout="vertical"
-      :model="formState"
-      name="login"
-      class="mt-8"
-      @finish="handleLogin"
-    >
+    <a-form layout="vertical" :model="formState" name="login" class="mt-8" @finish="handleLogin">
       <a-form-item
         name="email"
         label="邮箱地址"
@@ -53,9 +47,7 @@
 
       <div class="flex items-center justify-between mb-6">
         <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
-        <a class="text-blue-600 hover:text-blue-700 font-medium" href="#"
-          >忘记密码？</a
-        >
+        <a class="text-blue-600 hover:text-blue-700 font-medium" href="#">忘记密码？</a>
       </div>
 
       <a-button
@@ -88,9 +80,7 @@
     >
       以游客身份体验
     </a-button>
-    <p class="text-center text-xs text-gray-400 mt-2">
-      数据仅保存 24 小时，进入编辑器后提示注册。
-    </p>
+    <p class="text-center text-xs text-gray-400 mt-2">数据仅保存 24 小时，进入编辑器后提示注册。</p>
 
     <!-- Sign Up Link -->
     <div class="text-center mt-8">
@@ -109,10 +99,12 @@
 
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
+
 import { MailOutlined, LockOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
+import { useRouter } from "vue-router";
+
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
 const authStore = useAuthStore();

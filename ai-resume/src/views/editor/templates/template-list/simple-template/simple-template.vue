@@ -11,18 +11,12 @@
       }"
     >
       <!-- 静态头部 -->
-      <div
-        class="flex items-center justify-between mb-6 border-b-4 border-[#8B5CF6] pb-2"
-      >
+      <div class="flex items-center justify-between mb-6 border-b-4 border-[#8B5CF6] pb-2">
         <div class="flex items-end gap-4">
-          <h1 class="text-4xl font-bold text-[#8B5CF6] leading-none">
-            个人简历
-          </h1>
+          <h1 class="text-4xl font-bold text-[#8B5CF6] leading-none">个人简历</h1>
           <div class="flex flex-col text-[#8B5CF6]">
             <span class="text-xs">细心从每一个细节开始</span>
-            <span class="text-lg font-medium leading-none"
-              >Personal resume</span
-            >
+            <span class="text-lg font-medium leading-none">Personal resume</span>
           </div>
         </div>
         <div class="flex gap-3">
@@ -75,7 +69,7 @@
           :is="getComponent(item)"
           :data="resumeData[item.moduleKey]"
           :label="item.label"
-          :templateType="currentTemplateType"
+          :template-type="currentTemplateType"
         />
       </div>
     </div>
@@ -103,14 +97,10 @@
         class="flex items-center justify-between mb-6 border-b-4 border-[#8B5CF6] pb-2"
       >
         <div class="flex items-end gap-4">
-          <h1 class="text-4xl font-bold text-[#8B5CF6] leading-none">
-            个人简历
-          </h1>
+          <h1 class="text-4xl font-bold text-[#8B5CF6] leading-none">个人简历</h1>
           <div class="flex flex-col text-[#8B5CF6]">
             <span class="text-xs">细心从每一个细节开始</span>
-            <span class="text-lg font-medium leading-none"
-              >Personal resume</span
-            >
+            <span class="text-lg font-medium leading-none">Personal resume</span>
           </div>
         </div>
         <div class="flex gap-3">
@@ -154,15 +144,12 @@
       </div>
 
       <template v-for="moduleId in page" :key="moduleId">
-        <div
-          v-if="getModuleByKey(moduleId)"
-          :style="{ marginBottom: globalModuleMargin }"
-        >
+        <div v-if="getModuleByKey(moduleId)" :style="{ marginBottom: globalModuleMargin }">
           <component
             :is="getComponent(getModuleByKey(moduleId)!)"
             :data="(resumeData as any)[moduleId]"
             :label="getModuleByKey(moduleId)!.label"
-            :templateType="currentTemplateType"
+            :template-type="currentTemplateType"
           />
         </div>
       </template>
@@ -172,14 +159,16 @@
 
 <script setup lang="ts">
 import { ref, computed, inject } from "vue";
+
 import { storeToRefs } from "pinia";
+
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData, ModuleItem } from "@/stores/type";
-import { usePagination } from "@/views/editor/hooks/usePagination";
 
 // 引入组件
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+import { usePagination } from "@/views/editor/hooks/usePagination";
 
 const {
   moduleOrder,

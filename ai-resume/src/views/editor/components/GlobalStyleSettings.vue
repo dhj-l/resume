@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
+
 import { Slider } from "ant-design-vue";
 import { storeToRefs } from "pinia";
+
 import { useResumeStore } from "@/stores/resumeStore";
 
 const resumeStore = useResumeStore();
@@ -53,7 +55,7 @@ watch(
       lineHeight.value = parseValue(newStyle.lineHeight);
     }
   },
-  { deep: true }
+  { deep: true },
 );
 </script>
 

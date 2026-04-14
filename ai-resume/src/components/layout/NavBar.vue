@@ -1,11 +1,7 @@
 <template>
   <nav
     class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-    :class="[
-      isScrolled
-        ? 'bg-white/80 backdrop-blur-md shadow-sm py-4'
-        : 'bg-transparent py-6',
-    ]"
+    :class="[isScrolled ? 'bg-white/80 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6']"
   >
     <div class="container mx-auto px-4 flex items-center justify-between">
       <!-- Left: Logo -->
@@ -24,18 +20,14 @@
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <path
-              d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
-            />
+            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
             <path d="M14 2v4a2 2 0 0 0 2 2h4" />
             <path d="M10 9H8" />
             <path d="M16 13H8" />
             <path d="M16 17H8" />
           </svg>
         </div>
-        <span class="text-xl font-bold text-gray-900 tracking-tight"
-          >大学生简历</span
-        >
+        <span class="text-xl font-bold text-gray-900 tracking-tight">大学生简历</span>
       </router-link>
 
       <!-- Center: Navigation -->
@@ -44,8 +36,8 @@
           v-for="item in navItems"
           :key="item.name"
           href="#"
-          @click.prevent="handleNavClick(item)"
           class="text-sm font-medium text-gray-600 hover:text-primary-600 relative py-2 group transition-colors"
+          @click.prevent="handleNavClick(item)"
         >
           {{ item.name }}
           <span
@@ -71,10 +63,7 @@
             </div>
             <template #overlay>
               <a-menu>
-                <a-menu-item
-                  key="change-password"
-                  @click="handleChangePasswordClick"
-                >
+                <a-menu-item key="change-password" @click="handleChangePasswordClick">
                   <LockOutlined /> 修改密码
                 </a-menu-item>
                 <a-menu-divider />
@@ -95,8 +84,8 @@
         </template>
 
         <button
-          @click="handleStartCreating"
           class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0"
+          @click="handleStartCreating"
         >
           开始制作
         </button>
@@ -112,10 +101,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
+
 import { LockOutlined, LogoutOutlined } from "@ant-design/icons-vue";
+import { useRouter } from "vue-router";
+
 import ChangePasswordModal from "@/components/common/ChangePasswordModal.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
 const authStore = useAuthStore();

@@ -30,9 +30,7 @@
           </h3>
 
           <!-- Subtext -->
-          <p class="mt-2 text-gray-500 text-sm font-light text-center">
-            请勿关闭页面或刷新
-          </p>
+          <p class="mt-2 text-gray-500 text-sm font-light text-center">请勿关闭页面或刷新</p>
         </div>
       </div>
     </Transition>

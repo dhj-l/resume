@@ -1,5 +1,29 @@
-import { defineStore } from "pinia";
 import { computed, ref, shallowRef, watch } from "vue";
+
+import { defineStore } from "pinia";
+
+import { createResumeAPI, getResumeDetailAPI, updateResumeAPI } from "@/api/resume/resume";
+import BasicInfoForm from "@/views/editor/components/drawer/BasicInfoForm.vue";
+import CampusExperienceForm from "@/views/editor/components/drawer/CampusExperienceForm.vue";
+import CertificatesForm from "@/views/editor/components/drawer/CertificatesForm.vue";
+import EducationForm from "@/views/editor/components/drawer/EducationForm.vue";
+import InternshipExperienceForm from "@/views/editor/components/drawer/InternshipExperienceForm.vue";
+import JobIntentionForm from "@/views/editor/components/drawer/JobIntentionForm.vue";
+import ProjectExperienceForm from "@/views/editor/components/drawer/ProjectExperienceForm.vue";
+import SelfEvaluationForm from "@/views/editor/components/drawer/SelfEvaluationForm.vue";
+import SkillsForm from "@/views/editor/components/drawer/SkillsForm.vue";
+import WorkExperienceForm from "@/views/editor/components/drawer/WorkExperienceForm.vue";
+import CampusExperienceSection from "@/views/editor/components/preview/CampusExperienceSection.vue";
+import CertificatesSection from "@/views/editor/components/preview/CertificatesSection.vue";
+import EducationBackgroundSection from "@/views/editor/components/preview/EducationBackgroundSection.vue";
+import InternshipExperienceSection from "@/views/editor/components/preview/InternshipExperienceSection.vue";
+import ProjectExperienceSection from "@/views/editor/components/preview/ProjectExperienceSection.vue";
+import SelfEvaluationSection from "@/views/editor/components/preview/SelfEvaluationSection.vue";
+import SkillsSection from "@/views/editor/components/preview/SkillsSection.vue";
+import type { templateType } from "@/views/editor/components/preview/type";
+import WorkExperienceSection from "@/views/editor/components/preview/WorkExperienceSection.vue";
+import { mockResumeData } from "@/views/editor/data/mockData";
+
 import type {
   ModuleItem,
   ResumeData,
@@ -13,32 +37,6 @@ import type {
   GlobalStyle,
   SortableModule,
 } from "./type";
-import { mockResumeData } from "@/views/editor/data/mockData";
-
-import EducationBackgroundSection from "@/views/editor/components/preview/EducationBackgroundSection.vue";
-import WorkExperienceSection from "@/views/editor/components/preview/WorkExperienceSection.vue";
-import ProjectExperienceSection from "@/views/editor/components/preview/ProjectExperienceSection.vue";
-import CampusExperienceSection from "@/views/editor/components/preview/CampusExperienceSection.vue";
-import InternshipExperienceSection from "@/views/editor/components/preview/InternshipExperienceSection.vue";
-import SkillsSection from "@/views/editor/components/preview/SkillsSection.vue";
-import CertificatesSection from "@/views/editor/components/preview/CertificatesSection.vue";
-import SelfEvaluationSection from "@/views/editor/components/preview/SelfEvaluationSection.vue";
-import BasicInfoForm from "@/views/editor/components/drawer/BasicInfoForm.vue";
-import JobIntentionForm from "@/views/editor/components/drawer/JobIntentionForm.vue";
-import EducationForm from "@/views/editor/components/drawer/EducationForm.vue";
-import type { templateType } from "@/views/editor/components/preview/type";
-import WorkExperienceForm from "@/views/editor/components/drawer/WorkExperienceForm.vue";
-import ProjectExperienceForm from "@/views/editor/components/drawer/ProjectExperienceForm.vue";
-import CampusExperienceForm from "@/views/editor/components/drawer/CampusExperienceForm.vue";
-import InternshipExperienceForm from "@/views/editor/components/drawer/InternshipExperienceForm.vue";
-import SkillsForm from "@/views/editor/components/drawer/SkillsForm.vue";
-import CertificatesForm from "@/views/editor/components/drawer/CertificatesForm.vue";
-import SelfEvaluationForm from "@/views/editor/components/drawer/SelfEvaluationForm.vue";
-import {
-  createResumeAPI,
-  getResumeDetailAPI,
-  updateResumeAPI,
-} from "@/api/resume/resume";
 
 const DEFAULT_MODULE_ORDER: ModuleItem[] = [
   {
@@ -129,10 +127,7 @@ const isFixedModule = (moduleKey: string): boolean => {
   return FIXED_MODULES.includes(moduleKey as any);
 };
 
-const getGlobalSortFromResumeData = (
-  resumeData: ResumeData,
-  moduleKey: string,
-): number => {
+const getGlobalSortFromResumeData = (resumeData: ResumeData, moduleKey: string): number => {
   const moduleData = (resumeData as any)[moduleKey];
 
   if (moduleData === null || moduleData === undefined) {
@@ -217,21 +212,12 @@ export const useResumeStore = defineStore("resume", () => {
 
   const syncModuleOrderWithResumeData = () => {
     moduleOrder.value.forEach((module) => {
-      module.globalSort = getGlobalSortFromResumeData(
-        resumeData.value,
-        module.moduleKey,
-      );
+      module.globalSort = getGlobalSortFromResumeData(resumeData.value, module.moduleKey);
     });
 
-    const basicInfoModule = moduleOrder.value.find(
-      (m) => m.moduleKey === "basicInfo",
-    );
-    const jobIntentionModule = moduleOrder.value.find(
-      (m) => m.moduleKey === "jobIntention",
-    );
-    const otherModules = moduleOrder.value.filter(
-      (m) => !isFixedModule(m.moduleKey),
-    );
+    const basicInfoModule = moduleOrder.value.find((m) => m.moduleKey === "basicInfo");
+    const jobIntentionModule = moduleOrder.value.find((m) => m.moduleKey === "jobIntention");
+    const otherModules = moduleOrder.value.filter((m) => !isFixedModule(m.moduleKey));
 
     otherModules.sort((a, b) => a.globalSort - b.globalSort);
 
@@ -319,18 +305,11 @@ export const useResumeStore = defineStore("resume", () => {
     removeItem("educationBackground", index);
   };
 
-  const updateEducation = (
-    index: number,
-    data: Partial<EducationBackground>,
-  ) => {
+  const updateEducation = (index: number, data: Partial<EducationBackground>) => {
     updateItem("educationBackground", index, data);
   };
 
-  const moveItem = (
-    key: keyof ResumeData,
-    index: number,
-    direction: "up" | "down",
-  ) => {
+  const moveItem = (key: keyof ResumeData, index: number, direction: "up" | "down") => {
     const list = resumeData.value[key] as any;
     if (!list || list.length <= 1) return;
 
@@ -371,9 +350,7 @@ export const useResumeStore = defineStore("resume", () => {
     }
 
     const newLocalSort =
-      list.length > 0
-        ? Math.max(...list.map((item: any) => item.localSort ?? 0)) + 1
-        : 0;
+      list.length > 0 ? Math.max(...list.map((item: any) => item.localSort ?? 0)) + 1 : 0;
 
     const newItem = {
       ...initialData,
@@ -405,10 +382,7 @@ export const useResumeStore = defineStore("resume", () => {
     removeItem("workExperience", index);
   };
 
-  const updateWorkExperience = (
-    index: number,
-    data: Partial<WorkExperience>,
-  ) => {
+  const updateWorkExperience = (index: number, data: Partial<WorkExperience>) => {
     updateItem("workExperience", index, data);
   };
 
@@ -430,10 +404,7 @@ export const useResumeStore = defineStore("resume", () => {
     removeItem("projectExperience", index);
   };
 
-  const updateProjectExperience = (
-    index: number,
-    data: Partial<ProjectExperience>,
-  ) => {
+  const updateProjectExperience = (index: number, data: Partial<ProjectExperience>) => {
     updateItem("projectExperience", index, data);
   };
 
@@ -455,10 +426,7 @@ export const useResumeStore = defineStore("resume", () => {
     removeItem("campusExperience", index);
   };
 
-  const updateCampusExperience = (
-    index: number,
-    data: Partial<CampusExperience>,
-  ) => {
+  const updateCampusExperience = (index: number, data: Partial<CampusExperience>) => {
     updateItem("campusExperience", index, data);
   };
 
@@ -480,17 +448,11 @@ export const useResumeStore = defineStore("resume", () => {
     removeItem("internshipExperience", index);
   };
 
-  const updateInternshipExperience = (
-    index: number,
-    data: Partial<InternshipExperience>,
-  ) => {
+  const updateInternshipExperience = (index: number, data: Partial<InternshipExperience>) => {
     updateItem("internshipExperience", index, data);
   };
 
-  const moveInternshipExperience = (
-    index: number,
-    direction: "up" | "down",
-  ) => {
+  const moveInternshipExperience = (index: number, direction: "up" | "down") => {
     moveItem("internshipExperience", index, direction);
   };
 
@@ -524,16 +486,11 @@ export const useResumeStore = defineStore("resume", () => {
     if (isFixedModule(moduleKeyA) || isFixedModule(moduleKeyB)) {
       return false;
     }
-    const indexA = moduleOrder.value.findIndex(
-      (m) => m.moduleKey === moduleKeyA,
-    );
-    const indexB = moduleOrder.value.findIndex(
-      (m) => m.moduleKey === moduleKeyB,
-    );
+    const indexA = moduleOrder.value.findIndex((m) => m.moduleKey === moduleKeyA);
+    const indexB = moduleOrder.value.findIndex((m) => m.moduleKey === moduleKeyB);
     if (indexA === -1 || indexB === -1) return false;
     const tempGlobalSort = moduleOrder.value[indexA]?.globalSort;
-    moduleOrder.value[indexA]!.globalSort =
-      moduleOrder.value[indexB]?.globalSort || 0;
+    moduleOrder.value[indexA]!.globalSort = moduleOrder.value[indexB]?.globalSort || 0;
     moduleOrder.value[indexB]!.globalSort = tempGlobalSort || 0;
     moduleOrder.value.sort((a, b) => a.globalSort - b.globalSort);
 

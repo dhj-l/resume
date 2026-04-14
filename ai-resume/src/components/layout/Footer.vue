@@ -19,9 +19,7 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <path
-                  d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"
-                />
+                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
                 <path d="M14 2v4a2 2 0 0 0 2 2h4" />
                 <path d="M10 9H8" />
                 <path d="M16 13H8" />
@@ -40,30 +38,22 @@
           <h4 class="font-semibold text-gray-900 mb-4">产品</h4>
           <ul class="space-y-2">
             <li>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
+              <a href="#" class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
                 >首页</a
               >
             </li>
             <li>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
+              <a href="#" class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
                 >简历模板</a
               >
             </li>
             <li>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
+              <a href="#" class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
                 >定价方案</a
               >
             </li>
             <li>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
+              <a href="#" class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
                 >帮助中心</a
               >
             </li>
@@ -74,23 +64,17 @@
           <h4 class="font-semibold text-gray-900 mb-4">法律</h4>
           <ul class="space-y-2">
             <li>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
+              <a href="#" class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
                 >用户协议</a
               >
             </li>
             <li>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
+              <a href="#" class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
                 >隐私政策</a
               >
             </li>
             <li>
-              <a
-                href="#"
-                class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
+              <a href="#" class="text-gray-500 hover:text-primary-600 text-sm transition-colors"
                 >Cookie政策</a
               >
             </li>
@@ -138,10 +122,5 @@
 </template>
 
 <script setup lang="ts">
-import {
-  MailOutlined,
-  WechatOutlined,
-  WeiboOutlined,
-  GithubOutlined,
-} from "@ant-design/icons-vue";
+import { MailOutlined, WechatOutlined, WeiboOutlined, GithubOutlined } from "@ant-design/icons-vue";
 </script>

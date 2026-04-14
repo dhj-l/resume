@@ -3,8 +3,8 @@
     :open="open"
     title="选择已有简历"
     :width="600"
-    @cancel="handleCancel"
     class="select-resume-modal"
+    @cancel="handleCancel"
   >
     <div class="py-4 space-y-6">
       <!-- JD Input Section -->
@@ -28,14 +28,11 @@
 
         <!-- Loading State -->
         <div v-if="loading" class="space-y-3">
-          <a-skeleton active :paragraph="{ rows: 1 }" v-for="i in 3" :key="i" />
+          <a-skeleton v-for="i in 3" :key="i" active :paragraph="{ rows: 1 }" />
         </div>
 
         <!-- Error State -->
-        <div
-          v-else-if="error"
-          class="flex flex-col items-center py-8 text-center"
-        >
+        <div v-else-if="error" class="flex flex-col items-center py-8 text-center">
           <div class="text-red-500 mb-2">{{ error }}</div>
           <a-button @click="fetchResumes">重试</a-button>
         </div>
@@ -46,16 +43,11 @@
           class="flex flex-col items-center py-8 border border-dashed border-slate-200 rounded-lg bg-slate-50"
         >
           <div class="text-slate-400 mb-4">暂无可用简历</div>
-          <a-button type="primary" @click="$emit('create-new')"
-            >创建新简历</a-button
-          >
+          <a-button type="primary" @click="$emit('create-new')">创建新简历</a-button>
         </div>
 
         <!-- Resume List -->
-        <div
-          v-else
-          class="max-h-[300px] overflow-y-auto px-1 space-y-2 custom-scrollbar"
-        >
+        <div v-else class="max-h-[300px] overflow-y-auto px-1 space-y-2 custom-scrollbar">
           <div
             v-for="resume in resumes"
             :key="resume._id"
@@ -80,21 +72,13 @@
             <div class="flex-1 min-w-0">
               <h4
                 class="font-medium truncate"
-                :class="
-                  selectedResumeId === resume._id
-                    ? 'text-primary-700'
-                    : 'text-slate-700'
-                "
+                :class="selectedResumeId === resume._id ? 'text-primary-700' : 'text-slate-700'"
               >
                 {{ resume.title || "未命名简历" }}
               </h4>
               <p
                 class="text-xs mt-0.5"
-                :class="
-                  selectedResumeId === resume._id
-                    ? 'text-primary-500'
-                    : 'text-slate-400'
-                "
+                :class="selectedResumeId === resume._id ? 'text-primary-500' : 'text-slate-400'"
               >
                 更新于 {{ formatDate(resume.updatedAt || "") }}
               </p>
@@ -131,11 +115,13 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
+
 import { FileTextOutlined, CheckCircleFilled } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
-import { formatDate } from "@/utils/day";
+
 import { getUserResumesAPI } from "@/api/resume/resume";
 import type { UserResumeListItem } from "@/api/resume/type";
+import { formatDate } from "@/utils/day";
 
 const props = defineProps<{
   open: boolean;
@@ -157,9 +143,7 @@ const error = ref<string | null>(null);
 
 // Computed
 const isConfirmEnabled = computed(() => {
-  return (
-    jobDescription.value.trim().length > 0 && selectedResumeId.value !== null
-  );
+  return jobDescription.value.trim().length > 0 && selectedResumeId.value !== null;
 });
 
 // Methods
@@ -168,7 +152,7 @@ const fetchResumes = async () => {
   error.value = null;
   try {
     const res = await getUserResumesAPI();
-    resumes.value = res.data;
+    resumes.value = res?.data?.list || [];
   } finally {
     loading.value = false;
   }

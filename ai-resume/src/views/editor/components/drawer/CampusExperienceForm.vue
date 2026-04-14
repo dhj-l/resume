@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { FormItem, Input, Button, Checkbox, DatePicker } from "ant-design-vue";
+import { h, ref } from "vue";
+
 import {
   DeleteOutlined,
   PlusOutlined,
   ArrowDownOutlined,
   ArrowUpOutlined,
 } from "@ant-design/icons-vue";
-import type { CampusExperience } from "@/stores/type";
-import { h, ref } from "vue";
+import { FormItem, Input, Button, Checkbox, DatePicker } from "ant-design-vue";
+
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 import { useResumeStore } from "@/stores/resumeStore";
+import type { CampusExperience } from "@/stores/type";
 
 const props = defineProps<{
   data: CampusExperience[];
@@ -64,18 +66,18 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <FormItem label="经历名称" class="!mb-0">
               <Input
                 :value="experience.title"
-                @update:value="(val) => update(index, 'title', val)"
                 placeholder="请输入经历名称"
                 style="width: 180px"
+                @update:value="(val) => update(index, 'title', val)"
               />
             </FormItem>
 
             <FormItem label="经历描述" class="!mb-0">
               <Input
                 :value="experience.description"
-                @update:value="(val) => update(index, 'description', val)"
                 placeholder="请输入经历描述"
                 style="width: 180px"
+                @update:value="(val) => update(index, 'description', val)"
               />
             </FormItem>
 
@@ -83,29 +85,27 @@ const handleTillNowChange = (index: number, checked: boolean) => {
               <div class="flex items-center gap-2">
                 <DatePicker
                   :value="experience.startTime"
-                  @update:value="(val) => update(index, 'startTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="开始时间"
                   style="width: 110px"
+                  @update:value="(val) => update(index, 'startTime', val)"
                 />
                 <span class="text-gray-400">-</span>
                 <DatePicker
                   v-if="experience.endTime !== '至今'"
                   :value="experience.endTime"
-                  @update:value="(val) => update(index, 'endTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="结束时间"
                   style="width: 110px"
+                  @update:value="(val) => update(index, 'endTime', val)"
                 />
                 <span v-else class="text-gray-500 text-sm px-2">至今</span>
                 <Checkbox
                   :checked="experience.endTime === '至今'"
-                  @change="
-                    (e: any) => handleTillNowChange(index, e.target.checked)
-                  "
                   class="ml-2"
+                  @change="(e: any) => handleTillNowChange(index, e.target.checked)"
                   >至今</Checkbox
                 >
               </div>
@@ -119,8 +119,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             >
               <BasicEditor
                 class="w-full"
-                :modelValue="experience.content"
-                @update:modelValue="(val) => update(index, 'content', val)"
+                :model-value="experience.content"
+                @update:model-value="(val) => update(index, 'content', val)"
               />
             </div>
           </div>
@@ -132,8 +132,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             type="primary"
             size="small"
             :icon="h(ArrowUpOutlined)"
-            @click="handleMove(index, 'up')"
             :disabled="index === 0"
+            @click="handleMove(index, 'up')"
           >
             上移
           </Button>
@@ -141,8 +141,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             type="primary"
             size="small"
             :icon="h(ArrowDownOutlined)"
-            @click="handleMove(index, 'down')"
             :disabled="index === data.length - 1"
+            @click="handleMove(index, 'down')"
           >
             下移
           </Button>
@@ -159,7 +159,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
       </div>
     </div>
 
-    <Button type="dashed" block @click="handleAdd" class="mt-4">
+    <Button type="dashed" block class="mt-4" @click="handleAdd">
       <template #icon><PlusOutlined /></template>
       添加校园经历
     </Button>

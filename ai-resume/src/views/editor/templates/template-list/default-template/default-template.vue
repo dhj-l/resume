@@ -22,7 +22,7 @@
           :is="getComponent(item)"
           :data="resumeData[item.moduleKey]"
           :label="item.label"
-          :templateType="currentTemplateType"
+          :template-type="currentTemplateType"
         />
       </div>
     </div>
@@ -49,7 +49,7 @@
             :is="getComponent(getModuleByKey(moduleId)!)"
             :data="(resumeData as any)[moduleId]"
             :label="getModuleByKey(moduleId)!.label"
-            :templateType="currentTemplateType"
+            :template-type="currentTemplateType"
           />
         </div>
       </template>
@@ -59,14 +59,16 @@
 
 <script setup lang="ts">
 import { ref, computed, inject } from "vue";
+
 import { storeToRefs } from "pinia";
+
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData, ModuleItem } from "@/stores/type";
-import { usePagination } from "@/views/editor/hooks/usePagination";
 
 // 引入组件
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+import { usePagination } from "@/views/editor/hooks/usePagination";
 
 const {
   moduleOrder,

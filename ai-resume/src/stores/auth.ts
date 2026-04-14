@@ -1,9 +1,11 @@
-import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+
+import { defineStore } from "pinia";
+
 import { loginAPI, registerAPI } from "@/api/auth/auth";
-import { getUserProfileAPI, updateUserProfileAPI } from "@/api/user/user";
 import type { LoginParams, RegisterParams } from "@/api/auth/type";
 import type { UserProfile, UpdateProfileParams } from "@/api/user/type";
+import { getUserProfileAPI, updateUserProfileAPI } from "@/api/user/user";
 
 export const useAuthStore = defineStore(
   "auth",

@@ -2,27 +2,19 @@
   <div class="container mx-auto max-w-6xl px-4 pt-28 pb-8">
     <!-- Loading State -->
     <div v-if="loading" class="flex justify-center items-center min-h-[400px]">
-      <div
-        class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"
-      ></div>
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
     </div>
 
     <!-- Error State -->
     <div v-else-if="error" class="text-center py-12">
       <p class="text-red-500 mb-4">{{ error }}</p>
-      <button
-        @click="router.push('/templates')"
-        class="text-primary-600 hover:underline"
-      >
+      <button class="text-primary-600 hover:underline" @click="router.push('/templates')">
         返回列表
       </button>
     </div>
 
     <!-- Content -->
-    <div
-      v-else-if="template"
-      class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12"
-    >
+    <div v-else-if="template" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
       <!-- Left: Preview -->
       <div
         class="lg:col-span-5 lg:col-start-2 bg-slate-50 rounded-xl overflow-hidden shadow-md border border-slate-200 group"
@@ -45,9 +37,7 @@
             >
               {{ template.category }}
             </span>
-            <span class="text-slate-400 text-xs">
-              ID: {{ template._id.slice(-6) }}
-            </span>
+            <span class="text-slate-400 text-xs"> ID: {{ template._id.slice(-6) }} </span>
           </div>
 
           <h1 class="text-3xl font-bold text-slate-900 mb-3 tracking-tight">
@@ -84,13 +74,9 @@
         </div>
 
         <!-- Description -->
-        <div
-          class="prose prose-slate prose-sm mb-8 text-slate-600 leading-relaxed"
-        >
+        <div class="prose prose-slate prose-sm mb-8 text-slate-600 leading-relaxed">
           <p>
-            这是一款专业的{{
-              template.category
-            }}简历模板，设计简洁大方，重点突出。
+            这是一款专业的{{ template.category }}简历模板，设计简洁大方，重点突出。
             适合各类求职场景，帮助您在众多候选人中脱颖而出。
           </p>
         </div>
@@ -105,7 +91,7 @@
             class="flex items-center justify-center gap-2 h-12 bg-gradient-to-r from-violet-600 to-indigo-600 border-none hover:opacity-90 transition-opacity shadow-lg shadow-indigo-500/20"
             @click="handleAiCreate"
           >
-            <template #icon v-if="!isImporting">
+            <template v-if="!isImporting" #icon>
               <Sparkles class="w-4 h-4" />
             </template>
             AI 帮我写
@@ -116,10 +102,10 @@
             size="large"
             block
             :loading="isCreating"
-            @click="handleUseTemplate"
             class="flex items-center justify-center gap-2 h-12"
+            @click="handleUseTemplate"
           >
-            <template #icon v-if="!isCreating">
+            <template v-if="!isCreating" #icon>
               <Edit3 class="w-4 h-4" />
             </template>
             {{ isCreating ? "正在创建..." : "立即使用该模板" }}
@@ -129,10 +115,10 @@
             size="large"
             block
             :loading="isImportingResume"
-            @click="handleImportResume"
             class="flex items-center justify-center gap-2 h-12"
+            @click="handleImportResume"
           >
-            <template #icon v-if="!isImportingResume">
+            <template v-if="!isImportingResume" #icon>
               <Upload class="w-4 h-4" />
             </template>
             导入已有简历
@@ -141,23 +127,16 @@
           <a-button
             size="large"
             block
-            @click="router.push('/templates')"
             class="flex items-center justify-center gap-2 h-12"
+            @click="router.push('/templates')"
           >
             返回列表
           </a-button>
         </div>
       </div>
     </div>
-    <AiCreateDialog
-      v-model:open="aiDialogOpen"
-      :loading="isAiCreating"
-      @submit="handleAiSubmit"
-    />
-    <CreateModeDialog
-      v-model:open="createModeOpen"
-      @select="handleModeSelect"
-    />
+    <AiCreateDialog v-model:open="aiDialogOpen" :loading="isAiCreating" @submit="handleAiSubmit" />
+    <CreateModeDialog v-model:open="createModeOpen" @select="handleModeSelect" />
     <SelectResumeDialog
       v-model:open="selectResumeOpen"
       :submitting="isImporting"
@@ -180,24 +159,23 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
-import { getTemplateByIdAPI } from "@/api/templates/templates";
-import {
-  generateAiResumeAPI,
-  createResumeAPI,
-  importResumeAPI,
-} from "@/api/resume/resume";
-import type { TemplateDetails } from "@/api/templates/type";
+
+import { message } from "ant-design-vue";
 import { Calendar, Users, Edit3, Sparkles, Upload } from "lucide-vue-next";
-import { getFullImageUrl } from "@/utils/image";
+import { useRoute, useRouter } from "vue-router";
+
+import { generateAiResumeAPI, createResumeAPI, importResumeAPI } from "@/api/resume/resume";
+import { getTemplateByIdAPI } from "@/api/templates/templates";
+import type { TemplateDetails } from "@/api/templates/type";
+import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
 import { formatDate } from "@/utils/day";
+import { getFullImageUrl } from "@/utils/image";
+
 import AiCreateDialog from "./components/AiCreateDialog.vue";
 import CreateModeDialog from "./components/CreateModeDialog.vue";
+import ImportResumeDialog from "./components/ImportResumeDialog.vue";
 import SelectResumeDialog from "./components/SelectResumeDialog.vue";
 import UploadResumeDialog from "./components/UploadResumeDialog.vue";
-import ImportResumeDialog from "./components/ImportResumeDialog.vue";
-import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
-import { message } from "ant-design-vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -298,10 +276,7 @@ const handleAiSubmit = async (data: any) => {
   }
 };
 
-const handleSelectResumeSubmit = async (payload: {
-  jd: string;
-  resumeId: string;
-}) => {
+const handleSelectResumeSubmit = async (payload: { jd: string; resumeId: string }) => {
   if (!template.value || isGlobalLoading.value) return;
   isImporting.value = true;
   isGlobalLoading.value = true;
@@ -325,10 +300,7 @@ const handleSelectResumeSubmit = async (payload: {
   }
 };
 
-const handleUploadResumeSubmit = async (payload: {
-  resumeText: string;
-  jdText: string;
-}) => {
+const handleUploadResumeSubmit = async (payload: { resumeText: string; jdText: string }) => {
   if (!template.value || isGlobalLoading.value) return;
   isImporting.value = true;
   isGlobalLoading.value = true;

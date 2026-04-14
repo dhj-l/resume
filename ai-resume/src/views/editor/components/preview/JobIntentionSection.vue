@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 import { useResumeStore } from "@/stores/resumeStore";
 import type { JobIntention } from "@/stores/type";
-import type { templateType } from "./type";
+
 import { getJobIntentionStyles } from "./JobIntentionSection";
-import { computed } from "vue";
+import type { templateType } from "./type";
 
 const props = defineProps<{
   data?: JobIntention;
@@ -55,13 +57,13 @@ const isVisible = computed(() => {
     v-if="isVisible": 仅在至少有一个求职意向字段有值时渲染
     数据来源: props.data (JobIntention 对象)
   -->
-  <div :class="styles.container" @click="handleClick" v-if="isVisible">
+  <div v-if="isVisible" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
       {{ label || "求职意向" }}
     </h3>
-    <div :class="styles.contentWrapper" v-if="data">
+    <div v-if="data" :class="styles.contentWrapper">
       <template v-for="item in contentArray" :key="item.label">
-        <div :class="styles.item" v-if="item.value">
+        <div v-if="item.value" :class="styles.item">
           <span :class="styles.label">{{ item.label }}：</span>
           <span :class="styles.value">{{ item.value }}</span>
         </div>

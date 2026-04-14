@@ -1,7 +1,7 @@
-import type { TemplateItem } from "./type";
 import DefaultTemplate from "./template-list/default-template/default-template.vue";
 import DoubleColumnTemplate from "./template-list/double-column-template/double-column-template.vue";
 import SimpleTemplate from "./template-list/simple-template/simple-template.vue";
+import type { TemplateItem } from "./type";
 // import BlueTemplate from "./template-list/blue-template/blue-template.vue";
 
 export const templateList: TemplateItem[] = [

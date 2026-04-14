@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { templateList } from "@/views/editor/templates/index";
-import { useResumeStore } from "@/stores/resumeStore";
-import { storeToRefs } from "pinia";
 import { watch } from "vue";
+
+import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
+
+import { useResumeStore } from "@/stores/resumeStore";
+import { templateList } from "@/views/editor/templates/index";
 
 const { resumeData, globalLineHeight } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
@@ -27,8 +29,8 @@ watch(
 -->
 <template>
   <div
-    class="resume-preview-wrapper"
     ref="currentTemplateRef"
+    class="resume-preview-wrapper"
     :style="{ lineHeight: globalLineHeight }"
   >
     <template v-for="item in templateList" :key="item.value">

@@ -7,9 +7,7 @@ interface SelfEvaluationStyles {
   empty: string;
 }
 
-export const getSelfEvaluationStyles = (
-  type: templateType,
-): SelfEvaluationStyles => {
+export const getSelfEvaluationStyles = (type: templateType): SelfEvaluationStyles => {
   const commonStyles = {
     container:
       "resume-section w-full hover:bg-blue-50 hover:border-blue-300 border border-transparent rounded cursor-pointer transition-all duration-200",
@@ -29,8 +27,7 @@ export const getSelfEvaluationStyles = (
     case "simple":
       return {
         ...commonStyles,
-        title:
-          "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
+        title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
         container: `${commonStyles.container}`,
       };
     case "default":

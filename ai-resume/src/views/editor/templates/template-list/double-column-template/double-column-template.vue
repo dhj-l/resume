@@ -1,9 +1,7 @@
 <template>
   <div class="relative mx-auto w-full max-w-[210mm]">
     <!-- 计算层：隐藏 -->
-    <div
-      class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none"
-    >
+    <div class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none">
       <!-- 左侧计算层 -->
       <div
         ref="leftContentRef"
@@ -22,17 +20,13 @@
             :template-type="currentTemplateType"
           />
         </div>
-        <div
-          v-for="item in leftModules"
-          :key="item.moduleKey"
-          :data-id="item.moduleKey"
-        >
+        <div v-for="item in leftModules" :key="item.moduleKey" :data-id="item.moduleKey">
           <component
             :is="item.component"
+            v-if="item.isShow && item.component"
             :data="resumeData?.[item.moduleKey]"
             :label="item.label"
             :template-type="currentTemplateType"
-            v-if="item.isShow && item.component"
           />
         </div>
       </div>
@@ -51,20 +45,16 @@
           <JobIntentionSection
             :data="resumeData!.jobIntention"
             :label="jobIntentionModule?.label"
-            :templateType="currentTemplateType"
+            :template-type="currentTemplateType"
           />
         </div>
-        <div
-          v-for="item in rightModules"
-          :key="item.moduleKey"
-          :data-id="item.moduleKey"
-        >
+        <div v-for="item in rightModules" :key="item.moduleKey" :data-id="item.moduleKey">
           <component
             :is="item.component"
+            v-if="item.isShow && item.component"
             :data="resumeData?.[item.moduleKey]"
             :label="item.label"
-            :templateType="currentTemplateType"
-            v-if="item.isShow && item.component"
+            :template-type="currentTemplateType"
           />
         </div>
       </div>
@@ -96,8 +86,8 @@
             :template-type="currentTemplateType"
           />
           <component
-            v-else-if="getModuleByKey(moduleId)"
             :is="getModuleByKey(moduleId)!.component"
+            v-else-if="getModuleByKey(moduleId)"
             :data="(resumeData as any)[moduleId]"
             :label="getModuleByKey(moduleId)!.label"
             :template-type="currentTemplateType"
@@ -119,14 +109,14 @@
             v-if="moduleId === 'jobIntention'"
             :data="resumeData!.jobIntention"
             :label="jobIntentionModule?.label"
-            :templateType="currentTemplateType"
+            :template-type="currentTemplateType"
           />
           <component
-            v-else-if="getModuleByKey(moduleId)"
             :is="getModuleByKey(moduleId)!.component"
+            v-else-if="getModuleByKey(moduleId)"
             :data="(resumeData as any)[moduleId]"
             :label="getModuleByKey(moduleId)!.label"
-            :templateType="currentTemplateType"
+            :template-type="currentTemplateType"
             draggable="true"
           />
         </template>
@@ -136,12 +126,14 @@
 </template>
 
 <script setup lang="ts">
-import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
-import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+import { inject, computed, ref } from "vue";
+
+import { storeToRefs } from "pinia";
+
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData } from "@/stores/type";
-import { storeToRefs } from "pinia";
-import { inject, computed, ref } from "vue";
+import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
+import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { usePagination } from "@/views/editor/hooks/usePagination";
 
 const {
@@ -165,25 +157,19 @@ const rightModuleKeys = [
 ];
 
 // 获取基本信息和求职意向模块配置
-const basicInfoModule = computed(() =>
-  moduleOrder.value.find((m) => m.moduleKey === "basicInfo"),
-);
+const basicInfoModule = computed(() => moduleOrder.value.find((m) => m.moduleKey === "basicInfo"));
 const jobIntentionModule = computed(() =>
   moduleOrder.value.find((m) => m.moduleKey === "jobIntention"),
 );
 
 // 计算左侧模块列表 (保持 moduleOrder 中的相对顺序)
 const leftModules = computed(() => {
-  return moduleOrder.value.filter((item) =>
-    leftModuleKeys.includes(item.moduleKey),
-  );
+  return moduleOrder.value.filter((item) => leftModuleKeys.includes(item.moduleKey));
 });
 
 // 计算右侧模块列表 (保持 moduleOrder 中的相对顺序)
 const rightModules = computed(() => {
-  return moduleOrder.value.filter((item) =>
-    rightModuleKeys.includes(item.moduleKey),
-  );
+  return moduleOrder.value.filter((item) => rightModuleKeys.includes(item.moduleKey));
 });
 
 // 根据 ID 获取模块配置

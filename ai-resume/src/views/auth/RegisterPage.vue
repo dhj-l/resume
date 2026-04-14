@@ -124,14 +124,12 @@
 
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
-import {
-  MailOutlined,
-  LockOutlined,
-  UserOutlined,
-} from "@ant-design/icons-vue";
+
+import { MailOutlined, LockOutlined, UserOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import type { Rule } from "ant-design-vue/es/form";
+import { useRouter } from "vue-router";
+
 import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();

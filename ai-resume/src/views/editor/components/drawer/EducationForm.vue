@@ -1,29 +1,23 @@
 <script setup lang="ts">
-import {
-  FormItem,
-  Input,
-  Button,
-  Select,
-  Checkbox,
-  DatePicker,
-} from "ant-design-vue";
+import { h, ref } from "vue";
+
 import {
   DeleteOutlined,
   PlusOutlined,
   ArrowDownOutlined,
   ArrowUpOutlined,
 } from "@ant-design/icons-vue";
-import type { EducationBackground } from "@/stores/type";
-import { h, ref } from "vue";
+import { FormItem, Input, Button, Select, Checkbox, DatePicker } from "ant-design-vue";
+
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 import { useResumeStore } from "@/stores/resumeStore";
+import type { EducationBackground } from "@/stores/type";
 
 const props = defineProps<{
   data: EducationBackground[];
 }>();
 
-const { addEducation, removeEducation, updateEducation, moveEducation } =
-  useResumeStore();
+const { addEducation, removeEducation, updateEducation, moveEducation } = useResumeStore();
 
 const degreeOptions = [
   { label: "初中", value: "初中" },
@@ -80,18 +74,18 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <FormItem label="学校名称" class="!mb-0">
               <Input
                 :value="edu.schoolName"
-                @update:value="(val) => update(index, 'schoolName', val)"
                 placeholder="请输入学校名称"
                 style="width: 180px"
+                @update:value="(val) => update(index, 'schoolName', val)"
               />
             </FormItem>
 
             <FormItem label="所学专业" class="!mb-0">
               <Input
                 :value="edu.major"
-                @update:value="(val) => update(index, 'major', val)"
                 placeholder="请输入专业"
                 style="width: 180px"
+                @update:value="(val) => update(index, 'major', val)"
               />
             </FormItem>
 
@@ -99,29 +93,27 @@ const handleTillNowChange = (index: number, checked: boolean) => {
               <div class="flex items-center gap-2">
                 <DatePicker
                   :value="edu.enrollmentTime"
-                  @update:value="(val) => update(index, 'enrollmentTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="入学时间"
                   style="width: 110px"
+                  @update:value="(val) => update(index, 'enrollmentTime', val)"
                 />
                 <span class="text-gray-400">-</span>
                 <DatePicker
                   v-if="edu.graduationTime !== '至今'"
                   :value="edu.graduationTime"
-                  @update:value="(val) => update(index, 'graduationTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="毕业时间"
                   style="width: 110px"
+                  @update:value="(val) => update(index, 'graduationTime', val)"
                 />
                 <span v-else class="text-gray-500 text-sm px-2">至今</span>
                 <Checkbox
                   :checked="edu.graduationTime === '至今'"
-                  @change="
-                    (e: any) => handleTillNowChange(index, e.target.checked)
-                  "
                   class="ml-2"
+                  @change="(e: any) => handleTillNowChange(index, e.target.checked)"
                   >至今</Checkbox
                 >
               </div>
@@ -130,10 +122,10 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <FormItem label="学历" class="!mb-0">
               <Select
                 :value="edu.degree"
-                @update:value="(val) => update(index, 'degree', val)"
                 :options="degreeOptions"
                 placeholder="请选择"
                 style="width: 100px"
+                @update:value="(val) => update(index, 'degree', val)"
               />
             </FormItem>
           </div>
@@ -145,8 +137,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             >
               <BasicEditor
                 class="w-full"
-                :modelValue="edu.content"
-                @update:modelValue="(val) => update(index, 'content', val)"
+                :model-value="edu.content"
+                @update:model-value="(val) => update(index, 'content', val)"
               />
             </div>
           </div>
@@ -158,8 +150,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             type="primary"
             size="small"
             :icon="h(ArrowUpOutlined)"
-            @click="handleMove(index, 'up')"
             :disabled="index === 0"
+            @click="handleMove(index, 'up')"
           >
             上移
           </Button>
@@ -167,8 +159,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             type="primary"
             size="small"
             :icon="h(ArrowDownOutlined)"
-            @click="handleMove(index, 'down')"
             :disabled="index === data.length - 1"
+            @click="handleMove(index, 'down')"
           >
             下移
           </Button>
@@ -185,7 +177,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
       </div>
     </div>
 
-    <Button type="dashed" block @click="handleAdd" class="mt-4">
+    <Button type="dashed" block class="mt-4" @click="handleAdd">
       <template #icon><PlusOutlined /></template>
       添加教育经历
     </Button>

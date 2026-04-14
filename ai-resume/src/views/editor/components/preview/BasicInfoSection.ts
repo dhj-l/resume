@@ -33,8 +33,7 @@ export const getBasicInfoStyles = (type: templateType): BasicInfoStyles => {
       return {
         ...commonStyles,
         container: `${commonStyles.container}`,
-        contentWrapper:
-          "flex flex-row-reverse items-center justify-between gap-8",
+        contentWrapper: "flex flex-row-reverse items-center justify-between gap-8",
         avatar: "w-32 h-40 rounded object-cover bg-gray-200 shrink-0 shadow-sm",
         infoWrapper: "flex-1 min-w-0",
         name: "text-3xl font-bold text-gray-900 mb-6 tracking-wide",

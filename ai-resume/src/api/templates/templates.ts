@@ -1,9 +1,6 @@
 import { http } from "@/http/request";
-import type {
-  TemplateDetails,
-  TemplateListParams,
-  TemplateListResponse,
-} from "./type";
+
+import type { TemplateDetails, TemplateListParams, TemplateListResponse } from "./type";
 
 export const getTemplateListAPI = (params?: TemplateListParams) => {
   return http.get<TemplateListResponse>("/template", { params });

@@ -1,4 +1,5 @@
 import type { Component } from "vue";
+
 import type { templateType } from "@/views/editor/components/preview/type";
 
 /**

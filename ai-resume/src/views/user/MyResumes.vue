@@ -5,18 +5,13 @@
         <div class="flex items-start justify-between gap-6">
           <div>
             <h1 class="text-[32px] font-[600] text-[#1a1a1a] mb-3">我的简历</h1>
-            <p class="text-[#8c8c8c] text-[16px]">
-              管理你创建的简历，支持编辑与删除操作
-            </p>
+            <p class="text-[#8c8c8c] text-[16px]">管理你创建的简历，支持编辑与删除操作</p>
           </div>
         </div>
       </div>
 
       <div class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-[80px] pb-12">
-        <div
-          v-if="loading"
-          class="flex justify-center items-center min-h-[400px]"
-        >
+        <div v-if="loading" class="flex justify-center items-center min-h-[400px]">
           <a-spin size="large" tip="正在加载简历..." />
         </div>
 
@@ -49,10 +44,7 @@
           />
         </div>
 
-        <div
-          v-else
-          class="flex items-center justify-center py-24 min-h-[400px]"
-        >
+        <div v-else class="flex items-center justify-center py-24 min-h-[400px]">
           <a-empty :image="simpleImage">
             <template #image>
               <FileOutlined class="text-6xl text-gray-300" />
@@ -60,15 +52,10 @@
             <template #description>
               <div class="flex flex-col gap-2 mt-4">
                 <span class="text-lg font-medium text-[#1a1a1a]">暂无简历</span>
-                <span class="text-[#8c8c8c]"
-                  >去模板市场创建一份你的第一份简历吧</span
-                >
+                <span class="text-[#8c8c8c]">去模板市场创建一份你的第一份简历吧</span>
               </div>
             </template>
-            <a-button
-              type="primary"
-              class="mt-6"
-              @click="router.push('/templates')"
+            <a-button type="primary" class="mt-6" @click="router.push('/templates')"
               >去选模板</a-button
             >
           </a-empty>
@@ -80,14 +67,12 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+
 import { FileOutlined } from "@ant-design/icons-vue";
 import { Empty, Modal, message } from "ant-design-vue";
-import {
-  getUserResumesAPI,
-  deleteResumeAPI,
-  copyResumeAPI,
-} from "@/api/resume/resume";
+import { useRouter } from "vue-router";
+
+import { getUserResumesAPI, deleteResumeAPI, copyResumeAPI } from "@/api/resume/resume";
 import type { UserResumeListItem } from "@/api/resume/type";
 import ResumeCard from "@/views/user/components/ResumeCard.vue";
 

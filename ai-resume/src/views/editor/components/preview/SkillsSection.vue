@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { useResumeStore } from "@/stores/resumeStore";
-import type { templateType } from "./type";
-import { getSkillsStyles } from "./SkillsSection";
 import { computed } from "vue";
+
+import { useResumeStore } from "@/stores/resumeStore";
 import type { SortableModule } from "@/stores/type";
+
+import { getSkillsStyles } from "./SkillsSection";
+import type { templateType } from "./type";
 
 const props = defineProps<{
   data?: SortableModule;
@@ -30,10 +32,6 @@ const handleClick = () => {
     <h3 :class="styles.title">
       {{ label || "技能特长" }}
     </h3>
-    <div
-      v-if="data?.content"
-      :class="styles.listWrapper"
-      v-html="data.content"
-    ></div>
+    <div v-if="data?.content" :class="styles.listWrapper" v-html="data.content"></div>
   </div>
 </template>

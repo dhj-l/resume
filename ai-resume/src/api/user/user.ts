@@ -1,9 +1,6 @@
 import { http } from "@/http/request";
-import type {
-  UserProfile,
-  UpdateProfileParams,
-  ChangePasswordParams,
-} from "./type";
+
+import type { UserProfile, UpdateProfileParams, ChangePasswordParams } from "./type";
 
 // 获取用户信息
 export const getUserProfileAPI = () => {

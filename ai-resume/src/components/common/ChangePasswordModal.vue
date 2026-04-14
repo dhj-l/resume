@@ -4,16 +4,10 @@
     title="修改密码"
     :width="480"
     :footer="null"
-    @cancel="handleCancel"
     class="change-password-modal"
+    @cancel="handleCancel"
   >
-    <a-form
-      ref="formRef"
-      :model="formData"
-      :rules="rules"
-      layout="vertical"
-      class="mt-4"
-    >
+    <a-form ref="formRef" :model="formData" :rules="rules" layout="vertical" class="mt-4">
       <a-form-item label="当前密码" name="oldPassword">
         <a-input-password
           v-model:value="formData.oldPassword"
@@ -39,13 +33,13 @@
       </a-form-item>
 
       <div class="flex justify-end gap-3 mt-6">
-        <a-button @click="handleCancel" size="large"> 取消 </a-button>
+        <a-button size="large" @click="handleCancel"> 取消 </a-button>
         <a-button
           type="primary"
           :loading="loading"
-          @click="handleSubmit"
           size="large"
           class="min-w-[100px]"
+          @click="handleSubmit"
         >
           确认修改
         </a-button>
@@ -56,8 +50,10 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
+
 import { message } from "ant-design-vue";
 import type { FormInstance } from "ant-design-vue";
+
 import { changePasswordAPI } from "@/api/user/user";
 
 interface Props {

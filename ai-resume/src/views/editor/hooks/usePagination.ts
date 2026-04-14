@@ -1,13 +1,4 @@
-import {
-  ref,
-  nextTick,
-  watch,
-  onMounted,
-  onUnmounted,
-  type Ref,
-  unref,
-  type MaybeRef,
-} from "vue";
+import { ref, nextTick, watch, onMounted, onUnmounted, type Ref, unref, type MaybeRef } from "vue";
 
 const SAFE_PAGE_HEIGHT = 1122;
 
@@ -63,22 +54,16 @@ export function usePagination(
       const style = window.getComputedStyle(child);
       const marginTop = parseFloat(style.marginTop) || 0;
       const marginBottom = parseFloat(style.marginBottom) || 0;
-      const height =
-        child.getBoundingClientRect().height + marginTop + marginBottom;
+      const height = child.getBoundingClientRect().height + marginTop + marginBottom;
 
       const id = child.dataset.id;
       moduleHeights.push({ id, height, marginTop, marginBottom });
 
       if (!id) continue;
 
-      const currentAvailableHeight = isFirstPage
-        ? firstPageAvailableHeight
-        : availableHeight;
+      const currentAvailableHeight = isFirstPage ? firstPageAvailableHeight : availableHeight;
 
-      if (
-        currentPageHeight + height > currentAvailableHeight &&
-        currentPageItems.length > 0
-      ) {
+      if (currentPageHeight + height > currentAvailableHeight && currentPageItems.length > 0) {
         newPages.push(currentPageItems);
         currentPageItems = [];
         currentPageHeight = 0;

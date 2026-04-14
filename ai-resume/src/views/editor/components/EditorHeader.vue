@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, ref, nextTick, onMounted, onUnmounted } from "vue";
+
 import {
   LeftOutlined,
   SaveOutlined,
@@ -9,37 +11,24 @@ import {
   SkinOutlined,
   EditOutlined,
 } from "@ant-design/icons-vue";
-import { useRouter } from "vue-router";
-import {
-  Button,
-  Dropdown,
-  Menu,
-  MenuItem,
-  Popover,
-  Space,
-  message,
-  Input,
-} from "ant-design-vue";
-import { templateList } from "../templates";
-import { useResumeStore } from "@/stores/resumeStore";
+import { Button, Dropdown, Menu, MenuItem, Popover, Space, message, Input } from "ant-design-vue";
 import { storeToRefs } from "pinia";
-import { computed, ref, nextTick, onMounted, onUnmounted } from "vue";
-import type { templateType } from "./preview/type";
-import GlobalStyleSettings from "./GlobalStyleSettings.vue";
-import PublishTemplateModal from "./PublishTemplateModal.vue";
-import {
-  extractEffectiveCssForElement,
-  getDomCover,
-  getDomHtml,
-  getElement,
-} from "@/utils/dom";
+import { useRouter } from "vue-router";
+
 import { downloadResumeAPI } from "@/api/resume/resume";
+import { useResumeStore } from "@/stores/resumeStore";
+import { extractEffectiveCssForElement, getDomCover, getDomHtml, getElement } from "@/utils/dom";
 import { downloadPdf } from "@/utils/download";
 import { uploadImage } from "@/utils/upload";
 
+import { templateList } from "../templates";
+
+import GlobalStyleSettings from "./GlobalStyleSettings.vue";
+import type { templateType } from "./preview/type";
+import PublishTemplateModal from "./PublishTemplateModal.vue";
+
 const { resumeData } = storeToRefs(useResumeStore());
-const { setCurrentTemplate, saveResume, setResumeDataString } =
-  useResumeStore();
+const { setCurrentTemplate, saveResume, setResumeDataString } = useResumeStore();
 interface Props {
   resumeTitle?: string;
 }
@@ -61,9 +50,7 @@ const emit = defineEmits<{
 }>();
 
 const currentTemplateLabel = computed(() => {
-  const template = templateList.find(
-    (item) => item.value === resumeData.value.type,
-  );
+  const template = templateList.find((item) => item.value === resumeData.value.type);
   return template?.label || "默认通用模板";
 });
 const router = useRouter();
@@ -103,9 +90,7 @@ const autoSave = async (isUpdateCover: boolean = false) => {
 
     const coverFile = await getDomCover(
       element as HTMLElement,
-      elementHeight > COVER_HEIGHT_THRESHOLD
-        ? COVER_HEIGHT_THRESHOLD
-        : undefined,
+      elementHeight > COVER_HEIGHT_THRESHOLD ? COVER_HEIGHT_THRESHOLD : undefined,
     );
 
     const url = await uploadImage(coverFile);
@@ -254,25 +239,17 @@ onUnmounted(() => {
   >
     <!-- 左侧：返回和标题 -->
     <div class="flex items-center space-x-4">
-      <Button
-        type="text"
-        @click="handleBack"
-        class="!flex !items-center !justify-center"
-      >
+      <Button type="text" class="!flex !items-center !justify-center" @click="handleBack">
         <template #icon><LeftOutlined /></template>
       </Button>
       <div class="flex flex-col">
         <span class="text-xs text-gray-500">简历编辑</span>
         <div class="relative">
-          <Transition
-            name="title-fade"
-            mode="out-in"
-            @after-enter="handleTransitionAfterEnter"
-          >
+          <Transition name="title-fade" mode="out-in" @after-enter="handleTransitionAfterEnter">
             <div
               v-if="!isEditingTitle"
-              @click="startEditingTitle"
               class="font-medium text-gray-800 truncate w-[220px] cursor-pointer hover:text-blue-600 transition-colors duration-200 flex items-center group"
+              @click="startEditingTitle"
             >
               <span class="truncate">{{ resumeTitle }}</span>
               <EditOutlined
@@ -281,15 +258,15 @@ onUnmounted(() => {
             </div>
             <Input
               v-else
+              ref="titleInputRef"
               v-model:value="editingTitleValue"
               class="w-[220px]"
               placeholder="输入简历标题"
-              @blur="handleTitleBlur"
-              @keydown="handleTitleKeydown"
               :maxlength="50"
               show-count
               :autofocus="true"
-              ref="titleInputRef"
+              @blur="handleTitleBlur"
+              @keydown="handleTitleKeydown"
             />
           </Transition>
         </div>
@@ -301,12 +278,9 @@ onUnmounted(() => {
       <Dropdown>
         <template #overlay>
           <Menu @click="({ key }) => handleTemplateChange(key as templateType)">
-            <MenuItem
-              v-for="item in templateList"
-              :key="item.value"
-              :title="item.label"
-              >{{ item.label }}</MenuItem
-            >
+            <MenuItem v-for="item in templateList" :key="item.value" :title="item.label">{{
+              item.label
+            }}</MenuItem>
           </Menu>
         </template>
         <Button>
@@ -331,7 +305,7 @@ onUnmounted(() => {
         <template #icon><UploadOutlined /></template>
         发布为模板
       </Button>
-      <Button type="primary" @click="handleExport" :loading="exportLoading">
+      <Button type="primary" :loading="exportLoading" @click="handleExport">
         <template #icon><FilePdfOutlined /></template>
         导出PDF
       </Button>
@@ -347,10 +321,7 @@ onUnmounted(() => {
     </Space>
 
     <!-- Publish Template Modal -->
-    <PublishTemplateModal
-      ref="publishModalRef"
-      :resumeTitle="props.resumeTitle"
-    />
+    <PublishTemplateModal ref="publishModalRef" :resume-title="props.resumeTitle" />
   </header>
 </template>
 
