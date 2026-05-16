@@ -33,6 +33,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/user/MyResumes.vue"),
         meta: { title: "我的简历", requiresAuth: true },
       },
+      {
+        name: "GenerationRecords",
+        path: "/user/generations",
+        component: () => import("@/views/user/GenerationRecords.vue"),
+        meta: { title: "生成记录", requiresAuth: true },
+      },
     ],
   },
   {
