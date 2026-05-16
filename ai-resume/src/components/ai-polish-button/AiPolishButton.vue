@@ -16,17 +16,18 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const { resumeData, updateModuleContent } = useResumeStore();
+const { updateModuleContent } = useResumeStore();
 
 const open = ref(false);
 const description = ref("");
 const loading = ref(false);
 
 const handleConfirm = async () => {
+  const store = useResumeStore();
   loading.value = true;
   try {
     const res = await polishContentAPI({
-      resumeId: resumeData._id,
+      resumeId: store.resumeData._id,
       key: props.moduleKey,
       index: props.index,
       description: description.value || undefined,
@@ -39,7 +40,6 @@ const handleConfirm = async () => {
     );
     message.success("AI润色完成");
     open.value = false;
-    description.value = "";
   } catch {
     // Error already handled by http interceptor
   } finally {
@@ -74,8 +74,14 @@ const handleOpenChange = (visible: boolean) => {
           show-count
         />
         <div class="flex justify-end gap-2">
-          <Button size="small" @click="open = false">取消</Button>
-          <Button type="primary" size="small" :loading="loading" @click="handleConfirm">
+          <Button size="small" class="whitespace-nowrap" @click="open = false">取消</Button>
+          <Button
+            type="primary"
+            size="small"
+            class="whitespace-nowrap"
+            :loading="loading"
+            @click="handleConfirm"
+          >
             <template #icon>
               <Sparkles class="w-3.5 h-3.5" />
             </template>
@@ -85,7 +91,7 @@ const handleOpenChange = (visible: boolean) => {
       </div>
     </template>
 
-    <Button size="small" type="link" class="!px-1">
+    <Button size="small" type="link" class="!px-2 !h-10 whitespace-nowrap">
       <template #icon>
         <Sparkles class="w-3.5 h-3.5 text-purple-500" />
       </template>

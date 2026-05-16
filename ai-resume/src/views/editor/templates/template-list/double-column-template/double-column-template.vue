@@ -86,10 +86,10 @@
             :template-type="currentTemplateType"
           />
           <component
-            :is="getModuleByKey(moduleId)!.component"
-            v-else-if="getModuleByKey(moduleId)"
+            :is="leftModuleByKey.get(moduleId)!.component"
+            v-else-if="leftModuleByKey.get(moduleId)"
             :data="(resumeData as any)[moduleId]"
-            :label="getModuleByKey(moduleId)!.label"
+            :label="leftModuleByKey.get(moduleId)!.label"
             :template-type="currentTemplateType"
             draggable="true"
           />
@@ -112,10 +112,10 @@
             :template-type="currentTemplateType"
           />
           <component
-            :is="getModuleByKey(moduleId)!.component"
-            v-else-if="getModuleByKey(moduleId)"
+            :is="rightModuleByKey.get(moduleId)!.component"
+            v-else-if="rightModuleByKey.get(moduleId)"
             :data="(resumeData as any)[moduleId]"
-            :label="getModuleByKey(moduleId)!.label"
+            :label="rightModuleByKey.get(moduleId)!.label"
             :template-type="currentTemplateType"
             draggable="true"
           />
@@ -131,9 +131,10 @@ import { inject, computed, ref } from "vue";
 import { storeToRefs } from "pinia";
 
 import { useResumeStore } from "@/stores/resumeStore";
-import type { ResumeData } from "@/stores/type";
+import type { ResumeData, ModuleItem } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
 import { usePagination } from "@/views/editor/hooks/usePagination";
 
 const {
@@ -146,7 +147,6 @@ const {
 } = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
-// 定义左右分栏的模块 key
 const leftModuleKeys = ["skills", "certificates", "selfEvaluation"];
 const rightModuleKeys = [
   "educationBackground",
@@ -156,26 +156,36 @@ const rightModuleKeys = [
   "internshipExperience",
 ];
 
-// 获取基本信息和求职意向模块配置
 const basicInfoModule = computed(() => moduleOrder.value.find((m) => m.moduleKey === "basicInfo"));
 const jobIntentionModule = computed(() =>
   moduleOrder.value.find((m) => m.moduleKey === "jobIntention"),
 );
 
-// 计算左侧模块列表 (保持 moduleOrder 中的相对顺序)
+const { activeModules } = useActiveModules(moduleOrder, resumeData);
+
 const leftModules = computed(() => {
-  return moduleOrder.value.filter((item) => leftModuleKeys.includes(item.moduleKey));
+  return activeModules.value.filter((item) => leftModuleKeys.includes(item.moduleKey));
 });
 
-// 计算右侧模块列表 (保持 moduleOrder 中的相对顺序)
 const rightModules = computed(() => {
-  return moduleOrder.value.filter((item) => rightModuleKeys.includes(item.moduleKey));
+  return activeModules.value.filter((item) => rightModuleKeys.includes(item.moduleKey));
 });
 
-// 根据 ID 获取模块配置
-const getModuleByKey = (key: string) => {
-  return moduleOrder.value.find((item) => item.moduleKey === key);
-};
+const leftModuleByKey = computed(() => {
+  const map = new Map<string, ModuleItem>();
+  for (const item of leftModules.value) {
+    map.set(item.moduleKey, item);
+  }
+  return map;
+});
+
+const rightModuleByKey = computed(() => {
+  const map = new Map<string, ModuleItem>();
+  for (const item of rightModules.value) {
+    map.set(item.moduleKey, item);
+  }
+  return map;
+});
 
 // 分页逻辑
 const leftContentRef = ref<HTMLElement | null>(null);

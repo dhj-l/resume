@@ -811,20 +811,20 @@ curl -X POST http://localhost:3000/api/v1/resume/download \
 
 ##### Body (所有字段可选)
 
-| 参数名               | 类型   | 必填 | 说明                     |
-| -------------------- | ------ | ---- | ------------------------ |
-| templateId           | string | 否   | 模板ID，基于模板创建简历 |
-| title                | string | 否   | 简历标题                 |
-| globalStyle          | object | 否   | 全局样式配置             |
-| basicInfo            | object | 否   | 基础信息                 |
-| jobIntention         | object | 否   | 求职意向                 |
-| educationBackground  | array  | 否   | 教育背景数组             |
-| workExperience       | array  | 否   | 工作经验数组             |
-| campusExperience     | array  | 否   | 校园经历数组             |
+| 参数名               | 类型   | 必填 | 说明                                        |
+| -------------------- | ------ | ---- | ------------------------------------------- |
+| templateId           | string | 否   | 模板ID，基于模板创建简历                    |
+| title                | string | 否   | 简历标题                                    |
+| globalStyle          | object | 否   | 全局样式配置                                |
+| basicInfo            | object | 否   | 基础信息                                    |
+| jobIntention         | object | 否   | 求职意向                                    |
+| educationBackground  | array  | 否   | 教育背景数组                                |
+| workExperience       | array  | 否   | 工作经验数组                                |
+| campusExperience     | array  | 否   | 校园经历数组                                |
 | skills               | object | 否   | 技能特长（包含 content 和 globalSort 字段） |
 | certificates         | object | 否   | 荣誉证书（包含 content 和 globalSort 字段） |
-| projectExperience    | array  | 否   | 项目经历数组             |
-| internshipExperience | array  | 否   | 实习经历数组             |
+| projectExperience    | array  | 否   | 项目经历数组                                |
+| internshipExperience | array  | 否   | 实习经历数组                                |
 | selfEvaluation       | object | 否   | 自我评价（包含 content 和 globalSort 字段） |
 
 **请求示例**
@@ -1708,14 +1708,14 @@ curl -X POST http://localhost:3000/api/v1/upload/resume \
 
 ##### Body
 
-| 参数名         | 类型   | 必填 | 说明                                                                     |
-| -------------- | ------ | ---- | ------------------------------------------------------------------------ |
-| parseType      | enum   | 是   | 解析类型：`upload` (上传), `select` (选择已有), `manual` (手动输入)      |
-| jobDescription | string | 是   | 职位描述 (JD)                                                            |
-| templateType   | string | 是   | 简历模板类型                                                             |
-| resumeContent  | string | 否   | 简历内容 (当 `parseType` 为 `upload` 时必填)                             |
-| detailInfo     | object | 否   | 详细信息 JSON 对象 (当 `parseType` 为 `manual` 时必填)                   |
-| resumeId       | string | 否   | 已存在简历 ID (当 `parseType` 为 `select` 时必填)                        |
+| 参数名         | 类型   | 必填 | 说明                                                                |
+| -------------- | ------ | ---- | ------------------------------------------------------------------- |
+| parseType      | enum   | 是   | 解析类型：`upload` (上传), `select` (选择已有), `manual` (手动输入) |
+| jobDescription | string | 是   | 职位描述 (JD)                                                       |
+| templateType   | string | 是   | 简历模板类型                                                        |
+| resumeContent  | string | 否   | 简历内容 (当 `parseType` 为 `upload` 时必填)                        |
+| detailInfo     | object | 否   | 详细信息 JSON 对象 (当 `parseType` 为 `manual` 时必填)              |
+| resumeId       | string | 否   | 已存在简历 ID (当 `parseType` 为 `select` 时必填)                   |
 
 **detailInfo 结构**
 
@@ -1829,6 +1829,7 @@ curl -X POST http://localhost:3000/api/v1/resume-ai/generate \
 | updatedAt | string | 是   | 更新时间                         |
 
 ### 6.2 Resume (简历)
+
 | 字段名               | 类型                   | 必填 | 说明                     |
 | -------------------- | ---------------------- | ---- | ------------------------ |
 | \_id                 | string                 | 是   | 简历ID                   |
@@ -1876,6 +1877,7 @@ curl -X POST http://localhost:3000/api/v1/resume-ai/generate \
 | lineHeight   | string | 否   | 行高         |
 
 ### 6.5 BasicInfo (基础信息)
+
 | 字段名          | 类型   | 必填 | 说明     |
 | --------------- | ------ | ---- | -------- |
 | name            | string | 是   | 姓名     |
@@ -1888,21 +1890,24 @@ curl -X POST http://localhost:3000/api/v1/resume-ai/generate \
 | workYear        | string | 否   | 工作年限 |
 
 ### 6.6 Skills (技能特长)
-| 字段名     | 类型   | 必填 | 说明     |
-| ---------- | ------ | ---- | -------- |
-| content    | string | 否   | 技能内容 |
+
+| 字段名     | 类型   | 必填 | 说明                   |
+| ---------- | ------ | ---- | ---------------------- |
+| content    | string | 否   | 技能内容               |
 | globalSort | number | 否   | 全局排序字段（默认 0） |
 
 ### 6.7 Certificates (荣誉证书)
-| 字段名     | 类型   | 必填 | 说明     |
-| ---------- | ------ | ---- | -------- |
-| content    | string | 否   | 证书内容 |
+
+| 字段名     | 类型   | 必填 | 说明                   |
+| ---------- | ------ | ---- | ---------------------- |
+| content    | string | 否   | 证书内容               |
 | globalSort | number | 否   | 全局排序字段（默认 0） |
 
 ### 6.8 SelfEvaluation (自我评价)
-| 字段名     | 类型   | 必填 | 说明     |
-| ---------- | ------ | ---- | -------- |
-| content    | string | 否   | 评价内容 |
+
+| 字段名     | 类型   | 必填 | 说明                   |
+| ---------- | ------ | ---- | ---------------------- |
+| content    | string | 否   | 评价内容               |
 | globalSort | number | 否   | 全局排序字段（默认 0） |
 
 ### 6.9 JobIntention (求职意向)
@@ -1980,18 +1985,18 @@ curl -X POST http://localhost:3000/api/v1/resume-ai/generate \
 
 ### 6.16 ResumeAi (AI 简历)
 
-| 字段名                     | 类型       | 必填 | 说明                                  |
-| -------------------------- | ---------- | ---- | ------------------------------------- |
-| jobDescription             | string     | 是   | 岗位 JD                               |
-| status                     | string     | 是   | 状态 (creating, completed, failed)    |
-| templateType               | string     | 否   | 简历模板类型                          |
-| parseType                  | string     | 是   | 解析类型 (upload, select, manual)     |
-| resumeContent              | string     | 否   | 简历内容                              |
-| detailInfo                 | DetailInfo | 否   | 详细信息                              |
-| resumeId                   | string     | 否   | 简历 ID                               |
-| generatedResumeId          | string     | 否   | 生成的简历 ID                         |
-| generatedResumeDescription | string     | 否   | 生成简历的描述                        |
-| userId                     | ObjectId   | 是   | 用户 ID                               |
+| 字段名                     | 类型       | 必填 | 说明                               |
+| -------------------------- | ---------- | ---- | ---------------------------------- |
+| jobDescription             | string     | 是   | 岗位 JD                            |
+| status                     | string     | 是   | 状态 (creating, completed, failed) |
+| templateType               | string     | 否   | 简历模板类型                       |
+| parseType                  | string     | 是   | 解析类型 (upload, select, manual)  |
+| resumeContent              | string     | 否   | 简历内容                           |
+| detailInfo                 | DetailInfo | 否   | 详细信息                           |
+| resumeId                   | string     | 否   | 简历 ID                            |
+| generatedResumeId          | string     | 否   | 生成的简历 ID                      |
+| generatedResumeDescription | string     | 否   | 生成简历的描述                     |
+| userId                     | ObjectId   | 是   | 用户 ID                            |
 
 ---
 
@@ -2034,7 +2039,7 @@ curl -X POST http://localhost:3000/api/v1/resume-ai/generate \
 
 ## 更新日志
 
-| 日期       | 版本 | 更新内容                                                       |
-| ---------- | ---- | -------------------------------------------------------------- |
-| 2024-02-13 | v1.0 | 初始版本，包含 User、Resume、Template、Upload 模块共 19 个接口 |
+| 日期       | 版本 | 更新内容                                                                           |
+| ---------- | ---- | ---------------------------------------------------------------------------------- |
+| 2024-02-13 | v1.0 | 初始版本，包含 User、Resume、Template、Upload 模块共 19 个接口                     |
 | 2026-02-24 | v1.1 | 重构 skills、certificates、selfEvaluation 字段为对象结构，添加 globalSort 排序字段 |

@@ -114,7 +114,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
           </div>
 
           <!-- 第二行：富文本编辑器占位 -->
-          <div class="rich-text-container h-50">
+          <div class="rich-text-container">
             <div class="flex items-center justify-between mb-1">
               <span class="text-xs text-gray-400">详细描述</span>
               <AiPolishButton

@@ -144,11 +144,11 @@
       </div>
 
       <template v-for="moduleId in page" :key="moduleId">
-        <div v-if="getModuleByKey(moduleId)" :style="{ marginBottom: globalModuleMargin }">
+        <div v-if="moduleByKey.get(moduleId)" :style="{ marginBottom: globalModuleMargin }">
           <component
-            :is="getComponent(getModuleByKey(moduleId)!)"
+            :is="getComponent(moduleByKey.get(moduleId)!)"
             :data="(resumeData as any)[moduleId]"
-            :label="getModuleByKey(moduleId)!.label"
+            :label="moduleByKey.get(moduleId)!.label"
             :template-type="currentTemplateType"
           />
         </div>
@@ -165,9 +165,9 @@ import { storeToRefs } from "pinia";
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData, ModuleItem } from "@/stores/type";
 
-// 引入组件
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
 import { usePagination } from "@/views/editor/hooks/usePagination";
 
 const {
@@ -180,25 +180,15 @@ const {
 } = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
-// 映射特殊组件
 const componentMap: Record<string, any> = {
   basicInfo: BasicInfoSection,
   jobIntention: JobIntentionSection,
 };
 
-// 获取需要渲染的模块列表
-const activeModules = computed(() => {
-  return moduleOrder.value.filter((item) => item.isShow);
-});
+const { activeModules, moduleByKey } = useActiveModules(moduleOrder, resumeData);
 
-// 获取组件
 const getComponent = (item: ModuleItem) => {
   return item.component || componentMap[item.moduleKey];
-};
-
-// 根据 ID 获取模块配置
-const getModuleByKey = (key: string) => {
-  return activeModules.value.find((item) => item.moduleKey === key);
 };
 
 // 分页逻辑
