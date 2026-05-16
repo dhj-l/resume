@@ -23,3 +23,16 @@ export interface GenerationRecordResponse {
   total: number;
   list: GenerationRecord[];
 }
+
+export interface AiPolishParams {
+  resumeId: string;
+  key: string;
+  index?: number;
+  description?: string;
+}
+
+export interface AiPolishResult {
+  recordId: string;
+  beforeContent: string;
+  afterContent: string;
+}

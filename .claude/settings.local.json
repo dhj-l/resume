@@ -5,7 +5,8 @@
       "Bash(cat .env.development)",
       "Bash(curl -s \"http://localhost:3000/api/v1/resume-ai/records?page=1&pageSize=1\" -H \"Authorization: Bearer test\")",
       "Bash(curl *)",
-      "Bash(pnpm lint *)"
+      "Bash(pnpm lint *)",
+      "Bash(pnpm build *)"
     ]
   }
 }

@@ -456,6 +456,23 @@ export const useResumeStore = defineStore("resume", () => {
     moveItem("internshipExperience", index, direction);
   };
 
+  const updateModuleContent = (
+    key: keyof ResumeData,
+    contentField: string,
+    content: string,
+    index?: number,
+  ) => {
+    const moduleData = resumeData.value[key];
+    if (index !== undefined && Array.isArray(moduleData)) {
+      const list = moduleData as any[];
+      if (list[index]) {
+        list[index] = { ...list[index], [contentField]: content };
+      }
+    } else if (typeof moduleData === "object" && moduleData !== null) {
+      (moduleData as Record<string, any>)[contentField] = content;
+    }
+  };
+
   const changeGlobalSort = (moduleKeyA: string, moduleKeyB: string) => {
     const moduleA = (resumeData.value as any)[moduleKeyA];
     const moduleB = (resumeData.value as any)[moduleKeyB];
@@ -544,5 +561,6 @@ export const useResumeStore = defineStore("resume", () => {
     setGlobalStyle,
     swapModuleOrder,
     initializeModuleOrder,
+    updateModuleContent,
   };
 });

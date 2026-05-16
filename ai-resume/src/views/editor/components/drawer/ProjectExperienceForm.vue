@@ -9,6 +9,7 @@ import {
 } from "@ant-design/icons-vue";
 import { FormItem, Input, Button, Checkbox, DatePicker } from "ant-design-vue";
 
+import AiPolishButton from "@/components/ai-polish-button/AiPolishButton.vue";
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ProjectExperience } from "@/stores/type";
@@ -114,6 +115,14 @@ const handleTillNowChange = (index: number, checked: boolean) => {
 
           <!-- 第二行：富文本编辑器占位 -->
           <div class="rich-text-container">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs text-gray-400">详细描述</span>
+              <AiPolishButton
+                module-key="projectExperience"
+                content-field="content"
+                :index="index"
+              />
+            </div>
             <div
               class="border border-gray-300 rounded min-h-[150px] bg-gray-50 text-gray-400 flex flex-col items-center justify-center space-y-2"
             >
