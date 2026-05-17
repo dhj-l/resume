@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, nextTick, onMounted, onUnmounted } from "vue";
+import { computed, ref, nextTick, onMounted, onUnmounted, type Component, toRaw } from "vue";
 
 import {
   LeftOutlined,
@@ -12,6 +12,7 @@ import {
   EditOutlined,
 } from "@ant-design/icons-vue";
 import { Button, Dropdown, Menu, MenuItem, Popover, Space, message, Input } from "ant-design-vue";
+import { Sparkles } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
@@ -26,6 +27,7 @@ import { templateList } from "../templates";
 import GlobalStyleSettings from "./GlobalStyleSettings.vue";
 import type { templateType } from "./preview/type";
 import PublishTemplateModal from "./PublishTemplateModal.vue";
+import type { TooltipPlacement } from "ant-design-vue/es/tooltip";
 
 const { resumeData } = storeToRefs(useResumeStore());
 const { setCurrentTemplate, saveResume, setResumeDataString } = useResumeStore();
@@ -47,6 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   "update:resumeTitle": [value: string];
+  "toggle-ai-drawer": [];
 }>();
 
 const currentTemplateLabel = computed(() => {
@@ -68,6 +71,10 @@ const handleOpenPublishModal = () => {
 // TODO: 处理返回点击
 const handleBack = () => {
   router.back();
+};
+
+const handleToggleAiDrawer = () => {
+  emit("toggle-ai-drawer");
 };
 
 const handleSave = async () => {
@@ -219,6 +226,73 @@ const handleTitleKeydown = (e: KeyboardEvent) => {
   }
 };
 
+type ButtonType = "default" | "primary";
+
+interface HeaderButtonConfig {
+  key: string;
+  label: string;
+  icon?: Component;
+  type?: ButtonType;
+  loading?: boolean;
+  onClick: () => void;
+}
+
+interface HeaderPopoverConfig {
+  key: string;
+  label: string;
+  icon?: Component;
+  placement?: TooltipPlacement;
+  content: Component;
+}
+
+const middleButtons: HeaderButtonConfig[] = [
+  {
+    key: "theme",
+    label: "主题切换",
+    icon: toRaw(SkinOutlined),
+    onClick: handleThemeChange,
+  },
+  {
+    key: "ai-analysis",
+    label: "AI分析",
+    icon: toRaw(Sparkles),
+    onClick: handleToggleAiDrawer,
+  },
+];
+
+const rightButtons = computed<HeaderButtonConfig[]>(() => [
+  {
+    key: "save",
+    label: "保存草稿",
+    icon: toRaw(SaveOutlined),
+    onClick: handleSave,
+  },
+  {
+    key: "publish",
+    label: "发布为模板",
+    icon: toRaw(UploadOutlined),
+    onClick: handleOpenPublishModal,
+  },
+  {
+    key: "export",
+    label: "导出PDF",
+    icon: toRaw(FilePdfOutlined),
+    type: "primary",
+    loading: exportLoading.value,
+    onClick: handleExport,
+  },
+]);
+
+const rightPopovers: HeaderPopoverConfig[] = [
+  {
+    key: "settings",
+    label: "全局设置",
+    icon: toRaw(SettingOutlined),
+    placement: "bottomRight",
+    content: GlobalStyleSettings,
+  },
+];
+
 let timer: number | null = null;
 onMounted(() => {
   timer = setInterval(() => {
@@ -289,33 +363,48 @@ onUnmounted(() => {
         </Button>
       </Dropdown>
 
-      <Button @click="handleThemeChange">
-        <template #icon><SkinOutlined /></template>
-        主题切换
+      <Button
+        v-for="btn in middleButtons"
+        :key="btn.key"
+        class="flex items-center"
+        @click="btn.onClick"
+      >
+        <template v-if="btn.icon" #icon>
+          <component :is="btn.icon" class="w-4 h-4" />
+        </template>
+        {{ btn.label }}
       </Button>
     </div>
 
     <!-- 右侧：操作按钮 -->
     <Space>
-      <Button @click="handleSave">
-        <template #icon><SaveOutlined /></template>
-        保存草稿
-      </Button>
-      <Button @click="handleOpenPublishModal">
-        <template #icon><UploadOutlined /></template>
-        发布为模板
-      </Button>
-      <Button type="primary" :loading="exportLoading" @click="handleExport">
-        <template #icon><FilePdfOutlined /></template>
-        导出PDF
-      </Button>
-      <Popover trigger="click" placement="bottomRight">
-        <template #content>
-          <GlobalStyleSettings />
+      <Button
+        v-for="btn in rightButtons"
+        :key="btn.key"
+        :type="btn.type"
+        :loading="btn.loading"
+        class="flex items-center"
+        @click="btn.onClick"
+      >
+        <template v-if="btn.icon" #icon>
+          <component :is="btn.icon" />
         </template>
-        <Button>
-          <template #icon><SettingOutlined /></template>
-          全局设置
+        {{ btn.label }}
+      </Button>
+      <Popover
+        v-for="pop in rightPopovers"
+        :key="pop.key"
+        trigger="click"
+        :placement="pop.placement"
+      >
+        <template #content>
+          <component :is="pop.content" />
+        </template>
+        <Button class="flex items-center">
+          <template v-if="pop.icon" #icon>
+            <component :is="pop.icon" />
+          </template>
+          {{ pop.label }}
         </Button>
       </Popover>
     </Space>

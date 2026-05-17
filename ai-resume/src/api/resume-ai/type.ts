@@ -36,3 +36,55 @@ export interface AiPolishResult {
   beforeContent: string;
   afterContent: string;
 }
+
+export interface AnalyzeParams {
+  resumeId: string;
+  jobDescription: string;
+}
+
+export interface DimensionScore {
+  name: string;
+  score: number;
+  max: number;
+  weight: number;
+}
+
+export interface AnalysisItem {
+  category: string;
+  title: string;
+  description: string;
+  suggestion?: string;
+}
+
+export interface Suggestion {
+  priority: "high" | "medium" | "low";
+  action: string;
+}
+
+export interface AnalysisResult {
+  recordId: string;
+  analysisResult: {
+    meta: {
+      candidate_name: string;
+      target_position: string;
+      analysis_version: string;
+    };
+    overall_score: number;
+    dimension_scores: DimensionScore[];
+    strengths: AnalysisItem[];
+    weaknesses: AnalysisItem[];
+    suggestions: Suggestion[];
+    summary: string;
+  };
+}
+
+export interface AnalysisDetailResult {
+  _id: string;
+  resumeId: string;
+  jobDescription: string;
+  status: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+  analysisResult: AnalysisResult["analysisResult"];
+}

@@ -9,7 +9,9 @@
       "Bash(pnpm build *)",
       "Bash(pnpm lint:check)",
       "Bash(pnpm format *)",
-      "Bash(npx vue-tsc *)"
+      "Bash(npx vue-tsc *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm lint:check --no-error-on-unmatched-pattern)"
     ]
   }
 }

@@ -48,6 +48,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: "简历编辑" },
   },
   {
+    path: "/analysis-detail",
+    name: "AnalysisDetail",
+    component: () => import("@/views/editor/AnalysisDetailPage.vue"),
+    meta: { title: "AI 分析详情", requiresAuth: true },
+  },
+  {
     path: "/auth",
     component: () => import("@/layouts/AuthLayout.vue"),
     children: [

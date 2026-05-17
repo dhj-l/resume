@@ -24,7 +24,8 @@ export function useActiveModules(moduleOrder: Ref<ModuleItem[]>, resumeData: Ref
     if (Array.isArray(data)) {
       return data.some((element) => {
         if (element == null) return false;
-        if (typeof element === "object") return hasObjectContent(element as Record<string, unknown>);
+        if (typeof element === "object")
+          return hasObjectContent(element as Record<string, unknown>);
         return true;
       });
     }
