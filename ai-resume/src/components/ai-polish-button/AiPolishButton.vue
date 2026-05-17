@@ -64,7 +64,7 @@ const handleOpenChange = (visible: boolean) => {
     @update:open="handleOpenChange"
   >
     <template #content>
-      <div class="space-y-3">
+      <div class="space-y-5">
         <p class="text-sm font-medium text-gray-700">AI 润色</p>
         <Input.TextArea
           v-model:value="description"
@@ -78,12 +78,12 @@ const handleOpenChange = (visible: boolean) => {
           <Button
             type="primary"
             size="small"
-            class="whitespace-nowrap"
+            class="inline-flex items-center whitespace-nowrap"
             :loading="loading"
             @click="handleConfirm"
           >
             <template #icon>
-              <Sparkles class="w-3.5 h-3.5" />
+              <Sparkles class="w-3.5 h-3.5 mr-1 shrink-0" />
             </template>
             确认润色
           </Button>
@@ -91,11 +91,11 @@ const handleOpenChange = (visible: boolean) => {
       </div>
     </template>
 
-    <Button size="small" type="link" class="!px-2 !h-10 whitespace-nowrap">
+    <Button size="small" type="link" class="!px-3 !h-12 whitespace-nowrap inline-flex items-center">
       <template #icon>
-        <Sparkles class="w-3.5 h-3.5 text-purple-500" />
+        <Sparkles class="w-4 h-4 text-purple-500 mr-1" />
       </template>
-      <span class="text-purple-500">AI润色</span>
+      <span class="text-purple-500 text-[15px]">AI润色</span>
     </Button>
   </Popover>
 </template>
