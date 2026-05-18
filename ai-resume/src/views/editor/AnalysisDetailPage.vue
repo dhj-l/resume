@@ -8,7 +8,7 @@ import { useRoute, useRouter } from "vue-router";
 import { getAnalysisDetailAPI } from "@/api/resume-ai/resume-ai";
 import type { AnalysisDetailResult } from "@/api/resume-ai/type";
 
-import AiAnalysisResult from "./components/AiAnalysisResult.vue";
+import ResumeAnalysisReport from "@/components/resume-analysis/ResumeAnalysisReport.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -53,22 +53,22 @@ onMounted(() => {
     </div>
 
     <!-- Content -->
-    <div class="max-w-3xl mx-auto py-8 px-4">
+    <div class="w-full mx-auto py-8 px-4">
       <Spin :spinning="loading">
         <template v-if="detail && !loading">
           <div class="bg-white rounded-lg p-6 shadow-sm space-y-6">
             <!-- JD Info -->
             <div>
               <h3 class="text-sm font-medium text-gray-700 mb-2">目标职位描述</h3>
-              <p class="text-xs text-gray-500 leading-relaxed whitespace-pre-wrap">{{
-                detail.jobDescription
-              }}</p>
+              <p class="text-xs text-gray-500 leading-relaxed whitespace-pre-wrap">
+                {{ detail.jobDescription }}
+              </p>
             </div>
 
             <div class="border-t border-gray-100" />
 
             <!-- Analysis Result -->
-            <AiAnalysisResult :data="{ recordId: detail._id, analysisResult: detail.analysisResult }" />
+            <ResumeAnalysisReport :data="detail.analysisResult" />
           </div>
         </template>
       </Spin>

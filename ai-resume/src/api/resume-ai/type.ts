@@ -63,19 +63,21 @@ export interface Suggestion {
 
 export interface AnalysisResult {
   recordId: string;
-  analysisResult: {
-    meta: {
-      candidate_name: string;
-      target_position: string;
-      analysis_version: string;
-    };
-    overall_score: number;
-    dimension_scores: DimensionScore[];
-    strengths: AnalysisItem[];
-    weaknesses: AnalysisItem[];
-    suggestions: Suggestion[];
-    summary: string;
+  analysisResult: AnalysisResultData;
+}
+
+export interface AnalysisResultData {
+  meta: {
+    candidate_name: string;
+    target_position: string;
+    analysis_version: string;
   };
+  overall_score: number;
+  dimension_scores: DimensionScore[];
+  strengths: AnalysisItem[];
+  weaknesses: AnalysisItem[];
+  suggestions: Suggestion[];
+  summary: string;
 }
 
 export interface AnalysisDetailResult {

@@ -64,7 +64,9 @@ onMounted(() => {
       </div>
     </div>
     <div class="min-w-0">
-      <div class="text-lg font-semibold text-neutral-700">{{ displayLabel }}</div>
+      <div class="text-lg font-semibold" :style="{ color: strokeColor }">
+        <span class="hidden md:inline">整体竞争</span>{{ displayLabel }}
+      </div>
       <div v-if="description" class="text-sm text-neutral-400 mt-1">{{ description }}</div>
     </div>
   </div>

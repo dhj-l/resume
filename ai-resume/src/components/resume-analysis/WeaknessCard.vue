@@ -20,25 +20,25 @@ function getTagClass(category: string): string {
 </script>
 
 <template>
-  <div class="rounded-xl bg-white p-4 shadow-card">
+  <div class="rounded-xl bg-red-50/50 border border-red-100 p-4">
     <div class="flex items-start gap-3">
-      <CloseCircleFilled class="text-red-500 text-lg mt-0.5 shrink-0" />
+      <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+        <CloseCircleFilled />
+      </div>
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2 flex-wrap mb-1">
+          <span class="text-sm font-semibold text-neutral-800">{{ item.title }}</span>
           <span
             class="text-xs font-medium px-2 py-0.5 rounded-full"
             :class="getTagClass(item.category)"
           >
             {{ item.category }}
           </span>
-          <span class="text-sm font-semibold text-neutral-700">{{ item.title }}</span>
         </div>
-        <p class="text-sm text-neutral-400 leading-relaxed mb-2">{{ item.description }}</p>
-        <div v-if="item.suggestion" class="bg-blue-50 rounded-lg px-3 py-2.5">
-          <div class="flex items-start gap-2">
-            <BulbOutlined class="text-primary-500 mt-0.5 shrink-0" />
-            <span class="text-sm text-primary-600 leading-relaxed">{{ item.suggestion }}</span>
-          </div>
+        <p class="text-sm text-neutral-500 leading-relaxed mb-3">{{ item.description }}</p>
+        <div v-if="item.suggestion" class="flex items-start gap-2">
+          <span class="text-sm text-red-500 font-medium shrink-0">改进建议</span>
+          <span class="text-sm text-neutral-600 leading-relaxed">{{ item.suggestion }}</span>
         </div>
       </div>
     </div>

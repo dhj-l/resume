@@ -1,41 +1,17 @@
-export interface ResumeAnalysisData {
-  meta: {
-    candidate_name?: string;
-    target_position?: string;
-    analysis_version: string;
-  };
-  overall_score: number;
-  dimension_scores: DimensionScore[];
-  strengths: StrengthItem[];
-  weaknesses: WeaknessItem[];
-  suggestions: SuggestionItem[];
-  summary: string;
-}
+import type {
+  DimensionScore,
+  AnalysisItem,
+  Suggestion,
+  AnalysisResultData,
+} from "@/api/resume-ai/type";
 
-export interface DimensionScore {
-  name: string;
-  score: number;
-  max: number;
-  weight: number;
-}
-
-export interface StrengthItem {
-  category: string;
-  title: string;
-  description: string;
-}
-
-export interface WeaknessItem {
-  category: string;
-  title: string;
-  description: string;
-  suggestion: string;
-}
-
-export interface SuggestionItem {
-  priority: "high" | "medium" | "low";
-  action: string;
-}
+export type {
+  DimensionScore,
+  AnalysisItem as StrengthItem,
+  AnalysisItem as WeaknessItem,
+  Suggestion as SuggestionItem,
+};
+export type ResumeAnalysisData = AnalysisResultData;
 
 export const DIMENSION_COLORS = {
   palette: ["#1677ff", "#52c41a", "#722ed1", "#fa8c16", "#13c2c2"],
@@ -52,9 +28,9 @@ export const DIMENSION_COLORS = {
 } as const;
 
 export const PRIORITY_LABELS: Record<string, string> = {
-  high: "高优",
-  medium: "重要",
-  low: "建议",
+  high: "高优先级",
+  medium: "中优先级",
+  low: "低优先级",
 };
 
 export function getScoreColor(score: number): string {

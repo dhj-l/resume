@@ -21,20 +21,22 @@ function getTagClass(category: string): string {
 </script>
 
 <template>
-  <div class="rounded-xl bg-white p-4 shadow-card">
+  <div class="rounded-xl bg-green-50/50 border border-green-100 p-4">
     <div class="flex items-start gap-3">
-      <CheckCircleFilled class="text-green-500 text-lg mt-0.5 shrink-0" />
+      <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+        <CheckCircleFilled />
+      </div>
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2 flex-wrap mb-1">
+          <span class="text-sm font-semibold text-neutral-800">{{ item.title }}</span>
           <span
             class="text-xs font-medium px-2 py-0.5 rounded-full"
             :class="getTagClass(item.category)"
           >
             {{ item.category }}
           </span>
-          <span class="text-sm font-semibold text-neutral-700">{{ item.title }}</span>
         </div>
-        <p class="text-sm text-neutral-400 leading-relaxed">{{ item.description }}</p>
+        <p class="text-sm text-neutral-500 leading-relaxed">{{ item.description }}</p>
       </div>
     </div>
   </div>

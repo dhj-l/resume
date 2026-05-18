@@ -8,10 +8,9 @@ import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
 import { analyzeResumeAPI } from "@/api/resume-ai/resume-ai";
-import type { AnalysisResult } from "@/api/resume-ai/type";
+import type { AnalysisResultData } from "@/api/resume-ai/type";
+import ResumeAnalysisReport from "@/components/resume-analysis/ResumeAnalysisReport.vue";
 import { useResumeStore } from "@/stores/resumeStore";
-
-import AiAnalysisResult from "./AiAnalysisResult.vue";
 
 defineProps<{
   visible: boolean;
@@ -26,7 +25,8 @@ const router = useRouter();
 
 const jobDescription = ref("");
 const loading = ref(false);
-const analysisResult = ref<AnalysisResult | null>(null);
+const analysisResult = ref<AnalysisResultData | null>(null);
+const recordId = ref("");
 const showInput = ref(true);
 
 const btnDisabled = computed(() => {
@@ -40,7 +40,8 @@ const handleAnalyze = async () => {
       resumeId: resumeData.value._id,
       jobDescription: jobDescription.value,
     });
-    analysisResult.value = res.data;
+    analysisResult.value = res.data.analysisResult;
+    recordId.value = res.data.recordId;
     showInput.value = false;
   } catch {
     message.error("分析失败，请稍后重试");
@@ -55,7 +56,7 @@ const handleReAnalyze = () => {
 };
 
 const handleViewDetail = () => {
-  const id = analysisResult.value?.recordId;
+  const id = recordId.value;
   if (id) {
     router.push({ path: "/analysis-detail", query: { id } });
   }
@@ -107,7 +108,7 @@ const handleViewDetail = () => {
       </template>
 
       <!-- Analysis Result -->
-      <AiAnalysisResult v-if="!showInput && analysisResult" :data="analysisResult" />
+      <ResumeAnalysisReport v-if="!showInput && analysisResult" :data="analysisResult" />
     </div>
 
     <!-- Footer -->

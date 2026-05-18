@@ -73,8 +73,7 @@ const option = computed(() => ({
 </script>
 
 <template>
-  <div class="rounded-xl bg-white p-4 shadow-card">
-    <h3 class="text-base font-semibold text-neutral-700 mb-2">各维度评分</h3>
+  <div class="w-full">
     <v-chart :option="option" autoresize class="w-full aspect-square max-w-[400px] mx-auto" />
   </div>
 </template>
