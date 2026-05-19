@@ -11,7 +11,8 @@
       "Bash(pnpm format *)",
       "Bash(npx vue-tsc *)",
       "Bash(pnpm add *)",
-      "Bash(pnpm lint:check --no-error-on-unmatched-pattern)"
+      "Bash(pnpm lint:check --no-error-on-unmatched-pattern)",
+      "Bash(pnpm lint:fix)"
     ]
   }
 }

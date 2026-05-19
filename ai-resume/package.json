@@ -17,6 +17,7 @@
     "@ant-design/icons-vue": "^7.0.1",
     "@element-plus/icons-vue": "^2.3.2",
     "@eslint/js": "^10.0.1",
+    "@vueuse/core": "^14.3.0",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
     "ant-design-vue": "^4.2.6",

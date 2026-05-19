@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, inject, onMounted, computed } from "vue";
+
+import { ContainerWidthKey } from "./types";
 
 interface Props {
   name: string;
@@ -10,6 +12,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+
+const isDesktop = inject(ContainerWidthKey, ref(true));
 
 const animated = ref(false);
 const percentage = computed(() => (props.score / props.max) * 100);
@@ -24,7 +28,7 @@ onMounted(() => {
 <template>
   <div>
     <!-- Mobile Layout -->
-    <div class="md:hidden space-y-1.5">
+    <div v-if="!isDesktop" class="space-y-1.5">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: color }" />
@@ -45,7 +49,8 @@ onMounted(() => {
 
     <!-- Desktop Layout -->
     <div
-      class="hidden md:grid grid-cols-[1.2fr_1.5fr_1fr] items-center gap-4 py-3 border-b border-neutral-50 last:border-0"
+      v-if="isDesktop"
+      class="grid grid-cols-[1.2fr_1.5fr_1fr] items-center gap-4 py-3 border-b border-neutral-50 last:border-0"
     >
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: color }" />

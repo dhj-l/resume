@@ -64,7 +64,6 @@ import { storeToRefs } from "pinia";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData, ModuleItem } from "@/stores/type";
-
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { useActiveModules } from "@/views/editor/hooks/useActiveModules";

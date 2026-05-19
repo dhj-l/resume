@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 
 import { CloseOutlined } from "@ant-design/icons-vue";
+import { useElementSize } from "@vueuse/core";
 import { Button, Input, message } from "ant-design-vue";
 import { Sparkles } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
@@ -22,6 +23,10 @@ const emit = defineEmits<{
 
 const { resumeData } = storeToRefs(useResumeStore());
 const router = useRouter();
+
+const drawerRef = ref<HTMLElement>();
+const { width } = useElementSize(drawerRef);
+const isDesktop = computed(() => width.value >= 768);
 
 const jobDescription = ref("");
 const loading = ref(false);
@@ -65,6 +70,7 @@ const handleViewDetail = () => {
 
 <template>
   <div
+    ref="drawerRef"
     class="fixed top-16 right-0 bottom-[52px] w-[400px] bg-white border-l border-gray-200 shadow-[-4px_0_16px_rgba(0,0,0,0.08)] z-30 flex flex-col transition-transform duration-300 ease-in-out"
     :class="visible ? 'translate-x-0' : 'translate-x-full'"
   >
@@ -108,7 +114,11 @@ const handleViewDetail = () => {
       </template>
 
       <!-- Analysis Result -->
-      <ResumeAnalysisReport v-if="!showInput && analysisResult" :data="analysisResult" />
+      <ResumeAnalysisReport
+        v-if="!showInput && analysisResult"
+        :data="analysisResult"
+        :is-desktop="isDesktop"
+      />
     </div>
 
     <!-- Footer -->

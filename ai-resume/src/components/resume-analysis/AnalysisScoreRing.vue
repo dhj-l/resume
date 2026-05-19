@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
-import { getScoreColor, getScoreLevel } from "./types";
+import { ref, inject, onMounted, computed } from "vue";
+
+import { ContainerWidthKey, getScoreColor, getScoreLevel } from "./types";
 
 interface Props {
   score: number;
@@ -14,6 +15,8 @@ const props = withDefaults(defineProps<Props>(), {
   label: "",
   description: "",
 });
+
+const isDesktop = inject(ContainerWidthKey, ref(true));
 
 const animated = ref(false);
 
@@ -65,7 +68,7 @@ onMounted(() => {
     </div>
     <div class="min-w-0">
       <div class="text-lg font-semibold" :style="{ color: strokeColor }">
-        <span class="hidden md:inline">整体竞争</span>{{ displayLabel }}
+        <span v-if="isDesktop">整体竞争</span>{{ displayLabel }}
       </div>
       <div v-if="description" class="text-sm text-neutral-400 mt-1">{{ description }}</div>
     </div>

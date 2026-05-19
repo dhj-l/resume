@@ -1,9 +1,13 @@
+import type { InjectionKey, Ref } from "vue";
+
 import type {
   DimensionScore,
   AnalysisItem,
   Suggestion,
   AnalysisResultData,
 } from "@/api/resume-ai/type";
+
+export const ContainerWidthKey: InjectionKey<Ref<boolean>> = Symbol("containerWidth");
 
 export type {
   DimensionScore,

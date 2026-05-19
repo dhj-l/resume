@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { use } from "echarts/core";
-import { CanvasRenderer } from "echarts/renderers";
+
 import { RadarChart as ERadarChart } from "echarts/charts";
 import { TooltipComponent } from "echarts/components";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
 import VChart from "vue-echarts";
 
 import type { DimensionScore } from "./types";

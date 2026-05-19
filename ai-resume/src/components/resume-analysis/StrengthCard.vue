@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { StrengthItem } from "./types";
 import { CheckCircleFilled } from "@ant-design/icons-vue";
+
+import type { StrengthItem } from "./types";
 
 defineProps<{
   item: StrengthItem;
@@ -23,7 +24,9 @@ function getTagClass(category: string): string {
 <template>
   <div class="rounded-xl bg-green-50/50 border border-green-100 p-4">
     <div class="flex items-start gap-3">
-      <div class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+      <div
+        class="w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center shrink-0 mt-0.5"
+      >
         <CheckCircleFilled />
       </div>
       <div class="min-w-0 flex-1">

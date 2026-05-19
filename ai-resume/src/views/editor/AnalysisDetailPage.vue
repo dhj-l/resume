@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 
-import { Button, Spin, message } from "ant-design-vue";
 import { ArrowLeftOutlined } from "@ant-design/icons-vue";
+import { useElementSize } from "@vueuse/core";
+import { Button, Spin, message } from "ant-design-vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { getAnalysisDetailAPI } from "@/api/resume-ai/resume-ai";
 import type { AnalysisDetailResult } from "@/api/resume-ai/type";
-
 import ResumeAnalysisReport from "@/components/resume-analysis/ResumeAnalysisReport.vue";
 
 const route = useRoute();
@@ -15,6 +15,10 @@ const router = useRouter();
 
 const loading = ref(true);
 const detail = ref<AnalysisDetailResult | null>(null);
+
+const contentRef = ref<HTMLElement>();
+const { width } = useElementSize(contentRef);
+const isDesktop = computed(() => width.value >= 768);
 
 const fetchData = async (id: string) => {
   loading.value = true;
@@ -53,7 +57,7 @@ onMounted(() => {
     </div>
 
     <!-- Content -->
-    <div class="w-full mx-auto py-8 px-4">
+    <div ref="contentRef" class="w-full mx-auto py-8 px-4">
       <Spin :spinning="loading">
         <template v-if="detail && !loading">
           <div class="bg-white rounded-lg p-6 shadow-sm space-y-6">
@@ -68,7 +72,7 @@ onMounted(() => {
             <div class="border-t border-gray-100" />
 
             <!-- Analysis Result -->
-            <ResumeAnalysisReport :data="detail.analysisResult" />
+            <ResumeAnalysisReport :data="detail.analysisResult" :is-desktop="isDesktop" />
           </div>
         </template>
       </Spin>

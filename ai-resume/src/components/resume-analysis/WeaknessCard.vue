@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { WeaknessItem } from "./types";
 import { CloseCircleFilled, BulbOutlined } from "@ant-design/icons-vue";
+
+import type { WeaknessItem } from "./types";
 
 defineProps<{
   item: WeaknessItem;
@@ -22,7 +23,9 @@ function getTagClass(category: string): string {
 <template>
   <div class="rounded-xl bg-red-50/50 border border-red-100 p-4">
     <div class="flex items-start gap-3">
-      <div class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0 mt-0.5">
+      <div
+        class="w-8 h-8 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0 mt-0.5"
+      >
         <CloseCircleFilled />
       </div>
       <div class="min-w-0 flex-1">

@@ -12,6 +12,7 @@ import {
   EditOutlined,
 } from "@ant-design/icons-vue";
 import { Button, Dropdown, Menu, MenuItem, Popover, Space, message, Input } from "ant-design-vue";
+import type { TooltipPlacement } from "ant-design-vue/es/tooltip";
 import { Sparkles } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
@@ -27,7 +28,6 @@ import { templateList } from "../templates";
 import GlobalStyleSettings from "./GlobalStyleSettings.vue";
 import type { templateType } from "./preview/type";
 import PublishTemplateModal from "./PublishTemplateModal.vue";
-import type { TooltipPlacement } from "ant-design-vue/es/tooltip";
 
 const { resumeData } = storeToRefs(useResumeStore());
 const { setCurrentTemplate, saveResume, setResumeDataString } = useResumeStore();

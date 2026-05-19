@@ -36,11 +36,11 @@ function getNumberClass(priority: string): string {
     >
       {{ PRIORITY_LABELS[item.priority as string] || item.priority }}
     </span>
-    <span 
+    <span
       class="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold"
       :class="getNumberClass(item.priority)"
     >
-      {{ String(index + 1).padStart(2, '0') }}
+      {{ String(index + 1).padStart(2, "0") }}
     </span>
     <span class="text-sm text-neutral-600 leading-relaxed mt-0.5">{{ item.action }}</span>
   </div>
