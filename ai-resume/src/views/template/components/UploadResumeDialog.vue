@@ -194,6 +194,8 @@ const handleUpload = async (options: any) => {
     localResumeText.value = res.data;
     message.success("简历解析成功");
     onSuccess(res.data);
+  } catch {
+    options.onError?.();
   } finally {
     loading.value = false;
   }

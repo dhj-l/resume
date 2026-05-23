@@ -171,7 +171,7 @@ export const useResumeStore = defineStore("resume", () => {
   });
 
   const globalLineHeight = computed(() => {
-    return resumeData.value.globalStyle?.lineHeight || "20px";
+    return resumeData.value.globalStyle?.lineHeight || "1.5";
   });
 
   const globalModuleMargin = computed(() => {
@@ -478,11 +478,11 @@ export const useResumeStore = defineStore("resume", () => {
     const moduleB = (resumeData.value as any)[moduleKeyB];
 
     const tempGlobalSortA = Array.isArray(moduleA)
-      ? moduleA[0]?.globalSort || 0
-      : moduleA?.globalSort || 0;
+      ? moduleA[0]?.globalSort ?? 0
+      : moduleA?.globalSort ?? 0;
     const tempGlobalSortB = Array.isArray(moduleB)
-      ? moduleB[0]?.globalSort || 0
-      : moduleB?.globalSort || 0;
+      ? moduleB[0]?.globalSort ?? 0
+      : moduleB?.globalSort ?? 0;
     if (Array.isArray(moduleA)) {
       moduleA.forEach((item) => {
         item.globalSort = tempGlobalSortB;
@@ -507,8 +507,8 @@ export const useResumeStore = defineStore("resume", () => {
     const indexB = moduleOrder.value.findIndex((m) => m.moduleKey === moduleKeyB);
     if (indexA === -1 || indexB === -1) return false;
     const tempGlobalSort = moduleOrder.value[indexA]?.globalSort;
-    moduleOrder.value[indexA]!.globalSort = moduleOrder.value[indexB]?.globalSort || 0;
-    moduleOrder.value[indexB]!.globalSort = tempGlobalSort || 0;
+    moduleOrder.value[indexA]!.globalSort = moduleOrder.value[indexB]?.globalSort ?? 0;
+    moduleOrder.value[indexB]!.globalSort = tempGlobalSort ?? 0;
     moduleOrder.value.sort((a, b) => a.globalSort - b.globalSort);
 
     changeGlobalSort(moduleKeyA, moduleKeyB);

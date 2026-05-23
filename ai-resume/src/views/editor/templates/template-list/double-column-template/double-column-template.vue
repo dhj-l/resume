@@ -66,9 +66,9 @@
       class="absolute left-0 w-full pointer-events-none"
       :style="{ top: `${marker.top}px` }"
     >
-      <div class="border-t-2 border-dashed border-gray-300 relative">
+      <div class="border-t-[3px] border-dashed border-red-400 relative">
         <span
-          class="absolute right-0 -top-3 bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded"
+          class="absolute right-0 -top-3.5 bg-red-500 text-white text-xs px-2.5 py-0.5 rounded shadow-sm"
         >
           第{{ marker.pageNum }}页
         </span>

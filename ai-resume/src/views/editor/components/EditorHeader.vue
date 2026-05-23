@@ -78,7 +78,8 @@ const handleToggleAiDrawer = () => {
 };
 
 const handleSave = async () => {
-  await autoSave(true);
+  const result = await autoSave(true);
+  if (result === false) return;
   message.success("草稿保存成功");
 };
 
@@ -90,7 +91,7 @@ const autoSave = async (isUpdateCover: boolean = false) => {
   //如果是更新封面，或者没有封面，才需要更新封面
   if (isUpdateCover || !resumeData.value.cover) {
     const element = getElement(".resume-preview-wrapper");
-    if (!element) return;
+    if (!element) return false;
 
     const elementHeight = (element as HTMLElement).offsetHeight;
     const COVER_HEIGHT_THRESHOLD = 1200;
