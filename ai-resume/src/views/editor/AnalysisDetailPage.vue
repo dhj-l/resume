@@ -57,19 +57,19 @@ onMounted(() => {
     </div>
 
     <!-- Content -->
-    <div ref="contentRef" class="w-full mx-auto py-8 px-4">
+    <div ref="contentRef" class="w-full mx-auto py-4 px-2">
       <Spin :spinning="loading">
         <template v-if="detail && !loading">
           <div class="bg-white rounded-lg p-6 shadow-sm space-y-6">
             <!-- JD Info -->
-            <div>
+            <!-- <div>
               <h3 class="text-sm font-medium text-gray-700 mb-2">目标职位描述</h3>
               <p class="text-xs text-gray-500 leading-relaxed whitespace-pre-wrap">
                 {{ detail.jobDescription }}
               </p>
             </div>
 
-            <div class="border-t border-gray-100" />
+            <div class="border-t border-gray-100" /> -->
 
             <!-- Analysis Result -->
             <ResumeAnalysisReport :data="detail.analysisResult" :is-desktop="isDesktop" />
