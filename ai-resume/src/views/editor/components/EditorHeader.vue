@@ -130,31 +130,19 @@ const handleExport = async () => {
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-      }
-
-      html, body {
-        width: 210mm;
-        height: 297mm;
-        margin: 0;
-        padding: 0;
-      }
-
-      .resume-page {
-        width: 210mm !important;
-        min-height: 297mm !important;
-        height: auto !important;
-        margin-bottom: 0 !important;
         box-shadow: none !important;
-        page-break-after: always;
-        page-break-inside: avoid;
       }
 
-      .resume-page:last-child {
-        page-break-after: auto;
+      [data-page-marker] {
+        display: none !important;
       }
 
       .resume-section {
-        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .resume-section h3 {
+        break-after: avoid;
       }
     `;
     const res: any = await downloadResumeAPI({

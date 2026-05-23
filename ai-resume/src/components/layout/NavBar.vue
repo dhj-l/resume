@@ -106,6 +106,7 @@ import { LockOutlined, LogoutOutlined } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
 
 import ChangePasswordModal from "@/components/common/ChangePasswordModal.vue";
+import { logoutAPI } from "@/api/user/user";
 import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
@@ -137,7 +138,8 @@ const handleStartCreating = () => {
   router.push("/templates");
 };
 
-const handleLogout = () => {
+const handleLogout = async () => {
+  await logoutAPI();
   authStore.logout();
   router.push("/");
 };
