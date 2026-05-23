@@ -49,7 +49,7 @@ onMounted(() => {
     <div
       class="sticky top-0 z-10 bg-white border-b border-gray-200 px-6 h-14 flex items-center gap-3"
     >
-      <Button type="text" @click="router.back()">
+      <Button type="text" class="flex items-center" @click="router.back()">
         <template #icon><ArrowLeftOutlined /></template>
         返回
       </Button>

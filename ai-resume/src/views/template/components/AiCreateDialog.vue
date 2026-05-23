@@ -115,7 +115,7 @@
             v-else
             type="primary"
             :loading="loading"
-            class="rounded-lg px-8 bg-gradient-to-r from-primary-500 to-indigo-600 border-none hover:shadow-lg hover:shadow-primary-500/30"
+            class="rounded-lg px-8 flex items-center bg-gradient-to-r from-primary-500 to-indigo-600 border-none hover:shadow-lg hover:shadow-primary-500/30"
             @click="handleSubmit"
           >
             <template #icon>

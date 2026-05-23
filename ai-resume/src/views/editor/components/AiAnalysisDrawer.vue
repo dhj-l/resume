@@ -106,7 +106,7 @@ const handleViewDetail = () => {
         <Sparkles class="w-4 h-4 text-purple-500" />
         <span class="font-medium text-gray-700">AI 分析</span>
       </div>
-      <Button type="text" size="small" @click="emit('close')">
+      <Button type="text" size="small" class="flex items-center" @click="emit('close')">
         <template #icon><CloseOutlined /></template>
       </Button>
     </div>

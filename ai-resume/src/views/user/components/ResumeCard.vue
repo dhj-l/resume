@@ -45,18 +45,28 @@
       </div>
 
       <div class="flex items-center justify-end gap-2">
-        <a-button type="primary" :loading="editLoading" @click="$emit('edit', resume._id)">
+        <a-button
+          type="primary"
+          class="flex items-center"
+          :loading="editLoading"
+          @click="$emit('edit', resume._id)"
+        >
           <template #icon><EditOutlined /></template>
           编辑
         </a-button>
         <a-tooltip title="复制简历">
-          <a-button :loading="copyLoading" @click="$emit('copy', resume._id)">
+          <a-button
+            class="flex items-center"
+            :loading="copyLoading"
+            @click="$emit('copy', resume._id)"
+          >
             <template #icon><CopyOutlined /></template>
             复制
           </a-button>
         </a-tooltip>
         <a-button
           danger
+          class="flex items-center"
           :loading="deleteLoading"
           @click="$emit('delete', { id: resume._id, title: resume.title })"
         >

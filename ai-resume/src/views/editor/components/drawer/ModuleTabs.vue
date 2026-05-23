@@ -70,7 +70,7 @@ const canMoveRight = (moduleKey: string) => {
                 type="text"
                 size="small"
                 :disabled="!canMoveLeft(item.moduleKey)"
-                class="sort-btn"
+                class="sort-btn flex items-center"
                 @click.stop="moveModuleLeft(item.moduleKey)"
               >
                 <LeftOutlined />
@@ -82,7 +82,7 @@ const canMoveRight = (moduleKey: string) => {
                 type="text"
                 size="small"
                 :disabled="!canMoveRight(item.moduleKey)"
-                class="sort-btn"
+                class="sort-btn flex items-center"
                 @click.stop="moveModuleRight(item.moduleKey)"
               >
                 <RightOutlined />

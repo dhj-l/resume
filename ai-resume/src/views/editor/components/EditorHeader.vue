@@ -357,7 +357,7 @@ onUnmounted(() => {
             }}</MenuItem>
           </Menu>
         </template>
-        <Button>
+        <Button class="flex items-center">
           当前模板: {{ currentTemplateLabel }}
           <DownOutlined />
         </Button>
