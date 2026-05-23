@@ -1,12 +1,17 @@
 <script setup lang="ts">
+import { inject } from "vue";
+
 import { CheckCircleFilled } from "@ant-design/icons-vue";
 
+import { ContainerWidthKey } from "./types";
 import type { StrengthItem } from "./types";
 
 defineProps<{
   item: StrengthItem;
   index?: number;
 }>();
+
+const isDesktop = inject(ContainerWidthKey);
 
 const tagColors: Record<string, string> = {
   工作经历: "bg-blue-50 text-blue-600",
@@ -39,7 +44,9 @@ function getTagClass(category: string): string {
             {{ item.category }}
           </span>
         </div>
-        <p class="text-sm text-neutral-500 leading-relaxed">{{ item.description }}</p>
+        <p class="text-sm text-neutral-500 leading-relaxed" :class="!isDesktop && 'truncate'">
+          {{ item.description }}
+        </p>
       </div>
     </div>
   </div>

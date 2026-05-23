@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { inject } from "vue";
+
 import type { SuggestionItem } from "./types";
-import { PRIORITY_LABELS } from "./types";
+import { ContainerWidthKey, PRIORITY_LABELS } from "./types";
 
 const props = defineProps<{
   item: SuggestionItem;
   index: number;
 }>();
+
+const isDesktop = inject(ContainerWidthKey);
 
 const badgeStyles: Record<string, string> = {
   high: "bg-red-50 text-red-600 border border-red-200",
@@ -42,6 +46,8 @@ function getNumberClass(priority: string): string {
     >
       {{ String(index + 1).padStart(2, "0") }}
     </span>
-    <span class="text-sm text-neutral-600 leading-relaxed mt-0.5">{{ item.action }}</span>
+    <span class="text-sm text-neutral-600 leading-relaxed mt-0.5" :class="!isDesktop && 'truncate'">
+      {{ item.action }}
+    </span>
   </div>
 </template>

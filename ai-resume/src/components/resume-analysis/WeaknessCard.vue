@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { CloseCircleFilled, BulbOutlined } from "@ant-design/icons-vue";
+import { inject } from "vue";
 
+import { CloseCircleFilled } from "@ant-design/icons-vue";
+
+import { ContainerWidthKey } from "./types";
 import type { WeaknessItem } from "./types";
 
 defineProps<{
   item: WeaknessItem;
 }>();
+
+const isDesktop = inject(ContainerWidthKey);
 
 const tagColors: Record<string, string> = {
   工作经历: "bg-blue-50 text-blue-600",
@@ -38,10 +43,14 @@ function getTagClass(category: string): string {
             {{ item.category }}
           </span>
         </div>
-        <p class="text-sm text-neutral-500 leading-relaxed mb-3">{{ item.description }}</p>
+        <p class="text-sm text-neutral-500 leading-relaxed mb-3" :class="!isDesktop && 'truncate'">
+          {{ item.description }}
+        </p>
         <div v-if="item.suggestion" class="flex items-start gap-2">
           <span class="text-sm text-red-500 font-medium shrink-0">改进建议</span>
-          <span class="text-sm text-neutral-600 leading-relaxed">{{ item.suggestion }}</span>
+          <span class="text-sm text-neutral-600 leading-relaxed" :class="!isDesktop && 'truncate'">
+            {{ item.suggestion }}
+          </span>
         </div>
       </div>
     </div>
