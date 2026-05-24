@@ -28,7 +28,7 @@ watch(
   这里只展示模板，不涉及复杂的逻辑。
 -->
 <template>
-  <div class="resume-preview-wrapper" :style="{ lineHeight: globalLineHeight }">
+  <div class="resume-preview-wrapper w-[210mm]" :style="{ lineHeight: globalLineHeight }">
     <template v-for="item in templateList" :key="item.value">
       <component :is="item.component" v-if="item.value === resumeData.type" />
     </template>
