@@ -33,6 +33,14 @@ export const getCertificatesStyles = (type: templateType): CertificatesStyles =>
         title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
         container: `${commonStyles.container}`,
       };
+    case "modern":
+      return {
+        ...commonStyles,
+        title: "text-base font-bold text-gray-800 pl-3 border-l-[3px] border-primary-500 mb-4",
+        container: `${commonStyles.container}`,
+        list: "space-y-2 text-gray-700",
+        listItem: "flex items-center gap-2 pl-4 border-l-2 border-primary-200 py-1",
+      };
     case "default":
     default:
       return {

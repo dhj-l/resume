@@ -478,11 +478,11 @@ export const useResumeStore = defineStore("resume", () => {
     const moduleB = (resumeData.value as any)[moduleKeyB];
 
     const tempGlobalSortA = Array.isArray(moduleA)
-      ? moduleA[0]?.globalSort ?? 0
-      : moduleA?.globalSort ?? 0;
+      ? (moduleA[0]?.globalSort ?? 0)
+      : (moduleA?.globalSort ?? 0);
     const tempGlobalSortB = Array.isArray(moduleB)
-      ? moduleB[0]?.globalSort ?? 0
-      : moduleB?.globalSort ?? 0;
+      ? (moduleB[0]?.globalSort ?? 0)
+      : (moduleB?.globalSort ?? 0);
     if (Array.isArray(moduleA)) {
       moduleA.forEach((item) => {
         item.globalSort = tempGlobalSortB;

@@ -1,5 +1,6 @@
 import DefaultTemplate from "./template-list/default-template/default-template.vue";
 import DoubleColumnTemplate from "./template-list/double-column-template/double-column-template.vue";
+import ModernTemplate from "./template-list/modern-template/modern-template.vue";
 import SimpleTemplate from "./template-list/simple-template/simple-template.vue";
 import type { TemplateItem } from "./type";
 // import BlueTemplate from "./template-list/blue-template/blue-template.vue";
@@ -19,5 +20,10 @@ export const templateList: TemplateItem[] = [
     label: "简约求职版",
     value: "simple",
     component: SimpleTemplate,
+  },
+  {
+    label: "现代风格模板",
+    value: "modern",
+    component: ModernTemplate,
   },
 ];

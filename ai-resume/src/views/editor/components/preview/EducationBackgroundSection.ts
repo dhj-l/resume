@@ -43,6 +43,17 @@ export const getEducationBackgroundStyles = (type: templateType): EducationBackg
         title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
         container: `${commonStyles.container}`,
       };
+    case "modern":
+      return {
+        ...commonStyles,
+        title: "text-base font-bold text-gray-800 pl-3 border-l-[3px] border-primary-500 mb-4",
+        container: `${commonStyles.container}`,
+        itemWrapper: "pl-4 border-l-2 border-primary-200 py-2",
+        schoolName: "font-bold text-gray-800",
+        timeRange: "text-gray-500 shrink-0",
+        detailsWrapper: "flex gap-4 text-gray-600",
+        courses: "mt-1 text-gray-500",
+      };
     case "default":
     default:
       return {

@@ -40,6 +40,17 @@ export const getBasicInfoStyles = (type: templateType): BasicInfoStyles => {
         detailsWrapper: "grid grid-cols-2 gap-x-8 gap-y-3 text-gray-600",
         detailItem: "flex items-center gap-2",
       };
+    case "modern":
+      return {
+        ...commonStyles,
+        container: `${commonStyles.container}`,
+        contentWrapper: "flex items-start gap-6",
+        avatar: "w-20 h-20 rounded-full object-cover bg-gray-200 shrink-0 ring-2 ring-primary-200",
+        infoWrapper: "flex-1 min-w-0",
+        name: "text-2xl font-bold text-gray-900 mb-1 break-words",
+        detailsWrapper: "grid grid-cols-2 gap-x-6 gap-y-2 text-gray-600",
+        detailItem: "flex items-center gap-2",
+      };
     case "default":
     default:
       return {

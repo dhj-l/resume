@@ -70,8 +70,8 @@
 <script setup lang="ts">
 import { ref, inject } from "vue";
 
-import { storeToRefs } from "pinia";
 import { Box, Mail } from "lucide-vue-next";
+import { storeToRefs } from "pinia";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData, ModuleItem } from "@/stores/type";

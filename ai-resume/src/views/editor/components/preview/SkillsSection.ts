@@ -33,6 +33,14 @@ export const getSkillsStyles = (type: templateType): SkillsStyles => {
         title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
         container: `${commonStyles.container}`,
       };
+    case "modern":
+      return {
+        ...commonStyles,
+        title: "text-base font-bold text-gray-800 pl-3 border-l-[3px] border-primary-500 mb-4",
+        container: `${commonStyles.container}`,
+        listWrapper: "flex flex-wrap gap-2",
+        item: "px-3 py-1 bg-primary-50 text-primary-700 rounded-full font-medium",
+      };
     case "default":
     default:
       return {

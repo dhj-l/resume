@@ -36,6 +36,15 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
         title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
         container: `${commonStyles.container}`,
       };
+    case "modern":
+      return {
+        ...commonStyles,
+        title: "text-base font-bold text-gray-800 pl-3 border-l-[3px] border-primary-500 mb-4",
+        container: `${commonStyles.container}`,
+        contentWrapper: "grid grid-cols-2 gap-x-6 gap-y-2 text-gray-700",
+        label: "text-gray-500",
+        value: "font-medium text-gray-800",
+      };
     case "default":
     default:
       return {
