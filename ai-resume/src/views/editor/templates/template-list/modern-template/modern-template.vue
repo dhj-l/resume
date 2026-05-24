@@ -11,7 +11,7 @@
       <!-- Hero Header: 渐变背景 + 基本信息 + 求职意向 -->
       <div
         v-if="resumeData.basicInfo"
-        class="bg-gradient-to-r from-primary-600 to-primary-500 text-white px-8 py-6 resume-section hover:bg-blue-50 hover:border-blue-300 border border-transparent cursor-pointer transition-all duration-200"
+        class="bg-primary-600 text-white px-8 py-6 resume-section border border-transparent cursor-pointer"
         @click="handleBasicInfoClick"
       >
         <div class="flex items-start gap-6">

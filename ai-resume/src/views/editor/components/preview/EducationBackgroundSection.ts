@@ -40,8 +40,11 @@ export const getEducationBackgroundStyles = (type: templateType): EducationBackg
     case "simple":
       return {
         ...commonStyles,
-        title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
+        title:
+          "text-lg font-bold text-[#6D28D9] pl-3 border-l-[3px] border-[#6D28D9] mb-4 bg-[#F5F3FF] py-1.5 px-4 rounded-r-md",
         container: `${commonStyles.container}`,
+        schoolName: "font-bold text-[#6D28D9] break-words",
+        detailsWrapper: "flex gap-4 text-gray-600",
       };
     case "modern":
       return {

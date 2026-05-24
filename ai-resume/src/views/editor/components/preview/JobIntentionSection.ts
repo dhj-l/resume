@@ -33,8 +33,12 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
     case "simple":
       return {
         ...commonStyles,
-        title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
+        title:
+          "text-lg font-bold text-[#6D28D9] pl-3 border-l-[3px] border-[#6D28D9] mb-4 bg-[#F5F3FF] py-1.5 px-4 rounded-r-md",
         container: `${commonStyles.container}`,
+        contentWrapper: "flex flex-wrap gap-4 sm:gap-8 text-gray-600",
+        label: "font-medium text-[#6D28D9]",
+        value: "break-words text-gray-800",
       };
     case "modern":
       return {

@@ -30,8 +30,11 @@ export const getCertificatesStyles = (type: templateType): CertificatesStyles =>
     case "simple":
       return {
         ...commonStyles,
-        title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
+        title:
+          "text-lg font-bold text-[#6D28D9] pl-3 border-l-[3px] border-[#6D28D9] mb-4 bg-[#F5F3FF] py-1.5 px-4 rounded-r-md",
         container: `${commonStyles.container}`,
+        list: "space-y-2 text-gray-700",
+        listItem: "flex items-center gap-2",
       };
     case "modern":
       return {

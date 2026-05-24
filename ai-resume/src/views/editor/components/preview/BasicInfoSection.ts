@@ -36,7 +36,7 @@ export const getBasicInfoStyles = (type: templateType): BasicInfoStyles => {
         contentWrapper: "flex flex-row-reverse items-center justify-between gap-8",
         avatar: "w-32 h-40 rounded object-cover bg-gray-200 shrink-0 shadow-sm",
         infoWrapper: "flex-1 min-w-0",
-        name: "text-3xl font-bold text-gray-900 mb-6 tracking-wide",
+        name: "text-3xl font-bold text-[#6D28D9] mb-6 tracking-wide",
         detailsWrapper: "grid grid-cols-2 gap-x-8 gap-y-3 text-gray-600",
         detailItem: "flex items-center gap-2",
       };

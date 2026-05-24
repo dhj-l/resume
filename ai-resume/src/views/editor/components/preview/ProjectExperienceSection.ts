@@ -37,8 +37,12 @@ export const getProjectExperienceStyles = (type: templateType): ProjectExperienc
     case "simple":
       return {
         ...commonStyles,
-        title: "inline-block text-lg font-bold text-white bg-[#8B5CF6] px-4 py-1 mb-4 shadow-sm",
+        title:
+          "text-lg font-bold text-[#6D28D9] pl-3 border-l-[3px] border-[#6D28D9] mb-4 bg-[#F5F3FF] py-1.5 px-4 rounded-r-md",
         container: `${commonStyles.container}`,
+        projectName: "font-bold text-[#6D28D9] break-words",
+        role: "font-medium text-gray-700 mb-1",
+        timeRange: "text-gray-500 shrink-0",
       };
     case "modern":
       return {
