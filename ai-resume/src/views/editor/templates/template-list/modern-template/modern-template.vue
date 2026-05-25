@@ -9,79 +9,23 @@
       }"
     >
       <!-- Hero Header: 渐变背景 + 基本信息 + 求职意向 -->
-      <div
-        v-if="resumeData.basicInfo"
-        class="bg-primary-600 text-white px-8 py-6 resume-section border border-transparent cursor-pointer"
-        @click="handleBasicInfoClick"
-      >
+      <div v-if="basicInfoModule" class="bg-primary-600 text-white px-8 py-6">
         <div class="flex items-start gap-6">
-          <img
-            :src="fullAvatar"
-            alt="avatar"
-            class="w-20 h-20 rounded-full object-cover ring-2 ring-white/50 shrink-0 bg-white/20"
+          <!-- BasicInfo via section component -->
+          <component
+            :is="getComponent(basicInfoModule)"
+            :data="resumeData.basicInfo"
+            :label="basicInfoModule.label"
+            :template-type="currentTemplateType"
           />
-          <div class="flex-1 min-w-0">
-            <h1 class="text-2xl font-bold tracking-wide mb-2">
-              {{ resumeData.basicInfo.name }}
-            </h1>
-            <div class="flex flex-wrap gap-x-6 gap-y-1 text-white/80">
-              <span v-if="resumeData.basicInfo.phone" class="flex items-center gap-1">
-                <Phone class="w-3.5 h-3.5" />{{ resumeData.basicInfo.phone }}
-              </span>
-              <span v-if="resumeData.basicInfo.email" class="flex items-center gap-1">
-                <Mail class="w-3.5 h-3.5" />{{ resumeData.basicInfo.email }}
-              </span>
-              <span v-if="resumeData.basicInfo.age" class="flex items-center gap-1">
-                {{ resumeData.basicInfo.age }} 岁
-              </span>
-              <span v-if="resumeData.basicInfo.gender">{{ resumeData.basicInfo.gender }}</span>
-              <span v-if="resumeData.basicInfo.workYear">{{ resumeData.basicInfo.workYear }}</span>
-              <span v-if="resumeData.basicInfo.politicalStatus">
-                {{ resumeData.basicInfo.politicalStatus }}
-              </span>
-            </div>
-          </div>
-          <!-- 求职意向 -->
-          <div
-            v-if="hasJobIntention"
-            class="shrink-0 text-right"
-            @click.stop="handleJobIntentionClick"
-          >
-            <div class="space-y-1 text-sm">
-              <div
-                v-if="resumeData.jobIntention?.jobIntention"
-                class="flex items-center gap-2 justify-end"
-              >
-                <Briefcase class="w-3.5 h-3.5 text-white/60" />
-                <span class="text-white/60">期望职位</span>
-                <span class="font-medium">{{ resumeData.jobIntention.jobIntention }}</span>
-              </div>
-              <div
-                v-if="resumeData.jobIntention?.intentionCity"
-                class="flex items-center gap-2 justify-end"
-              >
-                <MapPin class="w-3.5 h-3.5 text-white/60" />
-                <span class="text-white/60">意向城市</span>
-                <span class="font-medium">{{ resumeData.jobIntention.intentionCity }}</span>
-              </div>
-              <div
-                v-if="resumeData.jobIntention?.expectationSalary"
-                class="flex items-center gap-2 justify-end"
-              >
-                <DollarSign class="w-3.5 h-3.5 text-white/60" />
-                <span class="text-white/60">期望薪资</span>
-                <span class="font-medium">{{ resumeData.jobIntention.expectationSalary }}</span>
-              </div>
-              <div
-                v-if="resumeData.jobIntention?.entryTime"
-                class="flex items-center gap-2 justify-end"
-              >
-                <Clock class="w-3.5 h-3.5 text-white/60" />
-                <span class="text-white/60">入职时间</span>
-                <span class="font-medium">{{ resumeData.jobIntention.entryTime }}</span>
-              </div>
-            </div>
-          </div>
+          <!-- JobIntention via section component -->
+          <component
+            v-if="jobIntentionModule"
+            :is="getComponent(jobIntentionModule)"
+            :data="resumeData.jobIntention"
+            :label="jobIntentionModule.label"
+            :template-type="currentTemplateType"
+          />
         </div>
       </div>
 
@@ -90,7 +34,7 @@
         <template v-for="item in contentModules" :key="item.moduleKey">
           <div :style="{ marginBottom: globalModuleMargin }">
             <component
-              :is="item.component"
+              :is="getComponent(item)"
               :data="resumeData[item.moduleKey]"
               :label="item.label"
               :template-type="currentTemplateType"
@@ -122,11 +66,12 @@
 <script setup lang="ts">
 import { computed, inject, ref } from "vue";
 
-import { Briefcase, Clock, DollarSign, Mail, MapPin, Phone } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 
 import { useResumeStore } from "@/stores/resumeStore";
-import type { ResumeData } from "@/stores/type";
+import type { ModuleItem, ResumeData } from "@/stores/type";
+import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
+import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
 import { usePageMarkers } from "@/views/editor/hooks/usePageMarkers";
 
@@ -138,11 +83,26 @@ const {
   globalLineHeight,
   globalModuleMargin,
 } = storeToRefs(useResumeStore());
+
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
-const { setCurrentModel, setIsExpanded } = useResumeStore();
+const componentMap: Record<string, any> = {
+  basicInfo: BasicInfoSection,
+  jobIntention: JobIntentionSection,
+};
 
 const { activeModules } = useActiveModules(moduleOrder, resumeData);
+
+const getComponent = (item: ModuleItem) => {
+  return item.component || componentMap[item.moduleKey];
+};
+
+const basicInfoModule = computed(() =>
+  activeModules.value.find((m) => m.moduleKey === "basicInfo"),
+);
+const jobIntentionModule = computed(() =>
+  activeModules.value.find((m) => m.moduleKey === "jobIntention"),
+);
 
 const contentModules = computed(() => {
   return activeModules.value.filter(
@@ -150,31 +110,13 @@ const contentModules = computed(() => {
   );
 });
 
-const hasJobIntention = computed(() => {
-  const { jobIntention } = resumeData.value;
-  return (
-    jobIntention?.jobIntention ||
-    jobIntention?.intentionCity ||
-    jobIntention?.expectationSalary ||
-    jobIntention?.entryTime
-  );
-});
-
-const fullAvatar = computed(() => {
-  return import.meta.env.VITE_DEFAULT_AVATAR + resumeData.value.basicInfo?.avatar;
-});
-
-const handleBasicInfoClick = () => {
-  setCurrentModel("basicInfo");
-  setIsExpanded(true);
-};
-
-const handleJobIntentionClick = () => {
-  setCurrentModel("jobIntention");
-  setIsExpanded(true);
-};
-
 // 分页标记线
 const contentRef = ref<HTMLElement | null>(null);
 const { markers } = usePageMarkers(contentRef);
 </script>
+
+<style scoped>
+:deep(.resume-section) {
+  margin-bottom: 0 !important;
+}
+</style>

@@ -11,7 +11,7 @@ interface CertificatesStyles {
 export const getCertificatesStyles = (type: templateType): CertificatesStyles => {
   const commonStyles = {
     container:
-      "resume-section w-full hover:bg-blue-50 hover:border-blue-300 border border-transparent rounded cursor-pointer transition-all duration-200",
+      "resume-section w-full border border-transparent rounded cursor-pointer transition-all duration-200",
     title: "text-lg font-bold text-gray-800 border-b border-gray-300 pb-2 mb-3",
     list: "list-disc list-inside text-gray-700 space-y-1", // Removed text-sm
     listItem: "",
@@ -43,6 +43,30 @@ export const getCertificatesStyles = (type: templateType): CertificatesStyles =>
         container: `${commonStyles.container}`,
         list: "space-y-2 text-gray-700",
         listItem: "flex items-center gap-2 pl-4 border-l-2 border-primary-200 py-1",
+      };
+    case "elegant":
+      return {
+        ...commonStyles,
+        title: "text-xs tracking-[0.15em] uppercase font-semibold text-[#8a8780] mb-4",
+        container: `${commonStyles.container}`,
+        list: "space-y-2 text-[#555]",
+        listItem: "flex items-center gap-2 pl-4 border-l-2 border-[#c9a96e]/40 py-1 text-sm",
+      };
+    case "minimal":
+      return {
+        ...commonStyles,
+        title: "text-base font-light text-[#111] tracking-[0.2em] uppercase mb-4",
+        container: `${commonStyles.container}`,
+        list: "space-y-1.5 text-[#555] text-sm",
+        listItem: "flex items-center gap-2",
+      };
+    case "luxury":
+      return {
+        ...commonStyles,
+        title: "text-xs tracking-[0.2em] uppercase font-semibold text-[#c9a050] mb-3",
+        container: `${commonStyles.container}`,
+        list: "space-y-1.5 text-white/70 text-sm",
+        listItem: "flex items-center gap-2",
       };
     case "default":
     default:
