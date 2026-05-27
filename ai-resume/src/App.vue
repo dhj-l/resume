@@ -11,10 +11,10 @@ const topLevelPreset = getPreset("fade");
 
 <template>
   <a-config-provider :locale="zhCN">
-    <GSAPTransition :preset="topLevelPreset" mode="out-in">
-      <router-view v-slot="{ Component }">
+    <router-view v-slot="{ Component }">
+      <GSAPTransition :preset="topLevelPreset" mode="out-in">
         <component :is="Component" :key="router.currentRoute.value.path" />
-      </router-view>
-    </GSAPTransition>
+      </GSAPTransition>
+    </router-view>
   </a-config-provider>
 </template>
