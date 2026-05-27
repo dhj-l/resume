@@ -93,24 +93,6 @@
     </a-button>
 
     <!-- Guest Access -->
-    <div class="relative my-8">
-      <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-gray-200"></div>
-      </div>
-      <div class="relative flex justify-center text-sm">
-        <span class="px-4 bg-white text-gray-500">快速体验，无需注册</span>
-      </div>
-    </div>
-
-    <a-button
-      block
-      size="large"
-      class="!h-12 !rounded-lg !border-gray-300 !text-gray-700 hover:!border-blue-500 hover:!text-blue-600"
-      @click="handleGuestAccess"
-    >
-      以游客身份体验
-    </a-button>
-    <p class="text-center text-xs text-gray-400 mt-2">数据仅保存 24 小时，进入编辑器后提示注册。</p>
 
     <!-- Sign Up Link -->
     <div class="text-center mt-8">
@@ -163,13 +145,6 @@ const handleLogin = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-const handleGuestAccess = () => {
-  message.info("正在进入游客模式...");
-  setTimeout(() => {
-    router.push("/home");
-  }, 1000);
 };
 
 const handleOAuthLogin = async (provider: "gitee" | "github") => {
