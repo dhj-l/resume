@@ -103,6 +103,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 
 import { LockOutlined, LogoutOutlined } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
 import { useRouter } from "vue-router";
 
 import { logoutAPI } from "@/api/user/user";
@@ -141,7 +142,8 @@ const handleStartCreating = () => {
 const handleLogout = async () => {
   await logoutAPI();
   authStore.logout();
-  router.push("/");
+  message.success("已退出登录");
+  router.push("/auth/login");
 };
 
 const handleChangePasswordClick = () => {

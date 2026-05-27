@@ -7,6 +7,7 @@ declare module "vue-router" {
   interface RouteMeta {
     title?: string;
     requiresAuth?: boolean;
+    guestOnly?: boolean;
     animation?: TransitionPreset;
     defaultChildAnimation?: TransitionPreset;
   }
@@ -36,7 +37,7 @@ const routes: RouteRecordRaw[] = [
         name: "template-details",
         path: "/templates/:id",
         component: () => import("@/views/template/TemplateDetailsPage.vue"),
-        meta: { title: "模板详情", animation: "fade-slide-up" },
+        meta: { title: "模板详情", requiresAuth: true, animation: "fade-slide-up" },
       },
       {
         name: "MyResumes",
@@ -56,19 +57,19 @@ const routes: RouteRecordRaw[] = [
     path: "/editor",
     name: "Editor",
     component: () => import("@/views/editor/EditorPage.vue"),
-    meta: { title: "简历编辑", animation: "scale-in" },
+    meta: { title: "简历编辑", requiresAuth: true, animation: "scale-in" },
   },
   {
     path: "/auth/gitee/callback",
     name: "GiteeCallback",
     component: () => import("@/views/auth/GiteeCallbackPage.vue"),
-    meta: { title: "Gitee 登录回调", animation: "none" },
+    meta: { title: "Gitee 登录回调", guestOnly: true, animation: "none" },
   },
   {
     path: "/auth/github/callback",
     name: "GitHubCallback",
     component: () => import("@/views/auth/GitHubCallbackPage.vue"),
-    meta: { title: "GitHub 登录回调", animation: "none" },
+    meta: { title: "GitHub 登录回调", guestOnly: true, animation: "none" },
   },
   {
     path: "/analysis-detail",
@@ -85,15 +86,21 @@ const routes: RouteRecordRaw[] = [
         path: "login",
         name: "Login",
         component: () => import("@/views/auth/LoginPage.vue"),
-        meta: { title: "登录" },
+        meta: { title: "登录", guestOnly: true },
       },
       {
         path: "register",
         name: "Register",
         component: () => import("@/views/auth/RegisterPage.vue"),
-        meta: { title: "注册" },
+        meta: { title: "注册", guestOnly: true },
       },
     ],
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("@/views/error/NotFoundPage.vue"),
+    meta: { title: "页面未找到", animation: "fade" },
   },
 ];
 
@@ -105,11 +112,18 @@ const router = createRouter({
 
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore();
+
+  if (to.meta.guestOnly && authStore.isLoggedIn) {
+    next({ name: "home" });
+    return;
+  }
+
   if (to.meta.requiresAuth && !authStore.isLoggedIn) {
     next({ name: "Login" });
-  } else {
-    next();
+    return;
   }
+
+  next();
 });
 
 export default router;
