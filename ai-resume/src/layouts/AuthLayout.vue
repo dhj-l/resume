@@ -92,11 +92,11 @@
 
     <!-- Right Section: Auth Form -->
     <div class="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
-      <div class="w-full max-w-[440px]">
+      <div class="w-full max-w-[440px] relative overflow-hidden">
         <router-view v-slot="{ Component }">
-          <!-- <transition name="fade" mode="out-in"> -->
-          <component :is="Component" />
-          <!-- </transition> -->
+          <GSAPTransition :preset="childPreset" mode="out-in">
+            <component :is="Component" />
+          </GSAPTransition>
         </router-view>
       </div>
     </div>
@@ -104,33 +104,17 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+
 import { CheckCircleOutlined, DownloadOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
+import { useRoute } from "vue-router";
+
+import GSAPTransition from "@/components/common/GSAPTransition.vue";
+import { resolvePresetFromMeta } from "@/utils/transitions";
+
+const route = useRoute();
+
+const childPreset = computed(() =>
+  resolvePresetFromMeta(route.meta as Record<string, unknown>, true),
+);
 </script>
-
-<style scoped>
-/* .fade-enter-active,
-.fade-leave-active {
-  transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
-}
-
-.fade-enter-from {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all 0.15s ease;
-}
-
-.fade-enter-to,
-.fade-leave-from {
-  opacity: 1;
-  transform: translateY(0);
-  transition: all 0.15s ease;
-}
-
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: all 0.15s ease;
-} */
-</style>
