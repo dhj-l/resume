@@ -1,86 +1,15 @@
 <template>
   <div class="relative mx-auto w-full max-w-[210mm]">
-    <!-- 计算层：隐藏 -->
+    <!-- 连续内容区：双栏 -->
     <div
-      class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none"
-    >
-      <!-- 左侧计算层 -->
-      <div
-        ref="leftContentRef"
-        class="w-[32%] flex flex-col"
-        :style="{
-          padding: globalPageMargin,
-          gap: globalModuleMargin,
-          fontSize: globalFontSize,
-          lineHeight: globalLineHeight,
-        }"
-      >
-        <div data-id="basicInfo">
-          <BasicInfoSection
-            :data="resumeData!.basicInfo"
-            :label="basicInfoModule?.label"
-            :template-type="currentTemplateType"
-          />
-        </div>
-        <div
-          v-for="item in leftModules"
-          :key="item.moduleKey"
-          :data-id="item.moduleKey"
-        >
-          <component
-            :is="item.component"
-            :data="resumeData?.[item.moduleKey]"
-            :label="item.label"
-            :template-type="currentTemplateType"
-            v-if="item.isShow && item.component"
-          />
-        </div>
-      </div>
-      <!-- 右侧计算层 -->
-      <div
-        ref="rightContentRef"
-        class="w-[68%] flex flex-col"
-        :style="{
-          padding: globalPageMargin,
-          gap: globalModuleMargin,
-          fontSize: globalFontSize,
-          lineHeight: globalLineHeight,
-        }"
-      >
-        <div data-id="jobIntention">
-          <JobIntentionSection
-            :data="resumeData!.jobIntention"
-            :label="jobIntentionModule?.label"
-            :templateType="currentTemplateType"
-          />
-        </div>
-        <div
-          v-for="item in rightModules"
-          :key="item.moduleKey"
-          :data-id="item.moduleKey"
-        >
-          <component
-            :is="item.component"
-            :data="resumeData?.[item.moduleKey]"
-            :label="item.label"
-            :templateType="currentTemplateType"
-            v-if="item.isShow && item.component"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- 展示层：分页 -->
-    <div
-      v-for="(page, index) in mergedPages"
-      :key="index"
-      class="resume-page w-full h-[1122px] bg-white shadow-lg mx-auto flex box-border overflow-hidden mb-8"
+      ref="containerRef"
+      class="w-full bg-white shadow-lg flex box-border"
       :style="{
         fontSize: globalFontSize,
         lineHeight: globalLineHeight,
       }"
     >
-      <!-- 左侧 -->
+      <!-- 左栏 32% -->
       <div
         class="w-[32%] bg-slate-50 flex flex-col shrink-0 border-r border-gray-100"
         :style="{
@@ -88,25 +17,23 @@
           gap: globalModuleMargin,
         }"
       >
-        <template v-for="moduleId in page.left" :key="moduleId">
-          <BasicInfoSection
-            v-if="moduleId === 'basicInfo'"
-            :data="resumeData!.basicInfo"
-            :label="basicInfoModule?.label"
-            :template-type="currentTemplateType"
-          />
+        <BasicInfoSection
+          :data="resumeData!.basicInfo"
+          :label="basicInfoModule?.label"
+          :template-type="currentTemplateType"
+        />
+        <template v-for="item in leftModules" :key="item.moduleKey">
           <component
-            v-else-if="getModuleByKey(moduleId)"
-            :is="getModuleByKey(moduleId)!.component"
-            :data="(resumeData as any)[moduleId]"
-            :label="getModuleByKey(moduleId)!.label"
+            :is="item.component"
+            v-if="item.isShow && item.component"
+            :data="resumeData?.[item.moduleKey]"
+            :label="item.label"
             :template-type="currentTemplateType"
-            draggable="true"
           />
         </template>
       </div>
 
-      <!-- 右侧 -->
+      <!-- 右栏 68% -->
       <div
         class="flex-1 flex flex-col min-w-0"
         :style="{
@@ -114,35 +41,53 @@
           gap: globalModuleMargin,
         }"
       >
-        <template v-for="moduleId in page.right" :key="moduleId">
-          <JobIntentionSection
-            v-if="moduleId === 'jobIntention'"
-            :data="resumeData!.jobIntention"
-            :label="jobIntentionModule?.label"
-            :templateType="currentTemplateType"
-          />
+        <JobIntentionSection
+          :data="resumeData!.jobIntention"
+          :label="jobIntentionModule?.label"
+          :template-type="currentTemplateType"
+        />
+        <template v-for="item in rightModules" :key="item.moduleKey">
           <component
-            v-else-if="getModuleByKey(moduleId)"
-            :is="getModuleByKey(moduleId)!.component"
-            :data="(resumeData as any)[moduleId]"
-            :label="getModuleByKey(moduleId)!.label"
-            :templateType="currentTemplateType"
-            draggable="true"
+            :is="item.component"
+            v-if="item.isShow && item.component"
+            :data="resumeData?.[item.moduleKey]"
+            :label="item.label"
+            :template-type="currentTemplateType"
           />
         </template>
+      </div>
+    </div>
+
+    <!-- 分页标记线 -->
+    <div
+      v-for="marker in markers"
+      :key="marker.pageNum"
+      data-page-marker
+      class="absolute left-0 w-full pointer-events-none"
+      :style="{ top: `${marker.top}px` }"
+    >
+      <div class="border-t-[3px] border-dashed border-red-400 relative">
+        <span
+          class="absolute right-0 -top-3.5 bg-red-500 text-white text-xs px-2.5 py-0.5 rounded shadow-sm"
+        >
+          第{{ marker.pageNum }}页
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
-import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+import { inject, computed, ref } from "vue";
+
+import { storeToRefs } from "pinia";
+
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData } from "@/stores/type";
-import { storeToRefs } from "pinia";
-import { inject, computed, ref } from "vue";
-import { usePagination } from "@/views/editor/hooks/usePagination";
+import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
+import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
+import { usePageMarkers } from "@/views/editor/hooks/usePageMarkers";
 
 const {
   moduleOrder,
@@ -154,7 +99,6 @@ const {
 } = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
-// 定义左右分栏的模块 key
 const leftModuleKeys = ["skills", "certificates", "selfEvaluation"];
 const rightModuleKeys = [
   "educationBackground",
@@ -164,71 +108,28 @@ const rightModuleKeys = [
   "internshipExperience",
 ];
 
-// 获取基本信息和求职意向模块配置
-const basicInfoModule = computed(() =>
-  moduleOrder.value.find((m) => m.moduleKey === "basicInfo"),
-);
+const basicInfoModule = computed(() => moduleOrder.value.find((m) => m.moduleKey === "basicInfo"));
 const jobIntentionModule = computed(() =>
   moduleOrder.value.find((m) => m.moduleKey === "jobIntention"),
 );
 
-// 计算左侧模块列表 (保持 moduleOrder 中的相对顺序)
+const { activeModules } = useActiveModules(moduleOrder, resumeData);
+
 const leftModules = computed(() => {
-  return moduleOrder.value.filter((item) =>
-    leftModuleKeys.includes(item.moduleKey),
-  );
+  return activeModules.value.filter((item) => leftModuleKeys.includes(item.moduleKey));
 });
 
-// 计算右侧模块列表 (保持 moduleOrder 中的相对顺序)
 const rightModules = computed(() => {
-  return moduleOrder.value.filter((item) =>
-    rightModuleKeys.includes(item.moduleKey),
-  );
+  return activeModules.value.filter((item) => rightModuleKeys.includes(item.moduleKey));
 });
 
-// 根据 ID 获取模块配置
-const getModuleByKey = (key: string) => {
-  return moduleOrder.value.find((item) => item.moduleKey === key);
-};
-
-// 分页逻辑
-const leftContentRef = ref<HTMLElement | null>(null);
-const rightContentRef = ref<HTMLElement | null>(null);
-
-const moduleGap = computed(() => {
-  return parseFloat(globalModuleMargin.value) || 0;
-});
-
-const pagePadding = computed(() => {
-  return (parseFloat(globalPageMargin.value) || 0) * 2;
-});
-
-const { pages: leftPages } = usePagination(leftContentRef, resumeData, {
-  contentPadding: pagePadding,
-  gap: moduleGap,
-});
-const { pages: rightPages } = usePagination(rightContentRef, resumeData, {
-  contentPadding: pagePadding,
-  gap: moduleGap,
-});
-
-const mergedPages = computed(() => {
-  const maxLen = Math.max(leftPages.value.length, rightPages.value.length);
-  const result = [];
-  for (let i = 0; i < maxLen; i++) {
-    const page = {
-      left: leftPages.value[i] || [],
-      right: rightPages.value[i] || [],
-    };
-    result.push(page);
-  }
-  return result.filter((page) => page.left.length > 0 || page.right.length > 0);
-});
+// 分页标记线
+const containerRef = ref<HTMLElement | null>(null);
+const { markers } = usePageMarkers(containerRef);
 </script>
 
 <style scoped>
-/* 针对侧边栏的基本信息样式微调 */
 :deep(.resume-section) {
-  margin-bottom: 0 !important; /* 移除组件自带的 margin-bottom，由 flex gap 控制 */
+  margin-bottom: 0 !important;
 }
 </style>

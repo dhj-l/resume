@@ -1,5 +1,6 @@
 import { http } from "@/http/request";
 import type { ResumeData } from "@/stores/type";
+
 import type {
   AIResumeParams,
   AiResumeParams,
@@ -28,17 +29,17 @@ export const getResumeDetailAPI = (id: string) => {
   return http.get<ResumeData>(`/resume/${id}`);
 };
 
-export const getUserResumesAPI = (query: {
-  page?: number;
-  pageSize?: number;
-}) => {
+export const getUserResumesAPI = (
+  query: {
+    page?: number;
+    pageSize?: number;
+  } = {},
+) => {
   return http.get<UserResumeListResponse>("/resume", { params: query });
 };
 
 export const deleteResumeAPI = (id: string) => {
-  return http.delete(`/resume/${id}`) as unknown as Promise<
-    ApiResponse<DeleteResumeResult>
-  >;
+  return http.delete(`/resume/${id}`) as unknown as Promise<ApiResponse<DeleteResumeResult>>;
 };
 
 /**

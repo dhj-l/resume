@@ -1,20 +1,14 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import {
-  Modal,
-  Form,
-  FormItem,
-  Input,
-  Select,
-  SelectOption,
-  message,
-} from "ant-design-vue";
+
+import { Modal, Form, FormItem, Input, Select, SelectOption, message } from "ant-design-vue";
 import type { Rule } from "ant-design-vue/es/form";
-import { getDomCover, getElement } from "@/utils/dom";
-import { uploadImage } from "@/utils/upload";
+import { storeToRefs } from "pinia";
+
 import { createTemplateAPI } from "@/api/templates/templates";
 import { useResumeStore } from "@/stores/resumeStore";
-import { storeToRefs } from "pinia";
+import { getDomCover, getElement } from "@/utils/dom";
+import { uploadImage } from "@/utils/upload";
 
 const props = defineProps<{
   resumeTitle?: string;
@@ -27,17 +21,7 @@ const isVisible = ref(false);
 const confirmLoading = ref(false);
 const formRef = ref();
 
-const categoryOptions = [
-  "技术",
-  "产品",
-  "设计",
-  "运营",
-  "市场",
-  "人事",
-  "行政",
-  "财务",
-  "通用",
-];
+const categoryOptions = ["技术", "产品", "设计", "运营", "市场", "人事", "行政", "财务", "通用"];
 
 const formState = reactive({
   name: "",
@@ -46,9 +30,7 @@ const formState = reactive({
 
 const rules: Record<string, Rule[]> = {
   name: [{ required: true, message: "请输入模板名称", trigger: "blur" }],
-  category: [
-    { required: true, message: "请选择适用岗位类型", trigger: "change" },
-  ],
+  category: [{ required: true, message: "请选择适用岗位类型", trigger: "change" }],
 };
 
 const open = () => {
@@ -69,7 +51,7 @@ const handleOk = async () => {
     }
 
     // 获取当前简历封面数据
-    const coverFile = await getDomCover(element as HTMLElement);
+    const coverFile = await getDomCover(element as HTMLElement, 1110);
     // 上传图片
     const previewImage = await uploadImage(coverFile);
 
@@ -117,9 +99,9 @@ defineExpose({
   <Modal
     v-model:visible="isVisible"
     title="发布为模板"
+    :confirm-loading="confirmLoading"
     @ok="handleOk"
     @cancel="handleCancel"
-    :confirmLoading="confirmLoading"
   >
     <Form ref="formRef" :model="formState" :rules="rules" layout="vertical">
       <FormItem label="模板名称" name="name">
@@ -127,11 +109,7 @@ defineExpose({
       </FormItem>
       <FormItem label="适用岗位" name="category">
         <Select v-model:value="formState.category">
-          <SelectOption
-            v-for="category in categoryOptions"
-            :key="category"
-            :value="category"
-          >
+          <SelectOption v-for="category in categoryOptions" :key="category" :value="category">
             {{ category }}
           </SelectOption>
         </Select>

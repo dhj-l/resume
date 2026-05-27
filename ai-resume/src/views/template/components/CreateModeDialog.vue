@@ -4,8 +4,8 @@
     title="选择创建方式"
     :width="800"
     :footer="null"
-    @cancel="handleCancel"
     class="create-mode-modal"
+    @cancel="handleCancel"
   >
     <div class="py-8 px-4">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -71,11 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  EditOutlined,
-  CopyOutlined,
-  CloudUploadOutlined,
-} from "@ant-design/icons-vue";
+import { EditOutlined, CopyOutlined, CloudUploadOutlined } from "@ant-design/icons-vue";
 
 defineProps<{
   open: boolean;

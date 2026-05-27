@@ -1,9 +1,11 @@
-import { defineStore } from "pinia";
 import { ref, computed } from "vue";
+
+import { defineStore } from "pinia";
+
 import { loginAPI, registerAPI } from "@/api/auth/auth";
-import { getUserProfileAPI, updateUserProfileAPI } from "@/api/user/user";
 import type { LoginParams, RegisterParams } from "@/api/auth/type";
 import type { UserProfile, UpdateProfileParams } from "@/api/user/type";
+import { getUserProfileAPI, updateUserProfileAPI } from "@/api/user/user";
 
 export const useAuthStore = defineStore(
   "auth",
@@ -53,6 +55,20 @@ export const useAuthStore = defineStore(
       }
     }
 
+    /**
+     * Gitee OAuth 登录 —— 直接用回调返回的 token + user 建立会话
+     */
+    async function giteeLogin(
+      giteeToken: string,
+      giteeUser: { _id: string; username: string; email: string },
+    ) {
+      token.value = giteeToken;
+      userInfo.value = giteeUser as UserProfile;
+
+      // 拉取完整用户信息（含 name / avatar 等扩展字段）
+      await fetchProfile();
+    }
+
     async function register(params: RegisterParams) {
       try {
         await registerAPI(params);
@@ -75,6 +91,7 @@ export const useAuthStore = defineStore(
       userInfo,
       isLoggedIn,
       login,
+      giteeLogin,
       register,
       logout,
       fetchProfile,

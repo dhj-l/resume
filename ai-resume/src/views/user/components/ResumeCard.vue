@@ -2,9 +2,7 @@
   <div
     class="group relative bg-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border border-[#f0f0f0] flex flex-col h-full"
   >
-    <div
-      class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-2"
-    >
+    <div class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-2">
       <img
         v-if="resume.cover"
         :src="coverUrl"
@@ -36,9 +34,7 @@
               {{ resume.title || "未命名简历" }}
             </h3>
           </div>
-          <div
-            class="mt-2 text-[13px] text-[#8c8c8c] flex items-center gap-1.5"
-          >
+          <div class="mt-2 text-[13px] text-[#8c8c8c] flex items-center gap-1.5">
             <CalendarOutlined />
             <span>更新时间：</span>
             <span>{{ formattedTime }}</span>
@@ -51,6 +47,7 @@
       <div class="flex items-center justify-end gap-2">
         <a-button
           type="primary"
+          class="flex items-center"
           :loading="editLoading"
           @click="$emit('edit', resume._id)"
         >
@@ -58,13 +55,18 @@
           编辑
         </a-button>
         <a-tooltip title="复制简历">
-          <a-button :loading="copyLoading" @click="$emit('copy', resume._id)">
+          <a-button
+            class="flex items-center"
+            :loading="copyLoading"
+            @click="$emit('copy', resume._id)"
+          >
             <template #icon><CopyOutlined /></template>
             复制
           </a-button>
         </a-tooltip>
         <a-button
           danger
+          class="flex items-center"
           :loading="deleteLoading"
           @click="$emit('delete', { id: resume._id, title: resume.title })"
         >
@@ -78,6 +80,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+
 import {
   CalendarOutlined,
   CopyOutlined,
@@ -85,6 +88,7 @@ import {
   EditOutlined,
   FileTextOutlined,
 } from "@ant-design/icons-vue";
+
 import type { UserResumeListItem } from "@/api/resume/type";
 import { formatDate } from "@/utils/day";
 import { getFullImageUrl } from "@/utils/image";

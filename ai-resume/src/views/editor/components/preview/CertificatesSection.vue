@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { useResumeStore } from "@/stores/resumeStore";
-import type { templateType } from "./type";
-import { getCertificatesStyles } from "./CertificatesSection";
 import { computed } from "vue";
+
+import { useResumeStore } from "@/stores/resumeStore";
 import type { SortableModule } from "@/stores/type";
+
+import { getCertificatesStyles } from "./CertificatesSection";
+import type { templateType } from "./type";
 
 const props = defineProps<{
   data?: SortableModule;

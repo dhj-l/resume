@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { FormItem, Input, Button, Checkbox, DatePicker } from "ant-design-vue";
+import { h, ref } from "vue";
+
 import {
   DeleteOutlined,
   PlusOutlined,
   ArrowDownOutlined,
   ArrowUpOutlined,
 } from "@ant-design/icons-vue";
-import type { ProjectExperience } from "@/stores/type";
-import { h, ref } from "vue";
+import { FormItem, Input, Button, Checkbox, DatePicker } from "ant-design-vue";
+
+import AiPolishButton from "@/components/ai-polish-button/AiPolishButton.vue";
 import BasicEditor from "@/components/basic-editor/basic-editor.vue";
 import { useResumeStore } from "@/stores/resumeStore";
+import type { ProjectExperience } from "@/stores/type";
 
 const props = defineProps<{
   data: ProjectExperience[];
@@ -64,18 +67,18 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             <FormItem label="项目名称" class="!mb-0">
               <Input
                 :value="project.title"
-                @update:value="(val) => update(index, 'title', val)"
                 placeholder="请输入项目名称"
                 style="width: 180px"
+                @update:value="(val) => update(index, 'title', val)"
               />
             </FormItem>
 
             <FormItem label="项目角色" class="!mb-0">
               <Input
                 :value="project.description"
-                @update:value="(val) => update(index, 'description', val)"
                 placeholder="请输入项目角色"
                 style="width: 180px"
+                @update:value="(val) => update(index, 'description', val)"
               />
             </FormItem>
 
@@ -83,29 +86,27 @@ const handleTillNowChange = (index: number, checked: boolean) => {
               <div class="flex items-center gap-2">
                 <DatePicker
                   :value="project.startTime"
-                  @update:value="(val) => update(index, 'startTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="开始时间"
                   style="width: 110px"
+                  @update:value="(val) => update(index, 'startTime', val)"
                 />
                 <span class="text-gray-400">-</span>
                 <DatePicker
                   v-if="project.endTime !== '至今'"
                   :value="project.endTime"
-                  @update:value="(val) => update(index, 'endTime', val)"
                   picker="month"
                   value-format="YYYY-MM"
                   placeholder="结束时间"
                   style="width: 110px"
+                  @update:value="(val) => update(index, 'endTime', val)"
                 />
                 <span v-else class="text-gray-500 text-sm px-2">至今</span>
                 <Checkbox
                   :checked="project.endTime === '至今'"
-                  @change="
-                    (e: any) => handleTillNowChange(index, e.target.checked)
-                  "
                   class="ml-2"
+                  @change="(e: any) => handleTillNowChange(index, e.target.checked)"
                   >至今</Checkbox
                 >
               </div>
@@ -114,13 +115,21 @@ const handleTillNowChange = (index: number, checked: boolean) => {
 
           <!-- 第二行：富文本编辑器占位 -->
           <div class="rich-text-container">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs text-gray-400">详细描述</span>
+              <AiPolishButton
+                module-key="projectExperience"
+                content-field="content"
+                :index="index"
+              />
+            </div>
             <div
               class="border border-gray-300 rounded min-h-[150px] bg-gray-50 text-gray-400 flex flex-col items-center justify-center space-y-2"
             >
               <BasicEditor
                 class="w-full"
-                :modelValue="project.content"
-                @update:modelValue="(val) => update(index, 'content', val)"
+                :model-value="project.content"
+                @update:model-value="(val) => update(index, 'content', val)"
               />
             </div>
           </div>
@@ -131,18 +140,20 @@ const handleTillNowChange = (index: number, checked: boolean) => {
           <Button
             type="primary"
             size="small"
+            class="flex items-center"
             :icon="h(ArrowUpOutlined)"
-            @click="handleMove(index, 'up')"
             :disabled="index === 0"
+            @click="handleMove(index, 'up')"
           >
             上移
           </Button>
           <Button
             type="primary"
             size="small"
+            class="flex items-center"
             :icon="h(ArrowDownOutlined)"
-            @click="handleMove(index, 'down')"
             :disabled="index === data.length - 1"
+            @click="handleMove(index, 'down')"
           >
             下移
           </Button>
@@ -150,6 +161,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             type="primary"
             danger
             size="small"
+            class="flex items-center"
             :icon="h(DeleteOutlined)"
             @click="handleDelete(index)"
           >
@@ -159,7 +171,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
       </div>
     </div>
 
-    <Button type="dashed" block @click="handleAdd" class="mt-4">
+    <Button type="dashed" block class="mt-4 flex items-center" @click="handleAdd">
       <template #icon><PlusOutlined /></template>
       添加项目经历
     </Button>

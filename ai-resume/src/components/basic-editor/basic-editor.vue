@@ -1,12 +1,12 @@
 <template>
   <div>
     <div>
-      <Toolbar :editor="editorRef" :defaultConfig="toolbarConfig" />
+      <Toolbar :editor="editorRef" :default-config="toolbarConfig" />
       <Editor
-        :defaultConfig="editorConfig"
         v-model="valueHtml"
+        :default-config="editorConfig"
         style="height: 301px; overflow-y: hidden; border-top: 1px solid #e5e5e5"
-        @onCreated="handleCreated"
+        @on-created="handleCreated"
       />
     </div>
   </div>
@@ -15,8 +15,9 @@
 <script setup lang="ts">
 import "@wangeditor/editor/dist/css/style.css";
 import { onBeforeUnmount, shallowRef } from "vue";
-import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
+
 import type { IToolbarConfig } from "@wangeditor/editor";
+import { Editor, Toolbar } from "@wangeditor/editor-for-vue";
 
 // 编辑器实例，必须用 shallowRef，重要！
 const editorRef = shallowRef();

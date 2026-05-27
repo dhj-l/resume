@@ -4,8 +4,8 @@
     title="AI 智能简历生成"
     :width="680"
     :footer="null"
-    @cancel="handleCancel"
     class="ai-create-modal"
+    @cancel="handleCancel"
   >
     <div class="pt-4 pb-2">
       <!-- Steps -->
@@ -67,25 +67,15 @@
             <template v-for="field in userInfoFields" :key="field.name">
               <a-form-item :label="field.label" :name="field.name">
                 <component
-                  :is="
-                    componentMap[field.component as keyof typeof componentMap]
-                  "
-                  v-model:value="
-                    formData.userInfo[
-                      field.name as keyof typeof formData.userInfo
-                    ]
-                  "
+                  :is="componentMap[field.component as keyof typeof componentMap]"
+                  v-model:value="formData.userInfo[field.name as keyof typeof formData.userInfo]"
                   :placeholder="field.placeholder"
                   :min="field.min"
                   :max="field.max"
                   class="rounded-lg w-full"
                 >
                   <template v-if="field.component === 'Select'">
-                    <a-select-option
-                      v-for="opt in field.options"
-                      :key="opt"
-                      :value="opt"
-                    >
+                    <a-select-option v-for="opt in field.options" :key="opt" :value="opt">
                       {{ opt }}
                     </a-select-option>
                   </template>
@@ -109,24 +99,15 @@
       </div>
 
       <!-- Footer Actions -->
-      <div
-        class="flex justify-between items-center px-4 mt-8 pt-4 border-t border-slate-100"
-      >
-        <a-button v-if="currentStep > 0" @click="prevStep" class="rounded-lg">
-          上一步
-        </a-button>
+      <div class="flex justify-between items-center px-4 mt-8 pt-4 border-t border-slate-100">
+        <a-button v-if="currentStep > 0" class="rounded-lg" @click="prevStep"> 上一步 </a-button>
         <div v-else></div>
         <!-- Spacer -->
 
         <div class="flex gap-3">
-          <a-button @click="handleCancel" class="rounded-lg">取消</a-button>
+          <a-button class="rounded-lg" @click="handleCancel">取消</a-button>
 
-          <a-button
-            v-if="currentStep < 2"
-            type="primary"
-            @click="nextStep"
-            class="rounded-lg px-6"
-          >
+          <a-button v-if="currentStep < 2" type="primary" class="rounded-lg px-6" @click="nextStep">
             下一步
           </a-button>
 
@@ -134,8 +115,8 @@
             v-else
             type="primary"
             :loading="loading"
+            class="rounded-lg px-8 flex items-center bg-gradient-to-r from-primary-500 to-indigo-600 border-none hover:shadow-lg hover:shadow-primary-500/30"
             @click="handleSubmit"
-            class="rounded-lg px-8 bg-gradient-to-r from-primary-500 to-indigo-600 border-none hover:shadow-lg hover:shadow-primary-500/30"
           >
             <template #icon>
               <Sparkles class="w-4 h-4 mr-1 inline-block" />
@@ -150,9 +131,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+
 import { message } from "ant-design-vue";
-import { Sparkles } from "lucide-vue-next";
 import type { FormInstance } from "ant-design-vue";
+import { Sparkles } from "lucide-vue-next";
+
 import type { AiCreateFormData } from "../types";
 
 interface Props {

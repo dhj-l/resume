@@ -8,9 +8,7 @@
           class="text-primary-600 font-medium hover:text-primary-700 flex items-center gap-1 group"
         >
           查看全部
-          <ArrowRight
-            class="w-4 h-4 transition-transform group-hover:translate-x-1"
-          />
+          <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
         </router-link>
       </div>
 
@@ -27,13 +25,14 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from "vue";
+
 import { ArrowRight } from "lucide-vue-next";
 import { useRouter } from "vue-router";
-import TemplateCard from "@/views/template/components/TemplateCard.vue";
 
-import { onMounted, ref } from "vue";
 import { getTemplateListAPI } from "@/api/templates/templates";
 import type { Template } from "@/api/templates/type";
+import TemplateCard from "@/views/template/components/TemplateCard.vue";
 
 const router = useRouter();
 const page = ref(1);

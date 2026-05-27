@@ -5,8 +5,6 @@
     :width="600"
     :mask-closable="false"
     :keyboard="false"
-    @cancel="handleCancel"
-    @ok="handleConfirm"
     :ok-button-props="{
       disabled: !isValid || loading || submitting,
       loading: loading || submitting,
@@ -14,16 +12,15 @@
     ok-text="确定"
     cancel-text="取消"
     class="import-resume-modal"
+    @cancel="handleCancel"
+    @ok="handleConfirm"
   >
     <div class="py-4 px-4">
       <div class="space-y-2">
         <div class="flex justify-between items-center">
           <label class="text-sm font-medium text-slate-700">
             简历内容解析
-            <span
-              class="text-slate-400 text-xs ml-2 font-normal"
-              v-if="localResumeText"
-            >
+            <span v-if="localResumeText" class="text-slate-400 text-xs ml-2 font-normal">
               (可编辑，已解析 {{ localResumeText.length }} 字)
             </span>
           </label>
@@ -32,8 +29,8 @@
             type="link"
             size="small"
             danger
-            @click="clearResume"
             :disabled="loading"
+            @click="clearResume"
           >
             重新上传
           </a-button>
@@ -56,9 +53,7 @@
               <div v-if="loading" class="text-center space-y-4">
                 <a-spin size="large" />
                 <p class="text-slate-600 font-medium">正在智能解析简历中...</p>
-                <p class="text-slate-400 text-xs">
-                  AI 正在识别关键信息，请稍候
-                </p>
+                <p class="text-slate-400 text-xs">AI 正在识别关键信息，请稍候</p>
               </div>
               <div v-else class="text-center space-y-3">
                 <div
@@ -66,12 +61,8 @@
                 >
                   <CloudUploadOutlined class="text-3xl" />
                 </div>
-                <p class="text-lg font-medium text-slate-700">
-                  点击或拖拽简历文件到此处
-                </p>
-                <p class="text-sm text-slate-500">
-                  支持 PDF, Word (doc/docx) 格式，最大 5MB
-                </p>
+                <p class="text-lg font-medium text-slate-700">点击或拖拽简历文件到此处</p>
+                <p class="text-sm text-slate-500">支持 PDF, Word (doc/docx) 格式，最大 5MB</p>
               </div>
             </div>
           </a-upload-dragger>
@@ -95,15 +86,19 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
+
 import { CloudUploadOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import type { UploadProps } from "ant-design-vue";
+
 import { parseResumeAPI } from "@/api/resume/resume";
 
 interface Props {
   open: boolean;
   submitting?: boolean;
 }
+
+// let a = "";
 
 const props = withDefaults(defineProps<Props>(), {
   open: false,
@@ -136,9 +131,7 @@ const beforeUpload: UploadProps["beforeUpload"] = (file) => {
   ];
   const fileName = file.name.toLowerCase();
   const isAllowedExt =
-    fileName.endsWith(".pdf") ||
-    fileName.endsWith(".doc") ||
-    fileName.endsWith(".docx");
+    fileName.endsWith(".pdf") || fileName.endsWith(".doc") || fileName.endsWith(".docx");
 
   if (!allowedTypes.includes(file.type) && !isAllowedExt) {
     message.error("只支持 PDF, DOC, DOCX 格式文件!");
@@ -156,6 +149,8 @@ const handleUpload = async (options: any) => {
     localResumeText.value = res.data;
     message.success("简历解析成功");
     onSuccess(res.data);
+  } catch {
+    options.onError?.();
   } finally {
     loading.value = false;
   }

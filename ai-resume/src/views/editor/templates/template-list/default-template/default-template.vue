@@ -1,72 +1,80 @@
 <template>
   <div class="relative mx-auto w-full max-w-[210mm]">
-    <!-- 计算层：用于计算每个模块的高度 -->
+    <!-- 连续内容区 -->
     <div
       ref="contentRef"
-      class="absolute top-0 left-0 w-full opacity-0 -z-50 pointer-events-none box-border"
+      class="w-full bg-white shadow-lg box-border"
       :style="{
         padding: globalPageMargin,
         fontSize: globalFontSize,
         lineHeight: globalLineHeight,
       }"
     >
+      <!-- 首页 header -->
+      <div class="flex items-center justify-between mb-6 border-b-4 border-gray-800 pb-2">
+        <div class="flex items-end gap-4">
+          <h1 class="text-4xl font-bold text-gray-800 leading-none">个人简历</h1>
+          <div class="flex flex-col text-gray-500">
+            <span class="text-xs">细心从每一个细节开始</span>
+            <span class="text-lg font-medium leading-none">Personal resume</span>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
+            <Box class="h-4 w-4" />
+          </div>
+          <div class="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
+            <Mail class="h-4 w-4" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 所有模块连续渲染 -->
       <div
         v-for="item in activeModules"
         :key="item.moduleKey"
-        :data-id="item.moduleKey"
-        :style="{
-          marginBottom: globalModuleMargin,
-        }"
+        :style="{ marginBottom: globalModuleMargin }"
       >
         <component
           :is="getComponent(item)"
           :data="resumeData[item.moduleKey]"
           :label="item.label"
-          :templateType="currentTemplateType"
+          :template-type="currentTemplateType"
         />
       </div>
     </div>
 
-    <!-- 展示层：分页渲染 -->
+    <!-- 分页标记线 -->
     <div
-      v-for="(page, index) in pages"
-      :key="index"
-      class="resume-page w-full h-[1122px] bg-white shadow-lg mb-8 box-border relative"
-      :style="{
-        padding: globalPageMargin,
-        fontSize: globalFontSize,
-        lineHeight: globalLineHeight,
-      }"
+      v-for="marker in markers"
+      :key="marker.pageNum"
+      data-page-marker
+      class="absolute left-0 w-full pointer-events-none"
+      :style="{ top: `${marker.top}px` }"
     >
-      <template v-for="moduleId in page" :key="moduleId">
-        <div
-          v-if="getModuleByKey(moduleId)"
-          :style="{
-            marginBottom: globalModuleMargin,
-          }"
+      <div class="border-t-[3px] border-dashed border-red-400 relative">
+        <span
+          class="absolute right-0 -top-3.5 bg-red-500 text-white text-xs px-2.5 py-0.5 rounded shadow-sm"
         >
-          <component
-            :is="getComponent(getModuleByKey(moduleId)!)"
-            :data="(resumeData as any)[moduleId]"
-            :label="getModuleByKey(moduleId)!.label"
-            :templateType="currentTemplateType"
-          />
-        </div>
-      </template>
+          第{{ marker.pageNum }}页
+        </span>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject } from "vue";
+import { ref, inject } from "vue";
+
+import { Box, Mail } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
+
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData, ModuleItem } from "@/stores/type";
-import { usePagination } from "@/views/editor/hooks/usePagination";
-
-// 引入组件
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
+import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
+import { usePageMarkers } from "@/views/editor/hooks/usePageMarkers";
 
 const {
   moduleOrder,
@@ -78,43 +86,20 @@ const {
 } = storeToRefs(useResumeStore());
 const resumeData = ref(inject<ResumeData>("resumeData")!);
 
-// 映射特殊组件
 const componentMap: Record<string, any> = {
   basicInfo: BasicInfoSection,
   jobIntention: JobIntentionSection,
 };
 
-// 获取需要渲染的模块列表
-const activeModules = computed(() => {
-  return moduleOrder.value.filter((item) => item.isShow);
-});
+const { activeModules } = useActiveModules(moduleOrder, resumeData);
 
-// 获取组件
 const getComponent = (item: ModuleItem) => {
   return item.component || componentMap[item.moduleKey];
 };
 
-// 根据 ID 获取模块配置
-const getModuleByKey = (key: string) => {
-  return activeModules.value.find((item) => item.moduleKey === key);
-};
-
-// 分页逻辑
+// 分页标记线
 const contentRef = ref<HTMLElement | null>(null);
-const contentPadding = computed(() => {
-  const marginStr = globalPageMargin.value;
-  const margin = parseFloat(marginStr) || 0;
-  return margin * 2;
-});
-
-const { pages } = usePagination(contentRef, resumeData, {
-  contentPadding,
-});
+const { markers } = usePageMarkers(contentRef);
 </script>
 
-<style scoped>
-/* A4纸张比例模拟 - 如果需要保持比例 */
-/* .resume-preview {
-  aspect-ratio: 210/297;
-} */
-</style>
+<style scoped></style>

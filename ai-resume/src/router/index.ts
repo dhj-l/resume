@@ -1,8 +1,5 @@
-import {
-  createRouter,
-  createWebHistory,
-  type RouteRecordRaw,
-} from "vue-router";
+import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
+
 import { useAuthStore } from "@/stores/auth";
 
 const routes: RouteRecordRaw[] = [
@@ -36,6 +33,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/user/MyResumes.vue"),
         meta: { title: "我的简历", requiresAuth: true },
       },
+      {
+        name: "GenerationRecords",
+        path: "/user/generations",
+        component: () => import("@/views/user/GenerationRecords.vue"),
+        meta: { title: "生成记录", requiresAuth: true },
+      },
     ],
   },
   {
@@ -43,6 +46,18 @@ const routes: RouteRecordRaw[] = [
     name: "Editor",
     component: () => import("@/views/editor/EditorPage.vue"),
     meta: { title: "简历编辑" },
+  },
+  {
+    path: "/auth/gitee/callback",
+    name: "GiteeCallback",
+    component: () => import("@/views/auth/GiteeCallbackPage.vue"),
+    meta: { title: "Gitee 登录回调" },
+  },
+  {
+    path: "/analysis-detail",
+    name: "AnalysisDetail",
+    component: () => import("@/views/editor/AnalysisDetailPage.vue"),
+    meta: { title: "AI 分析详情", requiresAuth: true },
   },
   {
     path: "/auth",
@@ -67,6 +82,7 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior: () => ({ top: 0 }),
 });
 
 router.beforeEach((to, _from, next) => {

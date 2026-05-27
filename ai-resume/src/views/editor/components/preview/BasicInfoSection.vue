@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { computed } from "vue";
+
 import { useResumeStore } from "@/stores/resumeStore";
 import type { BasicInfo } from "@/stores/type";
-import type { templateType } from "./type";
+
 import { getBasicInfoStyles } from "./BasicInfoSection";
-import { computed } from "vue";
+import type { templateType } from "./type";
 
 const props = defineProps<{
   data: BasicInfo;
@@ -68,7 +70,7 @@ const fullAvatar = computed(() => {
         </h1>
         <div :class="styles.detailsWrapper">
           <template v-for="item in contentArray" :key="item.label">
-            <div :class="styles.detailItem" v-if="item.value">
+            <div v-if="item.value" :class="styles.detailItem">
               <span>{{ item.label }}：{{ item.value }}</span>
             </div>
           </template>

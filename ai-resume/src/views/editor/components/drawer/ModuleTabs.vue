@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Tabs, TabPane, Button } from "ant-design-vue";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons-vue";
-import type { ResumeData } from "@/stores/type";
+import { Tabs, TabPane, Button } from "ant-design-vue";
 import { storeToRefs } from "pinia";
+
 import { useResumeStore } from "@/stores/resumeStore";
+import type { ResumeData } from "@/stores/type";
 
 defineProps<{
   resumeData: ResumeData;
@@ -20,9 +21,7 @@ const isFixedModule = (moduleKey: string) => {
 };
 
 const moveModuleLeft = (moduleKey: string) => {
-  const currentIndex = moduleOrder.value.findIndex(
-    (m) => m.moduleKey === moduleKey,
-  );
+  const currentIndex = moduleOrder.value.findIndex((m) => m.moduleKey === moduleKey);
   if (currentIndex <= 0) return;
 
   const prevModule = moduleOrder.value[currentIndex - 1];
@@ -32,9 +31,7 @@ const moveModuleLeft = (moduleKey: string) => {
 };
 
 const moveModuleRight = (moduleKey: string) => {
-  const currentIndex = moduleOrder.value.findIndex(
-    (m) => m.moduleKey === moduleKey,
-  );
+  const currentIndex = moduleOrder.value.findIndex((m) => m.moduleKey === moduleKey);
   if (currentIndex < 0 || currentIndex >= moduleOrder.value.length - 1) return;
 
   const nextModule = moduleOrder.value[currentIndex + 1];
@@ -44,20 +41,15 @@ const moveModuleRight = (moduleKey: string) => {
 };
 
 const canMoveLeft = (moduleKey: string) => {
-  const currentIndex = moduleOrder.value.findIndex(
-    (m) => m.moduleKey === moduleKey,
-  );
+  const currentIndex = moduleOrder.value.findIndex((m) => m.moduleKey === moduleKey);
   if (currentIndex <= 0) return false;
   const prevModule = moduleOrder.value[currentIndex - 1];
   return !isFixedModule(prevModule?.moduleKey || "");
 };
 
 const canMoveRight = (moduleKey: string) => {
-  const currentIndex = moduleOrder.value.findIndex(
-    (m) => m.moduleKey === moduleKey,
-  );
-  if (currentIndex < 0 || currentIndex >= moduleOrder.value.length - 1)
-    return false;
+  const currentIndex = moduleOrder.value.findIndex((m) => m.moduleKey === moduleKey);
+  if (currentIndex < 0 || currentIndex >= moduleOrder.value.length - 1) return false;
   const nextModule = moduleOrder.value[currentIndex + 1];
   return !isFixedModule(nextModule?.moduleKey || "");
 };
@@ -66,15 +58,11 @@ const canMoveRight = (moduleKey: string) => {
 <template>
   <div class="h-full flex flex-col bg-gray-50">
     <Tabs
-      v-model:activeKey="currentModule"
+      v-model:active-key="currentModule"
       class="bg-white px-4 border-b border-gray-200"
       centered
     >
-      <TabPane
-        v-for="item in moduleOrder"
-        :key="item.moduleKey"
-        :name="item.moduleKey"
-      >
+      <TabPane v-for="item in moduleOrder" :key="item.moduleKey" :name="item.moduleKey">
         <template #tab>
           <div class="flex items-center gap-1">
             <template v-if="!isFixedModule(item.moduleKey)">
@@ -82,8 +70,8 @@ const canMoveRight = (moduleKey: string) => {
                 type="text"
                 size="small"
                 :disabled="!canMoveLeft(item.moduleKey)"
+                class="sort-btn flex items-center"
                 @click.stop="moveModuleLeft(item.moduleKey)"
-                class="sort-btn"
               >
                 <LeftOutlined />
               </Button>
@@ -94,8 +82,8 @@ const canMoveRight = (moduleKey: string) => {
                 type="text"
                 size="small"
                 :disabled="!canMoveRight(item.moduleKey)"
+                class="sort-btn flex items-center"
                 @click.stop="moveModuleRight(item.moduleKey)"
-                class="sort-btn"
               >
                 <RightOutlined />
               </Button>
@@ -106,13 +94,11 @@ const canMoveRight = (moduleKey: string) => {
     </Tabs>
 
     <div class="flex-1 overflow-y-auto p-6">
-      <div
-        class="max-w-7xl mx-auto bg-white rounded-lg shadow-sm p-6 min-h-full"
-      >
+      <div class="max-w-7xl mx-auto bg-white rounded-lg shadow-sm p-6 min-h-full">
         <template v-for="item in moduleOrder" :key="item.moduleKey">
           <component
-            v-if="currentModule === item.moduleKey"
             :is="item.formComponent"
+            v-if="currentModule === item.moduleKey"
             :data="resumeData[item.moduleKey]"
           />
           <!-- 其他模块占位

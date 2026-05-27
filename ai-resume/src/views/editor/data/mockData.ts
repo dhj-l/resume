@@ -53,8 +53,7 @@ export const mockResumeData: ResumeData = {
       position: "前端开发工程师",
       workTime: "2020-07",
       dismissalTime: "2022-08",
-      workDescription:
-        "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
+      workDescription: "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
       localSort: 0,
     },
   ],
@@ -96,8 +95,7 @@ export const mockResumeData: ResumeData = {
       endTime: "2020-08",
       companyName: "某知名互联网公司",
       position: "前端开发工程师",
-      description:
-        "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
+      description: "负责公司核心产品的前端开发工作，使用Vue3+TS重构旧项目，提升性能30%。",
       localSort: 0,
     },
   ],

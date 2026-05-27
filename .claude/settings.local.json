@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat .env)",
+      "Bash(cat .env.development)",
+      "Bash(curl -s \"http://localhost:3000/api/v1/resume-ai/records?page=1&pageSize=1\" -H \"Authorization: Bearer test\")",
+      "Bash(curl *)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm build *)",
+      "Bash(pnpm lint:check)",
+      "Bash(pnpm format *)",
+      "Bash(npx vue-tsc *)",
+      "Bash(pnpm add *)",
+      "Bash(pnpm lint:check --no-error-on-unmatched-pattern)",
+      "Bash(pnpm lint:fix)",
+      "Bash(git checkout *)",
+      "mcp__zread__search_doc",
+      "Bash(pnpm dev *)"
+    ]
+  }
+}

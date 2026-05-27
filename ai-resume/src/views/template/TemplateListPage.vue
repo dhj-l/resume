@@ -2,13 +2,9 @@
   <a-layout class="min-h-screen">
     <a-layout-content class="bg-white">
       <!-- Header Section -->
-      <div
-        class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-[80px] mt-20 py-12 text-center"
-      >
+      <div class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-[80px] mt-20 py-12 text-center">
         <h1 class="text-[32px] font-[600] text-[#1a1a1a] mb-3">专业简历模板</h1>
-        <p class="text-[#8c8c8c] text-[16px]">
-          选择适合您的模板，快速创建专业简历
-        </p>
+        <p class="text-[#8c8c8c] text-[16px]">选择适合您的模板，快速创建专业简历</p>
 
         <!-- Extension Points: Search, Filter, Sort placeholders -->
         <!-- <div class="mt-8 flex justify-center gap-4"> ... </div> -->
@@ -17,10 +13,7 @@
       <!-- Template Grid -->
       <div class="max-w-[1440px] mx-auto px-4 md:px-10 lg:px-[80px] pb-24">
         <!-- Loading State -->
-        <div
-          v-if="loading"
-          class="flex justify-center items-center min-h-[400px]"
-        >
+        <div v-if="loading" class="flex justify-center items-center min-h-[400px]">
           <a-spin size="large" tip="正在加载模板..." />
         </div>
 
@@ -49,27 +42,18 @@
         </div>
 
         <!-- Empty State -->
-        <div
-          v-else
-          class="flex items-center justify-center py-24 min-h-[400px]"
-        >
+        <div v-else class="flex items-center justify-center py-24 min-h-[400px]">
           <a-empty :image="simpleImage">
             <template #image>
               <FileOutlined class="text-6xl text-gray-300" />
             </template>
             <template #description>
               <div class="flex flex-col gap-2 mt-4">
-                <span class="text-lg font-medium text-[#1a1a1a]"
-                  >暂无可用模板</span
-                >
-                <span class="text-[#8c8c8c]"
-                  >我们正在努力准备更多精美模板，敬请期待</span
-                >
+                <span class="text-lg font-medium text-[#1a1a1a]">暂无可用模板</span>
+                <span class="text-[#8c8c8c]">我们正在努力准备更多精美模板，敬请期待</span>
               </div>
             </template>
-            <a-button type="primary" class="mt-6" @click="$router.push('/')"
-              >返回首页</a-button
-            >
+            <a-button type="primary" class="mt-6" @click="$router.push('/')">返回首页</a-button>
           </a-empty>
         </div>
       </div>
@@ -79,12 +63,15 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
+
 import { FileOutlined } from "@ant-design/icons-vue";
 import { Empty } from "ant-design-vue";
-import TemplateCard from "./components/TemplateCard.vue";
+import { useRouter } from "vue-router";
+
 import { getTemplateListAPI } from "@/api/templates/templates";
 import type { Template } from "@/api/templates/type";
+
+import TemplateCard from "./components/TemplateCard.vue";
 
 const router = useRouter();
 const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;

@@ -4,9 +4,7 @@
     @click="$emit('click', template._id)"
   >
     <!-- Template Preview Image (70%) -->
-    <div
-      class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-2"
-    >
+    <div class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-2">
       <!-- Placeholder or Image -->
       <img
         v-if="template.previewImage"
@@ -51,9 +49,7 @@
         </div>
 
         <!-- Stats row -->
-        <div
-          class="flex items-center justify-between text-[#8c8c8c] text-[13px]"
-        >
+        <div class="flex items-center justify-between text-[#8c8c8c] text-[13px]">
           <div class="flex items-center gap-1.5" title="使用人数">
             <TeamOutlined />
             <span>{{ formatNumber(template.usedCount) }}</span>
@@ -69,11 +65,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  TagOutlined,
-  TeamOutlined,
-  CalendarOutlined,
-} from "@ant-design/icons-vue";
+import { TagOutlined, TeamOutlined, CalendarOutlined } from "@ant-design/icons-vue";
+
 import type { Template } from "@/api/templates/type";
 import { formatDate } from "@/utils/day";
 import { getFullImageUrl } from "@/utils/image";

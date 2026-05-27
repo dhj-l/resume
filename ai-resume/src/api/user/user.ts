@@ -1,9 +1,6 @@
 import { http } from "@/http/request";
-import type {
-  UserProfile,
-  UpdateProfileParams,
-  ChangePasswordParams,
-} from "./type";
+
+import type { UserProfile, UpdateProfileParams, ChangePasswordParams } from "./type";
 
 // 获取用户信息
 export const getUserProfileAPI = () => {
@@ -18,4 +15,9 @@ export const updateUserProfileAPI = (data: UpdateProfileParams) => {
 // 修改密码
 export const changePasswordAPI = (data: ChangePasswordParams) => {
   return http.patch<void>("/user/change-password", data);
+};
+
+// 退出登录
+export const logoutAPI = () => {
+  return http.post<void>("/user/logout");
 };

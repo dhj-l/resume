@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
+
 import { UpOutlined, DownOutlined } from "@ant-design/icons-vue";
-import ModuleTabs from "./drawer/ModuleTabs.vue";
-import type { ResumeData } from "@/stores/type";
 import { storeToRefs } from "pinia";
+
 import { useResumeStore } from "@/stores/resumeStore";
+import type { ResumeData } from "@/stores/type";
+
+import ModuleTabs from "./drawer/ModuleTabs.vue";
 
 defineProps<{
   resumeData: ResumeData;
@@ -39,14 +42,10 @@ const handleDragStart = () => {
       <span class="font-medium text-gray-700">简历内容编辑</span>
 
       <!-- 手柄条 -->
-      <div
-        class="w-16 h-1 bg-gray-300 rounded-full absolute left-1/2 -translate-x-1/2"
-      ></div>
+      <div class="w-16 h-1 bg-gray-300 rounded-full absolute left-1/2 -translate-x-1/2"></div>
 
       <div class="text-gray-400">
-        <span class="mr-2 text-xs">{{
-          isExpanded ? "点击收起" : "点击展开"
-        }}</span>
+        <span class="mr-2 text-xs">{{ isExpanded ? "点击收起" : "点击展开" }}</span>
         <DownOutlined v-if="isExpanded" />
         <UpOutlined v-else />
       </div>

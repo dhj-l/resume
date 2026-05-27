@@ -1,18 +1,12 @@
 <script setup lang="ts">
-import {
-  Form,
-  FormItem,
-  Input,
-  Row,
-  Col,
-  Upload,
-  Select,
-} from "ant-design-vue";
-import { PlusOutlined } from "@ant-design/icons-vue";
-import type { BasicInfo } from "@/stores/type";
-import { useResumeStore } from "@/stores/resumeStore";
-import { uploadImage } from "@/utils/upload";
 import { computed } from "vue";
+
+import { PlusOutlined } from "@ant-design/icons-vue";
+import { Form, FormItem, Input, Row, Col, Upload, Select } from "ant-design-vue";
+
+import { useResumeStore } from "@/stores/resumeStore";
+import type { BasicInfo } from "@/stores/type";
+import { uploadImage } from "@/utils/upload";
 
 const props = defineProps<{
   data: BasicInfo;
@@ -61,8 +55,8 @@ const uploadHandle = async (file: File) => {
             <FormItem label="姓名">
               <Input
                 :value="data.name"
-                @update:value="(val) => update('name', val)"
                 placeholder="请输入姓名"
+                @update:value="(val) => update('name', val)"
               />
             </FormItem>
           </Col>
@@ -70,9 +64,9 @@ const uploadHandle = async (file: File) => {
             <FormItem label="性别">
               <Select
                 :value="data.gender"
-                @update:value="(val) => update('gender', val)"
                 placeholder="请选择性别"
                 :options="genderOptions"
+                @update:value="(val) => update('gender', val)"
               />
             </FormItem>
           </Col>
@@ -80,9 +74,9 @@ const uploadHandle = async (file: File) => {
             <FormItem label="工作年限">
               <Select
                 :value="data.workYear"
-                @update:value="(val) => update('workYear', val)"
                 placeholder="请选择工作年限"
                 :options="workYearOptions"
+                @update:value="(val) => update('workYear', val)"
               />
             </FormItem>
           </Col>
@@ -90,8 +84,8 @@ const uploadHandle = async (file: File) => {
             <FormItem label="年龄">
               <Input
                 :value="data.age"
-                @update:value="(val) => update('age', Number(val))"
                 placeholder="请输入年龄"
+                @update:value="(val) => update('age', Number(val))"
               />
             </FormItem>
           </Col>
@@ -99,8 +93,8 @@ const uploadHandle = async (file: File) => {
             <FormItem label="手机号">
               <Input
                 :value="data.phone"
-                @update:value="(val) => update('phone', val)"
                 placeholder="请输入手机号"
+                @update:value="(val) => update('phone', val)"
               />
             </FormItem>
           </Col>
@@ -108,8 +102,8 @@ const uploadHandle = async (file: File) => {
             <FormItem label="邮箱">
               <Input
                 :value="data.email"
-                @update:value="(val) => update('email', val)"
                 placeholder="请输入邮箱"
+                @update:value="(val) => update('email', val)"
               />
             </FormItem>
           </Col>
@@ -117,8 +111,8 @@ const uploadHandle = async (file: File) => {
             <FormItem label="政治面貌">
               <Input
                 :value="data.politicalStatus"
-                @update:value="(val) => update('politicalStatus', val)"
                 placeholder="例如：中共党员"
+                @update:value="(val) => update('politicalStatus', val)"
               />
             </FormItem>
           </Col>
@@ -134,7 +128,7 @@ const uploadHandle = async (file: File) => {
               list-type="picture-card"
               class="avatar-uploader"
               :show-upload-list="false"
-              :beforeUpload="uploadHandle"
+              :before-upload="uploadHandle"
             >
               <img
                 v-if="data.avatar"

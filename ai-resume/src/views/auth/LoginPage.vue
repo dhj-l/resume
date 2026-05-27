@@ -7,13 +7,7 @@
     </div>
 
     <!-- Login Form -->
-    <a-form
-      layout="vertical"
-      :model="formState"
-      name="login"
-      class="mt-8"
-      @finish="handleLogin"
-    >
+    <a-form layout="vertical" :model="formState" name="login" class="mt-8" @finish="handleLogin">
       <a-form-item
         name="email"
         label="邮箱地址"
@@ -53,9 +47,7 @@
 
       <div class="flex items-center justify-between mb-6">
         <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
-        <a class="text-blue-600 hover:text-blue-700 font-medium" href="#"
-          >忘记密码？</a
-        >
+        <a class="text-blue-600 hover:text-blue-700 font-medium" href="#">忘记密码？</a>
       </div>
 
       <a-button
@@ -69,6 +61,26 @@
         登录
       </a-button>
     </a-form>
+
+    <!-- Social Login -->
+    <div class="relative my-6">
+      <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t border-gray-200"></div>
+      </div>
+      <div class="relative flex justify-center text-sm">
+        <span class="px-4 bg-white text-gray-500">社交账号登录</span>
+      </div>
+    </div>
+
+    <a-button
+      block
+      size="large"
+      class="!h-12 !rounded-lg !border !border-gray-300 !text-gray-700 hover:!border-[#C71D23] hover:!text-[#C71D23] !flex !items-center !justify-center !gap-2.5 !transition-all !duration-300"
+      @click="handleGiteeLogin"
+    >
+      <GiteeIcon class="w-5 h-5" />
+      Gitee 登录
+    </a-button>
 
     <!-- Guest Access -->
     <div class="relative my-8">
@@ -88,9 +100,7 @@
     >
       以游客身份体验
     </a-button>
-    <p class="text-center text-xs text-gray-400 mt-2">
-      数据仅保存 24 小时，进入编辑器后提示注册。
-    </p>
+    <p class="text-center text-xs text-gray-400 mt-2">数据仅保存 24 小时，进入编辑器后提示注册。</p>
 
     <!-- Sign Up Link -->
     <div class="text-center mt-8">
@@ -109,10 +119,14 @@
 
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
+
 import { MailOutlined, LockOutlined } from "@ant-design/icons-vue";
+import GiteeIcon from "@/components/icons/GiteeIcon.vue";
 import { message } from "ant-design-vue";
+import { useRouter } from "vue-router";
+
+import { getGiteeAuthUrlAPI } from "@/api/auth/auth";
+import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -145,6 +159,20 @@ const handleGuestAccess = () => {
   setTimeout(() => {
     router.push("/home");
   }, 1000);
+};
+
+const handleGiteeLogin = async () => {
+  try {
+    const { data } = await getGiteeAuthUrlAPI();
+    // 存储 state 到 sessionStorage，供回调页 CSRF 校验（后端主导，前端透传）
+    sessionStorage.setItem("gitee_oauth_state", data.state);
+    console.log(data.authUrl);
+
+    // 跳转到 Gitee 授权页面
+    window.location.href = data.authUrl;
+  } catch {
+    message.error("获取 Gitee 授权链接失败，请重试。");
+  }
 };
 </script>
 

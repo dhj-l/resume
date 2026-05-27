@@ -30,10 +30,7 @@ export const extractEffectiveCssForElement = (element: Element) => {
         if (processedSelectors.has(selectorText)) continue;
 
         try {
-          if (
-            element.matches(selectorText) ||
-            element.querySelectorAll(selectorText).length > 0
-          ) {
+          if (element.matches(selectorText) || element.querySelectorAll(selectorText).length > 0) {
             matchedCss.push(rule.cssText);
             processedSelectors.add(selectorText);
           }
@@ -74,9 +71,7 @@ export const extractEffectiveCssForElement = (element: Element) => {
         }
 
         if (hasMatchingRule && mediaCss.length > 0) {
-          matchedCss.push(
-            `@media ${mediaRule.conditionText} { ${mediaCss.join(" ")} }`,
-          );
+          matchedCss.push(`@media ${mediaRule.conditionText} { ${mediaCss.join(" ")} }`);
         }
       }
     }
@@ -97,8 +92,7 @@ export const getElement = (className: string) => {
 
 export const getDomCover = async (elemet: HTMLElement, height?: number) => {
   const elementHeight = elemet.offsetHeight;
-  const captureHeight =
-    height && elementHeight > height ? height : elementHeight;
+  const captureHeight = height && elementHeight > height ? height : elementHeight;
 
   const cover = await html2canvas(elemet, {
     scale: 2,
