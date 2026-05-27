@@ -141,6 +141,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
           <Button
             type="primary"
             size="small"
+            class="flex items-center"
             :icon="h(ArrowUpOutlined)"
             :disabled="index === 0"
             @click="handleMove(index, 'up')"
@@ -150,6 +151,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
           <Button
             type="primary"
             size="small"
+            class="flex items-center"
             :icon="h(ArrowDownOutlined)"
             :disabled="index === data.length - 1"
             @click="handleMove(index, 'down')"
@@ -160,6 +162,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
             type="primary"
             danger
             size="small"
+            class="flex items-center"
             :icon="h(DeleteOutlined)"
             @click="handleDelete(index)"
           >
@@ -169,7 +172,7 @@ const handleTillNowChange = (index: number, checked: boolean) => {
       </div>
     </div>
 
-    <Button type="dashed" block class="mt-4" @click="handleAdd">
+    <Button type="dashed" block class="mt-4 flex items-center" @click="handleAdd">
       <template #icon><PlusOutlined /></template>
       添加实习经历
     </Button>

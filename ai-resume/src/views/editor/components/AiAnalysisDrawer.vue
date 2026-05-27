@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 
 import { CloseOutlined } from "@ant-design/icons-vue";
 import { useElementSize } from "@vueuse/core";
@@ -8,12 +8,12 @@ import { Sparkles } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
-import { analyzeResumeAPI } from "@/api/resume-ai/resume-ai";
+import { analyzeResumeAPI, getLatestAnalysisAPI } from "@/api/resume-ai/resume-ai";
 import type { AnalysisResultData } from "@/api/resume-ai/type";
 import ResumeAnalysisReport from "@/components/resume-analysis/ResumeAnalysisReport.vue";
 import { useResumeStore } from "@/stores/resumeStore";
 
-defineProps<{
+const props = defineProps<{
   visible: boolean;
 }>();
 
@@ -33,6 +33,32 @@ const loading = ref(false);
 const analysisResult = ref<AnalysisResultData | null>(null);
 const recordId = ref("");
 const showInput = ref(true);
+const fetchLoading = ref(false);
+
+watch(
+  () => props.visible,
+  async (newVal) => {
+    if (!newVal) {
+      analysisResult.value = null;
+      showInput.value = true;
+      return;
+    }
+
+    fetchLoading.value = true;
+    try {
+      const { data } = await getLatestAnalysisAPI(resumeData.value._id);
+
+      if (data?.analysisResult) {
+        analysisResult.value = data.analysisResult;
+        recordId.value = data._id;
+        jobDescription.value = data.jobDescription || "";
+        showInput.value = false;
+      }
+    } finally {
+      fetchLoading.value = false;
+    }
+  },
+);
 
 const btnDisabled = computed(() => {
   return jobDescription.value.length >= 10;
@@ -80,14 +106,18 @@ const handleViewDetail = () => {
         <Sparkles class="w-4 h-4 text-purple-500" />
         <span class="font-medium text-gray-700">AI 分析</span>
       </div>
-      <Button type="text" size="small" @click="emit('close')">
+      <Button type="text" size="small" class="flex items-center" @click="emit('close')">
         <template #icon><CloseOutlined /></template>
       </Button>
     </div>
 
     <!-- Content -->
     <div class="flex-1 overflow-y-auto p-4 space-y-4">
-      <template v-if="showInput">
+      <div v-if="fetchLoading" class="flex items-center justify-center py-12">
+        <a-spin tip="正在加载最新分析数据..." />
+      </div>
+
+      <template v-else-if="showInput">
         <!-- Job Description Input -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">目标职位描述</label>

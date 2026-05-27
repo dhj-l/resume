@@ -32,7 +32,12 @@
           <CalendarOutlined />
           <span>{{ formattedTime }}</span>
         </div>
-        <a-button type="primary" size="small" @click="$emit('view', record._id)">
+        <a-button
+          type="primary"
+          size="small"
+          class="flex items-center"
+          @click="$emit('view', record._id)"
+        >
           <template #icon><EyeOutlined /></template>
           查看
         </a-button>

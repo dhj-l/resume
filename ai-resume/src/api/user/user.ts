@@ -16,3 +16,8 @@ export const updateUserProfileAPI = (data: UpdateProfileParams) => {
 export const changePasswordAPI = (data: ChangePasswordParams) => {
   return http.patch<void>("/user/change-password", data);
 };
+
+// 退出登录
+export const logoutAPI = () => {
+  return http.post<void>("/user/logout");
+};

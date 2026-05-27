@@ -78,7 +78,8 @@ const handleToggleAiDrawer = () => {
 };
 
 const handleSave = async () => {
-  await autoSave(true);
+  const result = await autoSave(true);
+  if (result === false) return;
   message.success("草稿保存成功");
 };
 
@@ -90,7 +91,7 @@ const autoSave = async (isUpdateCover: boolean = false) => {
   //如果是更新封面，或者没有封面，才需要更新封面
   if (isUpdateCover || !resumeData.value.cover) {
     const element = getElement(".resume-preview-wrapper");
-    if (!element) return;
+    if (!element) return false;
 
     const elementHeight = (element as HTMLElement).offsetHeight;
     const COVER_HEIGHT_THRESHOLD = 1200;
@@ -130,31 +131,19 @@ const handleExport = async () => {
       * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
-      }
-
-      html, body {
-        width: 210mm;
-        height: 297mm;
-        margin: 0;
-        padding: 0;
-      }
-
-      .resume-page {
-        width: 210mm !important;
-        min-height: 297mm !important;
-        height: auto !important;
-        margin-bottom: 0 !important;
         box-shadow: none !important;
-        page-break-after: always;
-        page-break-inside: avoid;
       }
 
-      .resume-page:last-child {
-        page-break-after: auto;
+      [data-page-marker] {
+        display: none !important;
       }
 
       .resume-section {
-        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      .resume-section h3 {
+        break-after: avoid;
       }
     `;
     const res: any = await downloadResumeAPI({
@@ -357,7 +346,7 @@ onUnmounted(() => {
             }}</MenuItem>
           </Menu>
         </template>
-        <Button>
+        <Button class="flex items-center">
           当前模板: {{ currentTemplateLabel }}
           <DownOutlined />
         </Button>

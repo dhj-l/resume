@@ -51,7 +51,7 @@ const handleOk = async () => {
     }
 
     // 获取当前简历封面数据
-    const coverFile = await getDomCover(element as HTMLElement);
+    const coverFile = await getDomCover(element as HTMLElement, 1110);
     // 上传图片
     const previewImage = await uploadImage(coverFile);
 

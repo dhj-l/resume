@@ -33,3 +33,7 @@ export const getAnalysisDetailAPI = (id: string) => {
     params: { id },
   });
 };
+
+export const getLatestAnalysisAPI = (resumeId: string) => {
+  return http.get<AnalysisDetailResult>("/resume-ai/latest-analysis", { params: { resumeId } });
+};
