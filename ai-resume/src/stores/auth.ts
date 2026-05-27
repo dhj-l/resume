@@ -1,23 +1,104 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
-export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(localStorage.getItem('token'))
-  const userInfo = ref<any | null>(null) // Replace 'any' with proper type later
+import { defineStore } from "pinia";
 
-  const isLoggedIn = computed(() => !!token.value)
+import { loginAPI, registerAPI } from "@/api/auth/auth";
+import type { LoginParams, RegisterParams } from "@/api/auth/type";
+import type { UserProfile, UpdateProfileParams } from "@/api/user/type";
+import { getUserProfileAPI, updateUserProfileAPI } from "@/api/user/user";
 
-  function login(newToken: string, user: any) {
-    token.value = newToken
-    userInfo.value = user
-    localStorage.setItem('token', newToken)
-  }
+export const useAuthStore = defineStore(
+  "auth",
+  () => {
+    const token = ref<string | null>(null);
+    const userInfo = ref<UserProfile | null>(null);
 
-  function logout() {
-    token.value = null
-    userInfo.value = null
-    localStorage.removeItem('token')
-  }
+    const isLoggedIn = computed(() => !!token.value);
 
-  return { token, userInfo, isLoggedIn, login, logout }
-})
+    async function login(params: LoginParams) {
+      try {
+        const { data } = await loginAPI(params);
+        token.value = data.token;
+        // The login API returns a User object, which is compatible with UserProfile base fields
+        // We cast it or fetch the full profile immediately
+        userInfo.value = data.user as unknown as UserProfile;
+
+        // Fetch full profile to get extra fields like name/avatar if login response is minimal
+        await fetchProfile();
+
+        return true;
+      } catch (error) {
+        console.error("Login failed:", error);
+        throw error;
+      }
+    }
+
+    async function fetchProfile() {
+      try {
+        const { data } = await getUserProfileAPI();
+        userInfo.value = data;
+        return data;
+      } catch (error) {
+        console.error("Fetch profile failed:", error);
+        throw error;
+      }
+    }
+
+    async function updateProfile(params: UpdateProfileParams) {
+      try {
+        const { data } = await updateUserProfileAPI(params);
+        userInfo.value = data;
+        return data;
+      } catch (error) {
+        console.error("Update profile failed:", error);
+        throw error;
+      }
+    }
+
+    /**
+     * Gitee OAuth 登录 —— 直接用回调返回的 token + user 建立会话
+     */
+    async function giteeLogin(
+      giteeToken: string,
+      giteeUser: { _id: string; username: string; email: string },
+    ) {
+      token.value = giteeToken;
+      userInfo.value = giteeUser as UserProfile;
+
+      // 拉取完整用户信息（含 name / avatar 等扩展字段）
+      await fetchProfile();
+    }
+
+    async function register(params: RegisterParams) {
+      try {
+        await registerAPI(params);
+        // Optionally auto-login or just return success
+        return true;
+      } catch (error) {
+        console.error("Registration failed:", error);
+        throw error;
+      }
+    }
+
+    function logout() {
+      token.value = null;
+      userInfo.value = null;
+      // Persistence plugin handles localStorage cleanup automatically when state changes
+    }
+
+    return {
+      token,
+      userInfo,
+      isLoggedIn,
+      login,
+      giteeLogin,
+      register,
+      logout,
+      fetchProfile,
+      updateProfile,
+    };
+  },
+  {
+    persist: true,
+  },
+);

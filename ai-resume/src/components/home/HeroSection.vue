@@ -1,7 +1,5 @@
 <template>
-  <section
-    class="relative overflow-hidden bg-[#f5f5f7] pt-20 pb-32 lg:pt-32 lg:pb-40"
-  >
+  <section class="relative overflow-hidden bg-[#f5f5f7] pt-20 pb-32 lg:pt-32 lg:pb-40">
     <!-- Background Decor -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div
@@ -16,17 +14,13 @@
       <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
         <!-- Left: Content -->
         <div class="flex-1 text-center lg:text-left space-y-8 max-w-2xl">
-          <h1
-            class="text-4xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-[1.15]"
-          >
+          <h1 class="text-4xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-[1.15]">
             专注于大学生的<br />
             <span class="text-primary-600">专业简历平台</span>
           </h1>
 
           <p class="text-lg text-slate-600 leading-relaxed">
-            制作简历和导出完全免费，AI功能让创建更智能。<br
-              class="hidden lg:block"
-            />
+            制作简历和导出完全免费，AI功能让创建更智能。<br class="hidden lg:block" />
             助你轻松获得心仪Offer。
           </p>
 
@@ -47,12 +41,10 @@
           </div>
 
           <!-- CTA Buttons -->
-          <div
-            class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4"
-          >
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
             <button
-              @click="router.push('/dashboard/templates')"
               class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/30 hover:shadow-primary-500/40 hover:-translate-y-1 cursor-pointer"
+              @click="router.push('/dashboard/templates')"
             >
               免费开始制作
             </button>
@@ -88,9 +80,7 @@
             <!-- Editor Content -->
             <div class="grid grid-cols-12 h-[400px] bg-slate-50">
               <!-- Sidebar -->
-              <div
-                class="col-span-3 bg-white border-r border-slate-100 p-4 space-y-4"
-              >
+              <div class="col-span-3 bg-white border-r border-slate-100 p-4 space-y-4">
                 <div class="h-8 w-16 bg-slate-100 rounded mb-6"></div>
                 <div class="space-y-3">
                   <div class="h-2 w-full bg-slate-100 rounded"></div>
@@ -99,9 +89,7 @@
                 </div>
               </div>
               <!-- Preview -->
-              <div
-                class="col-span-9 p-6 flex justify-center bg-slate-50/50 overflow-hidden"
-              >
+              <div class="col-span-9 p-6 flex justify-center bg-slate-50/50 overflow-hidden">
                 <div
                   class="w-full h-full bg-white shadow-sm border border-slate-200 rounded px-8 py-8 space-y-6"
                 >
@@ -154,16 +142,12 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
 import { Check, Sparkles } from "lucide-vue-next";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const sellingPoints = [
-  "100%免费制作与导出",
-  "AI智能优化与匹配",
-  "海量专业模板",
-];
+const sellingPoints = ["100%免费制作与导出", "AI智能优化与匹配", "海量专业模板"];
 </script>
 
 <style scoped>

@@ -27,7 +27,7 @@
             <path d="M16 17H8" />
           </svg>
         </div>
-        <span class="text-xl font-bold text-gray-900 tracking-tight">大学牲简历</span>
+        <span class="text-xl font-bold text-gray-900 tracking-tight">大学生简历</span>
       </router-link>
 
       <!-- Center: Navigation -->
@@ -36,8 +36,8 @@
           v-for="item in navItems"
           :key="item.name"
           href="#"
-          @click.prevent="handleNavClick(item)"
           class="text-sm font-medium text-gray-600 hover:text-primary-600 relative py-2 group transition-colors"
+          @click.prevent="handleNavClick(item)"
         >
           {{ item.name }}
           <span
@@ -54,20 +54,17 @@
             <div
               class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 px-2 py-1 rounded-lg transition-colors"
             >
-              <a-avatar
-                :src="authStore.userInfo?.avatar"
-                class="bg-primary-100 text-primary-600"
-              >
-                {{ authStore.userInfo?.name?.[0] || "U" }}
+              <a-avatar class="bg-primary-100 text-primary-600">
+                {{ authStore.userInfo?.username?.[0]?.toUpperCase() || "U" }}
               </a-avatar>
               <span class="text-sm font-medium text-gray-700">{{
-                authStore.userInfo?.name || "用户"
+                authStore.userInfo?.username || "用户"
               }}</span>
             </div>
             <template #overlay>
               <a-menu>
-                <a-menu-item key="profile">
-                  <UserOutlined /> 个人中心
+                <a-menu-item key="change-password" @click="handleChangePasswordClick">
+                  <LockOutlined /> 修改密码
                 </a-menu-item>
                 <a-menu-divider />
                 <a-menu-item key="logout" @click="handleLogout">
@@ -87,32 +84,42 @@
         </template>
 
         <button
-          @click="handleStartCreating"
           class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0"
+          @click="handleStartCreating"
         >
           开始制作
         </button>
       </div>
     </div>
   </nav>
+
+  <ChangePasswordModal
+    v-model:open="changePasswordModalVisible"
+    @success="handleChangePasswordSuccess"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
+
+import { LockOutlined, LogoutOutlined } from "@ant-design/icons-vue";
 import { useRouter } from "vue-router";
+
+import { logoutAPI } from "@/api/user/user";
+import ChangePasswordModal from "@/components/common/ChangePasswordModal.vue";
 import { useAuthStore } from "@/stores/auth";
-import { UserOutlined, LogoutOutlined } from "@ant-design/icons-vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
 const isScrolled = ref(false);
 
+const changePasswordModalVisible = ref(false);
+
 const navItems = [
   { name: "首页", path: "/" },
   { name: "模板", path: "/templates" },
-  { name: "定价", path: "/pricing" },
-  { name: "我的模板", path: "/dashboard/templates", requiresAuth: true },
-  { name: "个人中心", path: "/dashboard/profile", requiresAuth: true },
+  { name: "我的简历", path: "/user/resumes", requiresAuth: true },
+  { name: "生成记录", path: "/user/generations", requiresAuth: true },
 ];
 
 const handleScroll = () => {
@@ -128,12 +135,22 @@ const handleNavClick = (item: any) => {
 };
 
 const handleStartCreating = () => {
-  router.push("/dashboard/templates");
+  router.push("/templates");
 };
 
-const handleLogout = () => {
+const handleLogout = async () => {
+  await logoutAPI();
   authStore.logout();
   router.push("/");
+};
+
+const handleChangePasswordClick = () => {
+  changePasswordModalVisible.value = true;
+};
+
+const handleChangePasswordSuccess = () => {
+  authStore.logout();
+  router.push("/auth/login");
 };
 
 onMounted(() => {

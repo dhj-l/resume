@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-white font-sans text-slate-900">
+  <div class="min-h-screen bg-white font-sans text-slate-900 flex flex-col">
     <NavBar />
 
-    <main>
+    <main class="flex-grow">
       <router-view />
     </main>
 
@@ -11,8 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import NavBar from "@/components/layout/NavBar.vue";
 import Footer from "@/components/layout/Footer.vue";
+import NavBar from "@/components/layout/NavBar.vue";
 </script>
 
 <style scoped>

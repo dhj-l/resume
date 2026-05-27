@@ -33,9 +33,7 @@
               />
             </svg>
           </div>
-          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">
-            大学牲简历
-          </h1>
+          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">大学牲简历</h1>
         </div>
         <h2 class="text-4xl font-bold text-gray-900 mb-6 leading-tight">
           打造你的未来，<br />
@@ -48,9 +46,7 @@
         <div
           class="flex items-start gap-4 p-4 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/20 shadow-sm transition-transform hover:-translate-y-1 duration-300"
         >
-          <div
-            class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0"
-          >
+          <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
             <CheckCircleOutlined class="text-xl text-blue-600" />
           </div>
           <div>
@@ -62,16 +58,12 @@
         <div
           class="flex items-start gap-4 p-4 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/20 shadow-sm transition-transform hover:-translate-y-1 duration-300 delay-100"
         >
-          <div
-            class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center shrink-0"
-          >
+          <div class="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center shrink-0">
             <DownloadOutlined class="text-xl text-green-600" />
           </div>
           <div>
             <h3 class="text-lg font-semibold text-gray-900 mb-1">免费导出</h3>
-            <p class="text-gray-600">
-              以 PDF 格式下载你的简历，无任何隐藏水印或费用。
-            </p>
+            <p class="text-gray-600">以 PDF 格式下载你的简历，无任何隐藏水印或费用。</p>
           </div>
         </div>
 
@@ -99,9 +91,7 @@
     </div>
 
     <!-- Right Section: Auth Form -->
-    <div
-      class="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white"
-    >
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
       <div class="w-full max-w-[440px]">
         <router-view v-slot="{ Component }">
           <!-- <transition name="fade" mode="out-in"> -->
@@ -114,11 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  CheckCircleOutlined,
-  DownloadOutlined,
-  ThunderboltOutlined,
-} from "@ant-design/icons-vue";
+import { CheckCircleOutlined, DownloadOutlined, ThunderboltOutlined } from "@ant-design/icons-vue";
 </script>
 
 <style scoped>

@@ -1,8 +1,5 @@
-import {
-  createRouter,
-  createWebHistory,
-  type RouteRecordRaw,
-} from "vue-router";
+import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
+
 import { useAuthStore } from "@/stores/auth";
 
 const routes: RouteRecordRaw[] = [
@@ -18,6 +15,30 @@ const routes: RouteRecordRaw[] = [
         path: "/home",
         component: () => import("@/views/home/home.vue"),
       },
+      {
+        name: "templates",
+        path: "/templates",
+        component: () => import("@/views/template/TemplateListPage.vue"),
+        meta: { title: "模板列表" },
+      },
+      {
+        name: "template-details",
+        path: "/templates/:id",
+        component: () => import("@/views/template/TemplateDetailsPage.vue"),
+        meta: { title: "模板详情" },
+      },
+      {
+        name: "MyResumes",
+        path: "/user/resumes",
+        component: () => import("@/views/user/MyResumes.vue"),
+        meta: { title: "我的简历", requiresAuth: true },
+      },
+      {
+        name: "GenerationRecords",
+        path: "/user/generations",
+        component: () => import("@/views/user/GenerationRecords.vue"),
+        meta: { title: "生成记录", requiresAuth: true },
+      },
     ],
   },
   {
@@ -25,6 +46,18 @@ const routes: RouteRecordRaw[] = [
     name: "Editor",
     component: () => import("@/views/editor/EditorPage.vue"),
     meta: { title: "简历编辑" },
+  },
+  {
+    path: "/auth/gitee/callback",
+    name: "GiteeCallback",
+    component: () => import("@/views/auth/GiteeCallbackPage.vue"),
+    meta: { title: "Gitee 登录回调" },
+  },
+  {
+    path: "/analysis-detail",
+    name: "AnalysisDetail",
+    component: () => import("@/views/editor/AnalysisDetailPage.vue"),
+    meta: { title: "AI 分析详情", requiresAuth: true },
   },
   {
     path: "/auth",
@@ -49,6 +82,7 @@ const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(),
   routes,
+  scrollBehavior: () => ({ top: 0 }),
 });
 
 router.beforeEach((to, _from, next) => {

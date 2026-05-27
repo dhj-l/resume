@@ -2,12 +2,8 @@
   <section class="py-24 bg-white">
     <div class="container mx-auto px-4">
       <div class="text-center mb-16 space-y-4">
-        <h2 class="text-3xl lg:text-4xl font-bold text-slate-900">
-          全方位功能支持
-        </h2>
-        <p class="text-slate-500 text-lg">
-          从创建到投递，我们为你提供完整的求职工具箱
-        </p>
+        <h2 class="text-3xl lg:text-4xl font-bold text-slate-900">全方位功能支持</h2>
+        <p class="text-slate-500 text-lg">从创建到投递，我们为你提供完整的求职工具箱</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -55,41 +51,30 @@
 </template>
 
 <script setup lang="ts">
-import {
-  LayoutTemplate,
-  FileDown,
-  Sparkles,
-  ScanSearch,
-  FileText,
-  Eye,
-} from "lucide-vue-next";
+import { LayoutTemplate, FileDown, Sparkles, ScanSearch, FileText, Eye } from "lucide-vue-next";
 
 const features = [
   {
     title: "免费模板库",
-    description:
-      "海量专业简历模板任你选择，涵盖各个行业，一键套用，永久免费。",
+    description: "海量专业简历模板任你选择，涵盖各个行业，一键套用，永久免费。",
     icon: LayoutTemplate,
     type: "free",
   },
   {
     title: "PDF 导出",
-    description:
-      "支持高清 PDF 格式导出，完美保留排版样式，ATS 友好，打印无忧。",
+    description: "支持高清 PDF 格式导出，完美保留排版样式，ATS 友好，打印无忧。",
     icon: FileDown,
     type: "free",
   },
   {
     title: "AI 简历生成",
-    description:
-      "只需输入基本信息，AI 助手自动为你生成专业、有吸引力的简历内容。",
+    description: "只需输入基本信息，AI 助手自动为你生成专业、有吸引力的简历内容。",
     icon: Sparkles,
     type: "ai",
   },
   {
     title: "JD 智能匹配",
-    description:
-      "粘贴职位描述，AI 自动分析匹配度，并提供针对性的简历优化建议。",
+    description: "粘贴职位描述，AI 自动分析匹配度，并提供针对性的简历优化建议。",
     icon: ScanSearch,
     type: "ai",
   },
