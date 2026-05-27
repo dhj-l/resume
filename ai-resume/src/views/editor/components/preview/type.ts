@@ -1,1 +1,8 @@
-export type templateType = "default" | "double-column" | "simple" | "modern" | "elegant" | "minimal" | "luxury";
+export type templateType =
+  | "default"
+  | "double-column"
+  | "simple"
+  | "modern"
+  | "elegant"
+  | "minimal"
+  | "luxury";

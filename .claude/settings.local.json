@@ -15,7 +15,9 @@
       "Bash(pnpm lint:fix)",
       "Bash(git checkout *)",
       "mcp__zread__search_doc",
-      "Bash(pnpm dev *)"
+      "Bash(pnpm dev *)",
+      "Bash(git pull *)",
+      "Bash(pnpm install *)"
     ]
   }
 }

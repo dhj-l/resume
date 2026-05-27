@@ -82,7 +82,8 @@ export const getInternshipExperienceStyles = (type: templateType): InternshipExp
     case "luxury":
       return {
         ...commonStyles,
-        title: "text-sm font-semibold text-[#c9a050] tracking-[0.2em] uppercase border-b-2 border-[#c9a050]/40 pb-2 mb-5",
+        title:
+          "text-sm font-semibold text-[#c9a050] tracking-[0.2em] uppercase border-b-2 border-[#c9a050]/40 pb-2 mb-5",
         container: `${commonStyles.container}`,
         itemWrapper: "pb-5 mb-1 last:pb-0 last:mb-0",
         headerWrapper: "flex items-baseline justify-between gap-4 mb-1",

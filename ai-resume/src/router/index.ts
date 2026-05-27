@@ -54,6 +54,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: "Gitee 登录回调" },
   },
   {
+    path: "/auth/github/callback",
+    name: "GitHubCallback",
+    component: () => import("@/views/auth/GitHubCallbackPage.vue"),
+    meta: { title: "GitHub 登录回调" },
+  },
+  {
     path: "/analysis-detail",
     name: "AnalysisDetail",
     component: () => import("@/views/editor/AnalysisDetailPage.vue"),

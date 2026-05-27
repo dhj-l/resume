@@ -44,7 +44,8 @@ export const getSelfEvaluationStyles = (type: templateType): SelfEvaluationStyle
         ...commonStyles,
         title: "text-xs tracking-[0.15em] uppercase font-semibold text-[#8a8780] mb-4",
         container: `${commonStyles.container}`,
-        content: "text-[#4a4a6a] whitespace-pre-wrap leading-relaxed italic border-l-[3px] border-[#c9a96e]/40 pl-5 py-2",
+        content:
+          "text-[#4a4a6a] whitespace-pre-wrap leading-relaxed italic border-l-[3px] border-[#c9a96e]/40 pl-5 py-2",
       };
     case "minimal":
       return {
@@ -58,7 +59,8 @@ export const getSelfEvaluationStyles = (type: templateType): SelfEvaluationStyle
         ...commonStyles,
         title: "text-xs tracking-[0.2em] uppercase font-semibold text-[#c9a050] mb-3",
         container: `${commonStyles.container}`,
-        content: "text-white/60 whitespace-pre-wrap leading-relaxed text-sm italic border-l-2 border-[#c9a050]/30 pl-3",
+        content:
+          "text-white/60 whitespace-pre-wrap leading-relaxed text-sm italic border-l-2 border-[#c9a050]/30 pl-3",
       };
     case "default":
     default:

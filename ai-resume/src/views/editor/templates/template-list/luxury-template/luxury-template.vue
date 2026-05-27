@@ -56,7 +56,9 @@
         </template>
 
         <!-- Decorative gold bottom bar -->
-        <div class="mt-auto h-[3px] bg-gradient-to-l from-[#c9a050] to-transparent w-2/3 self-end"></div>
+        <div
+          class="mt-auto h-[3px] bg-gradient-to-l from-[#c9a050] to-transparent w-2/3 self-end"
+        ></div>
       </div>
 
       <!-- ═══════════════════════════════════════════ -->

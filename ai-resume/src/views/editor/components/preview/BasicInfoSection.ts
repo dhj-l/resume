@@ -56,7 +56,8 @@ export const getBasicInfoStyles = (type: templateType): BasicInfoStyles => {
         ...commonStyles,
         container: `${commonStyles.container}`,
         contentWrapper: "flex items-start gap-6",
-        avatar: "w-20 h-20 rounded-full object-cover bg-white/10 shrink-0 ring-[3px] ring-[#c9a96e]/60",
+        avatar:
+          "w-20 h-20 rounded-full object-cover bg-white/10 shrink-0 ring-[3px] ring-[#c9a96e]/60",
         infoWrapper: "flex-1 min-w-0",
         name: "text-2xl font-semibold text-white mb-2 break-words tracking-wide",
         detailsWrapper: "flex flex-wrap gap-x-5 gap-y-1.5 text-white/70",
@@ -78,7 +79,8 @@ export const getBasicInfoStyles = (type: templateType): BasicInfoStyles => {
         ...commonStyles,
         container: `${commonStyles.container}`,
         contentWrapper: "flex flex-col items-center gap-4 text-center",
-        avatar: "w-24 h-24 rounded-full object-cover bg-white/10 shrink-0 ring-[3px] ring-[#c9a050]",
+        avatar:
+          "w-24 h-24 rounded-full object-cover bg-white/10 shrink-0 ring-[3px] ring-[#c9a050]",
         infoWrapper: "w-full min-w-0 flex flex-col items-center",
         name: "text-xl font-semibold text-white mb-3 break-words tracking-wide",
         detailsWrapper: "flex flex-col gap-2 text-white/70 w-full",

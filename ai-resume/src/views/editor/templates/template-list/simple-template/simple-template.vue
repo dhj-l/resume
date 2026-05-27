@@ -14,9 +14,7 @@
       <div class="mb-8">
         <div class="flex items-center justify-between pb-4 border-b-[3px] border-[#6D28D9]">
           <div class="flex items-end gap-4">
-            <h1 class="text-4xl font-bold text-[#6D28D9] leading-none tracking-tight">
-              个人简历
-            </h1>
+            <h1 class="text-4xl font-bold text-[#6D28D9] leading-none tracking-tight">个人简历</h1>
             <div class="flex flex-col text-gray-400">
               <span class="text-xs">细心从每一个细节开始</span>
               <span class="text-lg font-medium leading-none">Personal resume</span>

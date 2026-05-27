@@ -4,7 +4,7 @@
       <!-- 加载中 -->
       <template v-if="status === 'loading'">
         <a-spin size="large" />
-        <p class="text-gray-500 text-lg">正在通过 Gitee 登录，请稍候…</p>
+        <p class="text-gray-500 text-lg">正在通过 GitHub 登录，请稍候…</p>
       </template>
 
       <!-- 成功（短暂闪现后自动跳转） -->
@@ -40,7 +40,7 @@ const status = ref<PageStatus>("loading");
 const errorMsg = ref("");
 
 onMounted(async () => {
-  // 后端 302 重定向到 /auth/gitee/callback#token=eyJ...
+  // 后端 302 重定向到 /auth/github/callback#token=eyJ...
   const hash = window.location.hash.substring(1); // 去掉开头的 #
   const params = new URLSearchParams(hash);
   const token = params.get("token");
@@ -59,9 +59,9 @@ onMounted(async () => {
     // 拉取用户完整信息（name / avatar 等扩展字段）
     await authStore.fetchProfile();
 
-    sessionStorage.removeItem("gitee_oauth_state");
+    sessionStorage.removeItem("github_oauth_state");
     status.value = "success";
-    message.success("Gitee 登录成功！");
+    message.success("GitHub 登录成功！");
     setTimeout(() => router.replace({ path: "/home" }), 800);
   } catch (err: unknown) {
     // 拉取用户信息失败，清除已写入的 token

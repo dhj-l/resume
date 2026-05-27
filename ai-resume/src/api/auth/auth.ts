@@ -2,8 +2,7 @@ import { http } from "@/http/request";
 
 import type {
   GiteeAuthUrlResponse,
-  GiteeCallbackParams,
-  GiteeCallbackResponse,
+  GitHubAuthUrlResponse,
   LoginParams,
   LoginResponse,
   RegisterParams,
@@ -32,9 +31,9 @@ export const getGiteeAuthUrlAPI = () => {
 };
 
 /**
- * Gitee OAuth 回调 —— 用 code + state 换取 JWT Token
- * GET /auth/gitee/callback
+ * 获取 GitHub OAuth 授权 URL
+ * GET /auth/github
  */
-export const giteeCallbackAPI = (params: GiteeCallbackParams) => {
-  return http.get<GiteeCallbackResponse>("/auth/gitee/callback", { params });
+export const getGitHubAuthUrlAPI = () => {
+  return http.get<GitHubAuthUrlResponse>("/auth/github");
 };

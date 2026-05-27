@@ -20,8 +20,8 @@
           />
           <!-- JobIntention via section component -->
           <component
-            v-if="jobIntentionModule"
             :is="getComponent(jobIntentionModule)"
+            v-if="jobIntentionModule"
             :data="resumeData.jobIntention"
             :label="jobIntentionModule.label"
             :template-type="currentTemplateType"
