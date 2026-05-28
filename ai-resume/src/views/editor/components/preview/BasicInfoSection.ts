@@ -70,9 +70,9 @@ export const getBasicInfoStyles = (type: templateType): BasicInfoStyles => {
         contentWrapper: "flex items-center gap-8",
         avatar: "w-16 h-16 rounded-full object-cover bg-gray-100 shrink-0",
         infoWrapper: "flex-1 min-w-0",
-        name: "text-3xl font-light text-[#111] mb-1 break-words tracking-tight",
+        name: "font-light text-[#111] mb-1 break-words tracking-tight",
         detailsWrapper: "flex flex-wrap gap-x-4 gap-y-0.5 text-[#666]",
-        detailItem: "inline-flex items-center gap-1 text-xs",
+        detailItem: "inline-flex items-center gap-1",
       };
     case "luxury":
       return {
@@ -82,9 +82,9 @@ export const getBasicInfoStyles = (type: templateType): BasicInfoStyles => {
         avatar:
           "w-24 h-24 rounded-full object-cover bg-white/10 shrink-0 ring-[3px] ring-[#c9a050]",
         infoWrapper: "w-full min-w-0 flex flex-col items-center",
-        name: "text-xl font-semibold text-white mb-3 break-words tracking-wide",
+        name: "font-semibold text-white mb-3 break-words tracking-wide",
         detailsWrapper: "flex flex-col gap-2 text-white/70 w-full",
-        detailItem: "flex items-center justify-center gap-1.5 text-sm",
+        detailItem: "flex items-center justify-center gap-1.5",
       };
     case "default":
     default:

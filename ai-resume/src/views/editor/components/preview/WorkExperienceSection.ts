@@ -70,27 +70,27 @@ export const getWorkExperienceStyles = (type: templateType): WorkExperienceStyle
     case "minimal":
       return {
         ...commonStyles,
-        title: "text-base font-light text-[#111] tracking-[0.2em] uppercase mb-6",
+        title: "font-light text-[#111] tracking-[0.2em] uppercase mb-6",
         container: `${commonStyles.container}`,
         itemWrapper: "pb-5 border-b border-[#e5e5e5] last:border-b-0 last:pb-0",
         headerWrapper: "flex items-baseline justify-between gap-4 mb-1",
-        companyName: "font-semibold text-[#111] text-base",
-        position: "font-medium text-[#555] text-sm",
-        timeRange: "text-[#999] text-xs tracking-wide shrink-0",
-        description: "text-[#555] leading-relaxed mt-2 text-sm",
+        companyName: "font-semibold text-[#111]",
+        position: "font-medium text-[#555]",
+        timeRange: "text-[#999] tracking-wide shrink-0",
+        description: "text-[#555] leading-relaxed mt-2",
       };
     case "luxury":
       return {
         ...commonStyles,
         title:
-          "text-sm font-semibold text-[#c9a050] tracking-[0.2em] uppercase border-b-2 border-[#c9a050]/40 pb-2 mb-5",
+          "font-semibold text-[#c9a050] tracking-[0.2em] uppercase border-b-2 border-[#c9a050]/40 pb-2 mb-5",
         container: `${commonStyles.container}`,
         itemWrapper: "pb-5 mb-1 last:pb-0 last:mb-0",
         headerWrapper: "flex items-baseline justify-between gap-4 mb-1",
         companyName: "font-semibold text-[#1a1a1a]",
-        position: "font-medium text-[#555] text-sm",
-        timeRange: "text-[#999] text-xs tracking-wide shrink-0",
-        description: "text-[#555] leading-relaxed mt-2 text-sm",
+        position: "font-medium text-[#555]",
+        timeRange: "text-[#999] tracking-wide shrink-0",
+        description: "text-[#555] leading-relaxed mt-2",
       };
     case "default":
     default:

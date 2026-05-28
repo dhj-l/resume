@@ -55,18 +55,18 @@ export const getSkillsStyles = (type: templateType): SkillsStyles => {
     case "minimal":
       return {
         ...commonStyles,
-        title: "text-base font-light text-[#111] tracking-[0.2em] uppercase mb-4",
+        title: "font-light text-[#111] tracking-[0.2em] uppercase mb-4",
         container: `${commonStyles.container}`,
         listWrapper: "flex flex-wrap gap-2",
-        item: "px-3 py-1 bg-gray-50 text-[#555] rounded text-xs border border-[#e5e5e5]",
+        item: "px-3 py-1 bg-gray-50 text-[#555] rounded border border-[#e5e5e5]",
       };
     case "luxury":
       return {
         ...commonStyles,
-        title: "text-xs tracking-[0.2em] uppercase font-semibold text-[#c9a050] mb-3",
+        title: "tracking-[0.2em] uppercase font-semibold text-[#c9a050] mb-3",
         container: `${commonStyles.container}`,
         listWrapper: "flex flex-wrap gap-1.5 text-white/80",
-        item: "px-2.5 py-1 bg-white/10 text-white/90 rounded text-xs border border-white/10",
+        item: "px-2.5 py-1 bg-white/10 text-white/90 rounded border border-white/10",
       };
     case "default":
     default:

@@ -13,18 +13,16 @@
       <!-- HEADER — centered, oversized, stark        -->
       <!-- ═══════════════════════════════════════════ -->
       <div class="text-center mb-6">
-        <h1 class="text-4xl font-light text-[#111] tracking-[0.04em] mb-2">
+        <h1 class="font-light text-[#111] tracking-[0.04em] mb-2">
           {{ resumeData?.basicInfo?.name || "Your Name" }}
         </h1>
         <p
           v-if="resumeData?.jobIntention?.jobIntention"
-          class="text-sm text-[#999] tracking-[0.15em] uppercase mb-2 font-light"
+          class="text-[#999] tracking-[0.15em] uppercase mb-2 font-light"
         >
           {{ resumeData.jobIntention.jobIntention }}
         </p>
-        <div
-          class="flex justify-center flex-wrap gap-x-5 gap-y-1 text-xs text-[#999] tracking-wide"
-        >
+        <div class="flex justify-center flex-wrap gap-x-5 gap-y-1 text-[#999] tracking-wide">
           <span v-if="resumeData?.basicInfo?.phone">{{ resumeData.basicInfo.phone }}</span>
           <span
             v-if="resumeData?.basicInfo?.phone && resumeData?.basicInfo?.email"

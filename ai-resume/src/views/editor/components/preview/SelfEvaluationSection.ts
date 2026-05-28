@@ -50,17 +50,17 @@ export const getSelfEvaluationStyles = (type: templateType): SelfEvaluationStyle
     case "minimal":
       return {
         ...commonStyles,
-        title: "text-base font-light text-[#111] tracking-[0.2em] uppercase mb-4",
+        title: "font-light text-[#111] tracking-[0.2em] uppercase mb-4",
         container: `${commonStyles.container}`,
-        content: "text-[#555] whitespace-pre-wrap leading-relaxed text-sm",
+        content: "text-[#555] whitespace-pre-wrap leading-relaxed",
       };
     case "luxury":
       return {
         ...commonStyles,
-        title: "text-xs tracking-[0.2em] uppercase font-semibold text-[#c9a050] mb-3",
+        title: "tracking-[0.2em] uppercase font-semibold text-[#c9a050] mb-3",
         container: `${commonStyles.container}`,
         content:
-          "text-white/60 whitespace-pre-wrap leading-relaxed text-sm italic border-l-2 border-[#c9a050]/30 pl-3",
+          "text-white/60 whitespace-pre-wrap leading-relaxed italic border-l-2 border-[#c9a050]/30 pl-3",
       };
     case "default":
     default:
