@@ -19,9 +19,9 @@ import { computed } from "vue";
 
 import { useRoute } from "vue-router";
 
+import GSAPTransition from "@/components/common/GSAPTransition.vue";
 import Footer from "@/components/layout/Footer.vue";
 import NavBar from "@/components/layout/NavBar.vue";
-import GSAPTransition from "@/components/common/GSAPTransition.vue";
 import { resolvePresetFromMeta } from "@/utils/transitions";
 
 const route = useRoute();

@@ -12,10 +12,15 @@ import {
 import { Spin } from "ant-design-vue";
 
 import AnalysisScoreRing from "./AnalysisScoreRing.vue";
+import CareerAnalysisCard from "./CareerAnalysisCard.vue";
+import CompetitivenessBadge from "./CompetitivenessBadge.vue";
 import DimensionScoresSection from "./DimensionScoresSection.vue";
+import KeyFindingsSection from "./KeyFindingsSection.vue";
+import MarketAnalysisCard from "./MarketAnalysisCard.vue";
 import RadarChart from "./RadarChart.vue";
 import StrengthCard from "./StrengthCard.vue";
 import SuggestionItem from "./SuggestionItem.vue";
+import TechnologyAssessmentCard from "./TechnologyAssessmentCard.vue";
 import { ContainerWidthKey, getScoreLevel } from "./types";
 import type { ResumeAnalysisData } from "./types";
 import WeaknessCard from "./WeaknessCard.vue";
@@ -48,6 +53,8 @@ const today = computed(() => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 });
+
+const analysisDate = computed(() => props.data.meta.analysis_date || today.value);
 </script>
 
 <template>
@@ -71,7 +78,7 @@ const today = computed(() => {
         >
           <!-- Desktop Title & Meta (Hidden on mobile) -->
           <div v-if="isDesktop" class="space-y-4 w-[500px]">
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
               <h1 class="text-2xl font-bold text-neutral-700">
                 简历分析报告
                 <span
@@ -79,6 +86,10 @@ const today = computed(() => {
                   >v{{ data.meta.analysis_version || "1.0" }}</span
                 >
               </h1>
+              <CompetitivenessBadge
+                v-if="data.competitiveness_level"
+                :level="data.competitiveness_level"
+              />
             </div>
             <div class="flex items-start flex-col gap-4 text-sm text-neutral-500 mt-4">
               <span v-if="data.meta.candidate_name" class="flex items-center gap-1">
@@ -86,12 +97,11 @@ const today = computed(() => {
                   data.meta.candidate_name
                 }}</span>
               </span>
-              <!-- <span class="text-neutral-300">|</span> -->
               <span v-if="data.meta.target_position">
                 目标岗位：<span class="font-bold">{{ data.meta.target_position }}</span>
               </span>
             </div>
-            <div class="text-xs text-neutral-400 mt-2">分析时间：{{ today }}</div>
+            <div class="text-xs text-neutral-400 mt-2">分析时间：{{ analysisDate }}</div>
           </div>
 
           <!-- Score Ring (Visible on both) -->
@@ -146,6 +156,9 @@ const today = computed(() => {
               </div>
             </div>
 
+            <!-- Key Findings (NEW) -->
+            <KeyFindingsSection v-if="data.key_findings?.length" :findings="data.key_findings" />
+
             <!-- Weaknesses -->
             <div v-if="data.weaknesses.length" class="space-y-3">
               <h3 class="text-base font-semibold text-neutral-700 flex items-center gap-2">
@@ -158,6 +171,12 @@ const today = computed(() => {
                 :item="weakness"
               />
             </div>
+
+            <!-- Technology Assessment (NEW) -->
+            <TechnologyAssessmentCard
+              v-if="data.technology_assessment"
+              :data="data.technology_assessment"
+            />
 
             <!-- Footer tip (only on PC) -->
             <div v-if="isDesktop" class="flex bg-blue-50/50 rounded-xl p-4 items-center gap-3">
@@ -209,6 +228,12 @@ const today = computed(() => {
                 />
               </div>
             </div>
+
+            <!-- Market Analysis (NEW) -->
+            <MarketAnalysisCard v-if="data.market_analysis" :data="data.market_analysis" />
+
+            <!-- Career Analysis (NEW) -->
+            <CareerAnalysisCard v-if="data.career_analysis" :data="data.career_analysis" />
           </div>
         </div>
       </div>

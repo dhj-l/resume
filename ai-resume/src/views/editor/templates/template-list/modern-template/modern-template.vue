@@ -32,7 +32,12 @@
       <!-- 内容模块区 -->
       <div :style="{ padding: globalPageMargin }">
         <template v-for="item in contentModules" :key="item.moduleKey">
-          <div :style="{ marginBottom: globalModuleMargin }">
+          <div
+            :class="{
+              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+            }"
+            :style="{ marginBottom: globalModuleMargin }"
+          >
             <component
               :is="getComponent(item)"
               :data="resumeData[item.moduleKey]"

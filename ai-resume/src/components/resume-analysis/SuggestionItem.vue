@@ -2,7 +2,7 @@
 import { inject } from "vue";
 
 import type { SuggestionItem } from "./types";
-import { ContainerWidthKey, PRIORITY_LABELS } from "./types";
+import { ContainerWidthKey, PRIORITY_LABELS, CATEGORY_COLORS, TIMELINE_LABELS } from "./types";
 
 const props = defineProps<{
   item: SuggestionItem;
@@ -30,6 +30,14 @@ function getBadgeClass(priority: string): string {
 function getNumberClass(priority: string): string {
   return (numberStyles[priority] ?? numberStyles.low) as string;
 }
+
+function getCategoryClass(category: string): string {
+  return CATEGORY_COLORS[category] || "bg-gray-50 text-gray-600";
+}
+
+function getTimelineLabel(timeline: string): string {
+  return TIMELINE_LABELS[timeline] || timeline;
+}
 </script>
 
 <template>
@@ -46,8 +54,25 @@ function getNumberClass(priority: string): string {
     >
       {{ String(index + 1).padStart(2, "0") }}
     </span>
-    <span class="text-sm text-neutral-600 leading-relaxed mt-0.5" :class="!isDesktop && 'truncate'">
-      {{ item.action }}
-    </span>
+    <div class="flex-1 min-w-0">
+      <span class="text-sm text-neutral-600 leading-relaxed" :class="!isDesktop && 'line-clamp-2'">
+        {{ item.action }}
+      </span>
+      <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+        <span
+          v-if="item.category"
+          class="text-xs font-medium px-2 py-0.5 rounded-full"
+          :class="getCategoryClass(item.category)"
+        >
+          {{ item.category }}
+        </span>
+        <span
+          v-if="item.timeline"
+          class="text-xs font-medium px-2 py-0.5 rounded-full bg-neutral-50 text-neutral-500"
+        >
+          {{ getTimelineLabel(item.timeline) }}
+        </span>
+      </div>
+    </div>
   </div>
 </template>

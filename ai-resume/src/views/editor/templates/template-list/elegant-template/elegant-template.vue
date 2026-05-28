@@ -48,7 +48,10 @@
       <!-- ═══════════════════════════════════════════ -->
       <div :style="{ padding: globalPageMargin }">
         <!-- Job Intention -->
-        <div :style="{ marginBottom: globalModuleMargin }">
+        <div
+          class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
+          :style="{ marginBottom: globalModuleMargin }"
+        >
           <component
             :is="getComponent(jobIntentionModule)"
             :data="resumeData.jobIntention"
@@ -62,7 +65,12 @@
           <!-- LEFT COLUMN -->
           <div>
             <template v-for="item in leftModules" :key="item.moduleKey">
-              <div :style="{ marginBottom: globalModuleMargin }">
+              <div
+                :class="{
+                  'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+                }"
+                :style="{ marginBottom: globalModuleMargin }"
+              >
                 <component
                   :is="getComponent(item)"
                   :data="resumeData[item.moduleKey]"
@@ -76,7 +84,12 @@
           <!-- RIGHT COLUMN -->
           <div>
             <template v-for="item in rightModules" :key="item.moduleKey">
-              <div :style="{ marginBottom: globalModuleMargin }">
+              <div
+                :class="{
+                  'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+                }"
+                :style="{ marginBottom: globalModuleMargin }"
+              >
                 <component
                   :is="getComponent(item)"
                   :data="resumeData[item.moduleKey]"
@@ -90,7 +103,10 @@
 
         <!-- Full-width modules -->
         <template v-for="item in fullWidthModules" :key="item.moduleKey">
-          <div :style="{ marginBottom: globalModuleMargin }">
+          <div
+            class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
+            :style="{ marginBottom: globalModuleMargin }"
+          >
             <component
               :is="getComponent(item)"
               :data="resumeData[item.moduleKey]"

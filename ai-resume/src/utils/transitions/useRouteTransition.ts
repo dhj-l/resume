@@ -1,5 +1,5 @@
-import type { TransitionPreset, TransitionPresetConfig } from "./config";
 import { getPreset } from "./animations";
+import type { TransitionPreset, TransitionPresetConfig } from "./config";
 
 export function resolvePresetFromMeta(
   meta: Record<string, unknown>,
