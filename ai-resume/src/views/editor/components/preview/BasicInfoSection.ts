@@ -55,13 +55,13 @@ export const getBasicInfoStyles = (type: templateType): BasicInfoStyles => {
       return {
         ...commonStyles,
         container: `${commonStyles.container}`,
-        contentWrapper: "flex items-start gap-6",
+        contentWrapper: "flex items-start gap-8",
         avatar:
-          "w-20 h-20 rounded-full object-cover bg-white/10 shrink-0 ring-[3px] ring-[#c9a96e]/60",
+          "w-24 h-24 rounded-full object-cover bg-white/10 shrink-0 ring-[3px] ring-[#c9a96e]/70 shadow-lg shadow-[#c9a96e]/20",
         infoWrapper: "flex-1 min-w-0",
-        name: "text-2xl font-semibold text-white mb-2 break-words tracking-wide",
-        detailsWrapper: "flex flex-wrap gap-x-5 gap-y-1.5 text-white/70",
-        detailItem: "inline-flex items-center gap-1.5",
+        name: "text-3xl font-semibold text-white mb-3 break-words tracking-[0.05em]",
+        detailsWrapper: "flex flex-wrap gap-x-6 gap-y-2 text-white/80",
+        detailItem: "inline-flex items-center gap-2 text-sm",
       };
     case "minimal":
       return {

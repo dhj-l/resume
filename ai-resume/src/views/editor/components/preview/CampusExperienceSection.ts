@@ -60,15 +60,16 @@ export const getCampusExperienceStyles = (type: templateType): CampusExperienceS
     case "elegant":
       return {
         ...commonStyles,
-        title: "text-xs tracking-[0.15em] uppercase font-semibold text-[#8a8780] mb-4",
+        title:
+          "text-xs tracking-[0.2em] uppercase font-semibold text-[#8a8780] mb-5 flex items-center gap-3",
         container: `${commonStyles.container}`,
         itemWrapper:
-          "relative pl-4 border-l-2 border-[#ede8df] pb-4 last:border-l-0 last:pb-0 outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300",
-        headerWrapper: "flex flex-col gap-0.5 mb-1",
-        projectName: "font-semibold text-[#1a1a2e]",
-        role: "font-medium text-[#5a5a7a]",
-        timeRange: "text-[#9a9aa0] tracking-wide",
-        description: "text-[#555] leading-relaxed mt-1",
+          "relative pb-5 last:pb-0 outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300",
+        headerWrapper: "flex flex-col gap-1 mb-2",
+        projectName: "font-semibold text-[#1a1a2e] text-base tracking-wide",
+        role: "font-medium text-[#5a5a7a] text-sm",
+        timeRange: "text-[#9a9aa0] tracking-[0.1em] text-xs uppercase",
+        description: "text-[#555] leading-[1.7] mt-2",
       };
     case "minimal":
       return {
