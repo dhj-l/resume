@@ -66,7 +66,7 @@ export const getEducationBackgroundStyles = (type: templateType): EducationBackg
           "text-xs tracking-[0.2em] uppercase font-semibold text-[#8a8780] mb-5 flex items-center gap-3",
         container: `${commonStyles.container}`,
         itemWrapper:
-          "relative pb-5 last:pb-0 outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300",
+          "relative pl-4 border-l-2 border-[#c9a96e]/30 pb-5 last:pb-0 outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300",
         headerWrapper: "flex flex-col gap-1 mb-2",
         schoolName: "font-semibold text-[#1a1a2e] text-base tracking-wide",
         timeRange: "text-[#9a9aa0] tracking-[0.1em] text-xs uppercase",

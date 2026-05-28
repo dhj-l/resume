@@ -93,20 +93,7 @@
           <!-- LEFT COLUMN -->
           <div class="border-r border-[#e8e0d4]/60 pr-10">
             <template v-for="item in leftModules" :key="item.moduleKey">
-              <div
-                class="pl-4 border-l-2 border-[#c9a96e]/30"
-                :class="{
-                  'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
-                    ![
-                      'workExperience',
-                      'educationBackground',
-                      'projectExperience',
-                      'campusExperience',
-                      'internshipExperience',
-                    ].includes(item.moduleKey),
-                }"
-                :style="{ marginBottom: globalModuleMargin }"
-              >
+              <div :style="{ marginBottom: globalModuleMargin }">
                 <component
                   :is="getComponent(item)"
                   :data="resumeData[item.moduleKey]"
@@ -120,20 +107,7 @@
           <!-- RIGHT COLUMN -->
           <div>
             <template v-for="item in rightModules" :key="item.moduleKey">
-              <div
-                class="pl-4 border-l-2 border-[#c9a96e]/30"
-                :class="{
-                  'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
-                    ![
-                      'workExperience',
-                      'educationBackground',
-                      'projectExperience',
-                      'campusExperience',
-                      'internshipExperience',
-                    ].includes(item.moduleKey),
-                }"
-                :style="{ marginBottom: globalModuleMargin }"
-              >
+              <div :style="{ marginBottom: globalModuleMargin }">
                 <component
                   :is="getComponent(item)"
                   :data="resumeData[item.moduleKey]"
