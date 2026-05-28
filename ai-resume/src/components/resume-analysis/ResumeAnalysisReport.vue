@@ -172,12 +172,6 @@ const analysisDate = computed(() => props.data.meta.analysis_date || today.value
               />
             </div>
 
-            <!-- Technology Assessment (NEW) -->
-            <TechnologyAssessmentCard
-              v-if="data.technology_assessment"
-              :data="data.technology_assessment"
-            />
-
             <!-- Footer tip (only on PC) -->
             <div v-if="isDesktop" class="flex bg-blue-50/50 rounded-xl p-4 items-center gap-3">
               <div
@@ -231,6 +225,12 @@ const analysisDate = computed(() => props.data.meta.analysis_date || today.value
 
             <!-- Market Analysis (NEW) -->
             <MarketAnalysisCard v-if="data.market_analysis" :data="data.market_analysis" />
+
+            <!-- Technology Assessment (NEW) -->
+            <TechnologyAssessmentCard
+              v-if="data.technology_assessment"
+              :data="data.technology_assessment"
+            />
 
             <!-- Career Analysis (NEW) -->
             <CareerAnalysisCard v-if="data.career_analysis" :data="data.career_analysis" />

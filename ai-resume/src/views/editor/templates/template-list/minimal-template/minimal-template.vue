@@ -10,57 +10,6 @@
       }"
     >
       <!-- ═══════════════════════════════════════════ -->
-      <!-- HEADER — centered, oversized, stark        -->
-      <!-- ═══════════════════════════════════════════ -->
-      <div class="text-center mb-6">
-        <h1 class="font-light text-[#111] tracking-[0.04em] mb-2">
-          {{ resumeData?.basicInfo?.name || "Your Name" }}
-        </h1>
-        <p
-          v-if="resumeData?.jobIntention?.jobIntention"
-          class="text-[#999] tracking-[0.15em] uppercase mb-2 font-light"
-        >
-          {{ resumeData.jobIntention.jobIntention }}
-        </p>
-        <div class="flex justify-center flex-wrap gap-x-5 gap-y-1 text-[#999] tracking-wide">
-          <span v-if="resumeData?.basicInfo?.phone">{{ resumeData.basicInfo.phone }}</span>
-          <span
-            v-if="resumeData?.basicInfo?.phone && resumeData?.basicInfo?.email"
-            class="text-[#ddd]"
-            >·</span
-          >
-          <span v-if="resumeData?.basicInfo?.email">{{ resumeData.basicInfo.email }}</span>
-          <span
-            v-if="
-              (resumeData?.basicInfo?.phone || resumeData?.basicInfo?.email) &&
-              (resumeData?.basicInfo?.age || resumeData?.basicInfo?.gender)
-            "
-            class="text-[#ddd]"
-            >·</span
-          >
-          <span v-if="resumeData?.basicInfo?.age">{{ resumeData.basicInfo.age }} 岁</span>
-          <span
-            v-if="resumeData?.basicInfo?.age && resumeData?.basicInfo?.gender"
-            class="text-[#ddd]"
-            >·</span
-          >
-          <span v-if="resumeData?.basicInfo?.gender">{{ resumeData.basicInfo.gender }}</span>
-          <span
-            v-if="
-              (resumeData?.basicInfo?.age || resumeData?.basicInfo?.gender) &&
-              resumeData?.basicInfo?.workYear
-            "
-            class="text-[#ddd]"
-            >·</span
-          >
-          <span v-if="resumeData?.basicInfo?.workYear">{{ resumeData.basicInfo.workYear }}</span>
-        </div>
-      </div>
-
-      <!-- Thin rule -->
-      <div class="border-t border-[#111] mb-6"></div>
-
-      <!-- ═══════════════════════════════════════════ -->
       <!-- ALL MODULES — single column, sequential    -->
       <!-- ═══════════════════════════════════════════ -->
       <div
