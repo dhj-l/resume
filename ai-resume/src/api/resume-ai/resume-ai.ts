@@ -37,3 +37,7 @@ export const getAnalysisDetailAPI = (id: string) => {
 export const getLatestAnalysisAPI = (resumeId: string) => {
   return http.get<AnalysisDetailResult>("/resume-ai/latest-analysis", { params: { resumeId } });
 };
+
+export const exportAnalysisAPI = (id: string) => {
+  return http.get<Blob>(`/resume-ai/export-analysis/${id}`, { responseType: "blob" });
+};
