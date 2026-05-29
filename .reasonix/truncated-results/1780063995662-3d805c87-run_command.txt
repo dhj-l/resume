@@ -1,0 +1,535 @@
+$ pnpm --prefix ai-resume exec playwright test --reporter=list
+[exit 1]
+
+Running 24 tests using 12 workers
+
+  ok 11 [chrome] › tests\specs\guest-flows.spec.ts:44:3 › 未登录用户 — 公开页面 › ③ 导航栏链接：点击我的简历跳转到登录页 (2.1s)
+  x  13 [chrome] › tests\specs\guest-flows.spec.ts:55:3 › 未登录用户 — 公开页面 › ④ 页面未找到：访问不存在的路由显示 404 (5.5s)
+  x   1 [chrome] › tests\specs\auth-flows.spec.ts:36:3 › 认证流程 — 登录 › ① 登录页加载：显示标题和表单字段 (12.2s)
+  x   8 [chrome] › tests\specs\auth-flows.spec.ts:101:3 › 认证流程 — 注册 › ⑥ 注册页加载：显示标题和表单字段 (12.5s)
+  x  12 [chrome] › tests\specs\guest-flows.spec.ts:32:3 › 未登录用户 — 公开页面 › ② 模板列表页：加载后展示模板卡片 (11.9s)
+  x   2 [chrome] › tests\specs\auth-flows.spec.ts:70:3 › 认证流程 — 登录 › ④ 登录失败：凭据错误显示错误提示 (30.2s)
+  x   4 [chrome] › tests\specs\auth-flows.spec.ts:61:3 › 认证流程 — 登录 › ③ 表单验证：无效邮箱格式 (30.2s)
+  x   3 [chrome] › tests\specs\auth-flows.spec.ts:51:3 › 认证流程 — 登录 › ② 表单验证：空字段提交显示错误信息 (30.2s)
+  x   5 [chrome] › tests\specs\auth-flows.spec.ts:81:3 › 认证流程 — 登录 › ⑤ 登录成功：跳转首页，导航栏显示用户名 (30.2s)
+  x   6 [chrome] › tests\specs\auth-flows.spec.ts:109:3 › 认证流程 — 注册 › ⑦ 注册表单验证：空字段提交 (30.2s)
+  x   7 [chrome] › tests\specs\auth-flows.spec.ts:125:3 › 认证流程 — 游客体验 & 退出 › ⑧ 点击游客体验按钮跳转首页 (30.2s)
+  x   9 [chrome] › tests\specs\auth-flows.spec.ts:140:3 › 认证流程 — 游客体验 & 退出 › ⑨ 登录后退出：导航栏用户菜单退出 (30.2s)
+  x  10 [chrome] › tests\specs\guest-flows.spec.ts:20:3 › 未登录用户 — 公开页面 › ① 首页加载：显示导航栏、Hero 区域和开始制作按钮 (30.3s)
+  ok 19 [chrome] › tests\specs\resume-flows.spec.ts:35:3 › 登录后 — 我的简历列表 › ② 从导航栏我的简历链接正确跳转 (2.6s)
+  ok 22 [chrome] › tests\specs\resume-flows.spec.ts:99:3 › 登录后 — 简历操作（编辑/删除/复制） › ⑤ 点击编辑按钮 → 跳转编辑器 (4.6s)
+  ok 23 [chrome] › tests\specs\resume-flows.spec.ts:112:3 › 登录后 — 简历操作（编辑/删除/复制） › ⑥ 点击删除按钮 → 弹出确认弹窗 (4.5s)
+  ok 24 [chrome] › tests\specs\resume-flows.spec.ts:126:3 › 登录后 — 简历操作（编辑/删除/复制） › ⑦ 点击复制按钮 → 创建副本 (4.2s)
+  ok 21 [chrome] › tests\specs\resume-flows.spec.ts:80:3 › 登录后 — 编辑器页面 › ④ 编辑器页面加载 (5.5s)
+  x  14 [chrome] › tests\specs\guest-flows.spec.ts:70:3 › 未登录用户 — 路由守卫 › 访问 /editor → 重定向到 /auth/login (30.3s)
+  x  18 [chrome] › tests\specs\resume-flows.spec.ts:21:3 › 登录后 — 我的简历列表 › ① 导航到我的简历列表：展示简历卡片 (11.9s)
+  x  15 [chrome] › tests\specs\guest-flows.spec.ts:76:3 › 未登录用户 — 路由守卫 › 访问 /user/resumes → 重定向到 /auth/login (30.3s)
+  x  20 [chrome] › tests\specs\resume-flows.spec.ts:54:3 › 登录后 — 创建简历流程 › ③ 从模板详情页使用模板 → 跳转编辑器 (12.3s)
+  x  16 [chrome] › tests\specs\guest-flows.spec.ts:82:3 › 未登录用户 — 路由守卫 › 访问 /user/generations → 重定向到 /auth/login (30.3s)
+  x  17 [chrome] › tests\specs\guest-flows.spec.ts:88:3 › 未登录用户 — 路由守卫 › 访问 /analysis-detail → 重定向到 /auth/login (30.3s)
+
+
+  1) [chrome] › tests\specs\auth-flows.spec.ts:36:3 › 认证流程 — 登录 › ① 登录页加载：显示标题和表单字段 ────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=欢迎回来')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=欢迎回来')[22m
+
+
+      37 |     await page.goto("/auth/login");
+      38 |
+    > 39 |     await expect(page.locator("text=欢迎回来")).toBeVisible();
+         |                                             ^
+      40 |     await expect(page.locator("text=社交账号登录")).toBeVisible();
+      41 |     // 邮箱输入框存在
+      42 |     await expect(page.getByPlaceholder("name@example.com")).toBeVisible();
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:39:45
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-①-登录页加载：显示标题和表单字段-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-①-登录页加载：显示标题和表单字段-chrome\error-context.md
+
+  2) [chrome] › tests\specs\auth-flows.spec.ts:51:3 › 认证流程 — 登录 › ② 表单验证：空字段提交显示错误信息 ───────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button[type="submit"]')[22m
+
+
+      53 |
+      54 |     // 直接点击登录按钮，触发表单验证
+    > 55 |     await page.locator('button[type="submit"]').click();
+         |                                                 ^
+      56 |
+      57 |     // ant-design 表单验证：应有"请输入你的邮箱"错误提示
+      58 |     await expect(page.locator("text=请输入你的邮箱")).toBeVisible({ timeout: 5000 });
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:55:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-②-表单验证：空字段提交显示错误信息-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-②-表单验证：空字段提交显示错误信息-chrome\error-context.md
+
+  3) [chrome] › tests\specs\auth-flows.spec.ts:61:3 › 认证流程 — 登录 › ③ 表单验证：无效邮箱格式 ────────────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder('name@example.com')[22m
+
+
+      25 |   password: string,
+      26 | ) {
+    > 27 |   await page.getByPlaceholder("name@example.com").fill(email);
+         |                                                   ^
+      28 |   await page.getByPlaceholder("请输入密码").fill(password);
+      29 | }
+      30 |
+        at fillLoginForm (D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:27:51)
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:64:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-③-表单验证：无效邮箱格式-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-③-表单验证：无效邮箱格式-chrome\error-context.md
+
+  4) [chrome] › tests\specs\auth-flows.spec.ts:70:3 › 认证流程 — 登录 › ④ 登录失败：凭据错误显示错误提示 ────────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder('name@example.com')[22m
+
+
+      25 |   password: string,
+      26 | ) {
+    > 27 |   await page.getByPlaceholder("name@example.com").fill(email);
+         |                                                   ^
+      28 |   await page.getByPlaceholder("请输入密码").fill(password);
+      29 | }
+      30 |
+        at fillLoginForm (D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:27:51)
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:74:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-④-登录失败：凭据错误显示错误提示-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-④-登录失败：凭据错误显示错误提示-chrome\error-context.md
+
+  5) [chrome] › tests\specs\auth-flows.spec.ts:81:3 › 认证流程 — 登录 › ⑤ 登录成功：跳转首页，导航栏显示用户名 ─────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder('name@example.com')[22m
+
+
+      25 |   password: string,
+      26 | ) {
+    > 27 |   await page.getByPlaceholder("name@example.com").fill(email);
+         |                                                   ^
+      28 |   await page.getByPlaceholder("请输入密码").fill(password);
+      29 | }
+      30 |
+        at fillLoginForm (D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:27:51)
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:85:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-⑤-登录成功：跳转首页，导航栏显示用户名-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-⑤-登录成功：跳转首页，导航栏显示用户名-chrome\error-context.md
+
+  6) [chrome] › tests\specs\auth-flows.spec.ts:101:3 › 认证流程 — 注册 › ⑥ 注册页加载：显示标题和表单字段 ───────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('heading', { name: '创建账号' })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('heading', { name: '创建账号' })[22m
+
+
+      103 |
+      104 |     // 使用 heading 选择器避免与注册按钮文字冲突
+    > 105 |     await expect(page.getByRole("heading", { name: "创建账号" })).toBeVisible();
+          |                                                               ^
+      106 |     await expect(page.getByPlaceholder("请输入用户名")).toBeVisible();
+      107 |   });
+      108 |
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:105:63
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-注册-⑥-注册页加载：显示标题和表单字段-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-注册-⑥-注册页加载：显示标题和表单字段-chrome\error-context.md
+
+  7) [chrome] › tests\specs\auth-flows.spec.ts:109:3 › 认证流程 — 注册 › ⑦ 注册表单验证：空字段提交 ──────────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('button[type="submit"]')[22m
+
+
+      111 |
+      112 |     // 注册提交按钮
+    > 113 |     await page.locator('button[type="submit"]').click();
+          |                                                 ^
+      114 |
+      115 |     // 应有用户名必填提示
+      116 |     await expect(page.locator("text=请输入你的用户名")).toBeVisible({ timeout: 5000 });
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:113:49
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-注册-⑦-注册表单验证：空字段提交-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-注册-⑦-注册表单验证：空字段提交-chrome\error-context.md
+
+  8) [chrome] › tests\specs\auth-flows.spec.ts:125:3 › 认证流程 — 游客体验 & 退出 › ⑧ 点击游客体验按钮跳转首页 ───────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.scrollIntoViewIfNeeded: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByText('以游客身份体验')[22m
+
+
+      128 |     // 查找游客体验按钮（页面可能需滚动）
+      129 |     const guestBtn = page.getByText("以游客身份体验");
+    > 130 |     await guestBtn.scrollIntoViewIfNeeded();
+          |                    ^
+      131 |     await expect(guestBtn).toBeVisible({ timeout: 8000 });
+      132 |
+      133 |     await guestBtn.click();
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:130:20
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-游客体验-退出-⑧-点击游客体验按钮跳转首页-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-游客体验-退出-⑧-点击游客体验按钮跳转首页-chrome\error-context.md
+
+  9) [chrome] › tests\specs\auth-flows.spec.ts:140:3 › 认证流程 — 游客体验 & 退出 › ⑨ 登录后退出：导航栏用户菜单退出 ────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByPlaceholder('name@example.com')[22m
+
+
+      25 |   password: string,
+      26 | ) {
+    > 27 |   await page.getByPlaceholder("name@example.com").fill(email);
+         |                                                   ^
+      28 |   await page.getByPlaceholder("请输入密码").fill(password);
+      29 | }
+      30 |
+        at fillLoginForm (D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:27:51)
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:143:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-游客体验-退出-⑨-登录后退出：导航栏用户菜单退出-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-游客体验-退出-⑨-登录后退出：导航栏用户菜单退出-chrome\error-context.md
+
+  10) [chrome] › tests\specs\guest-flows.spec.ts:20:3 › 未登录用户 — 公开页面 › ① 首页加载：显示导航栏、Hero 区域和开始制作按钮 ─
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/home" until "load"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+    ============================================================
+
+      20 |   test("① 首页加载：显示导航栏、Hero 区域和开始制作按钮", async ({ page }) => {
+      21 |     await page.goto("/");
+    > 22 |     await page.waitForURL("**/home");
+         |                ^
+      23 |
+      24 |     // 导航栏品牌名
+      25 |     await expect(page.locator("text=大学生简历")).toBeVisible({ timeout: 8000 });
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:22:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-公开页面-①-首页加载：显示导航栏、Hero-区域和开始制作按钮-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-公开页面-①-首页加载：显示导航栏、Hero-区域和开始制作按钮-chrome\error-context.md
+
+  11) [chrome] › tests\specs\guest-flows.spec.ts:32:3 › 未登录用户 — 公开页面 › ② 模板列表页：加载后展示模板卡片 ───────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('h1')
+    Expected: [32m"专业简历模板"[39m
+    Received: [31m"Resume Admin"[39m
+    Timeout:  10000ms
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 10000ms[22m
+    [2m  - waiting for locator('h1')[22m
+    [2m    20 × locator resolved to <h1 data-v-409777eb="">Resume Admin</h1>[22m
+    [2m       - unexpected value "Resume Admin"[22m
+
+
+      34 |
+      35 |     // 页面标题
+    > 36 |     await expect(page.locator("h1")).toHaveText("专业简历模板");
+         |                                      ^
+      37 |
+      38 |     // 模板卡片存在（mock 返回 3 个）
+      39 |     await page.waitForTimeout(1500);
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:36:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-公开页面-②-模板列表页：加载后展示模板卡片-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-公开页面-②-模板列表页：加载后展示模板卡片-chrome\error-context.md
+
+  12) [chrome] › tests\specs\guest-flows.spec.ts:55:3 › 未登录用户 — 公开页面 › ④ 页面未找到：访问不存在的路由显示 404 ──────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=404').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=404').first()[22m
+
+
+      57 |
+      58 |     // 404 页面应包含 404 标题
+    > 59 |     await expect(page.locator("text=404").first()).toBeVisible({
+         |                                                    ^
+      60 |       timeout: 5000,
+      61 |     });
+      62 |   });
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:59:52
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-公开页面-④-页面未找到：访问不存在的路由显示-404-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-公开页面-④-页面未找到：访问不存在的路由显示-404-chrome\error-context.md
+
+  13) [chrome] › tests\specs\guest-flows.spec.ts:70:3 › 未登录用户 — 路由守卫 › 访问 /editor → 重定向到 /auth/login 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/auth/login" until "load"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+    ============================================================
+
+      70 |   test("访问 /editor → 重定向到 /auth/login", async ({ page }) => {
+      71 |     await page.goto("/editor");
+    > 72 |     await page.waitForURL("**/auth/login");
+         |                ^
+      73 |     await expect(page.locator("text=欢迎回来")).toBeVisible();
+      74 |   });
+      75 |
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:72:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-路由守卫-访问-editor-→-重定向到-auth-login-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-路由守卫-访问-editor-→-重定向到-auth-login-chrome\error-context.md
+
+  14) [chrome] › tests\specs\guest-flows.spec.ts:76:3 › 未登录用户 — 路由守卫 › 访问 /user/resumes → 重定向到 /auth/login 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/auth/login" until "load"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+    ============================================================
+
+      76 |   test("访问 /user/resumes → 重定向到 /auth/login", async ({ page }) => {
+      77 |     await page.goto("/user/resumes");
+    > 78 |     await page.waitForURL("**/auth/login");
+         |                ^
+      79 |     await expect(page.locator("text=欢迎回来")).toBeVisible();
+      80 |   });
+      81 |
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:78:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-路由守卫-访问-user-resumes-→-重定向到-auth-login-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-路由守卫-访问-user-resumes-→-重定向到-auth-login-chrome\error-context.md
+
+  15) [chrome] › tests\specs\guest-flows.spec.ts:82:3 › 未登录用户 — 路由守卫 › 访问 /user/generations → 重定向到 /auth/login 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/auth/login" until "load"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+    ============================================================
+
+      82 |   test("访问 /user/generations → 重定向到 /auth/login", async ({ page }) => {
+      83 |     await page.goto("/user/generations");
+    > 84 |     await page.waitForURL("**/auth/login");
+         |                ^
+      85 |     await expect(page.locator("text=欢迎回来")).toBeVisible();
+      86 |   });
+      87 |
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:84:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-路由守卫-访-ef08d-nerations-→-重定向到-auth-login-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-路由守卫-访-ef08d-nerations-→-重定向到-auth-login-chrome\error-context.md
+
+  16) [chrome] › tests\specs\guest-flows.spec.ts:88:3 › 未登录用户 — 路由守卫 › 访问 /analysis-detail → 重定向到 /auth/login 
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: page.waitForURL: Test timeout of 30000ms exceeded.
+    =========================== logs ===========================
+    waiting for navigation to "**/auth/login" until "load"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+      navigated to "http://localhost:5173/login?redirect=/dashboard"
+    ============================================================
+
+      88 |   test("访问 /analysis-detail → 重定向到 /auth/login", async ({ page }) => {
+      89 |     await page.goto("/analysis-detail");
+    > 90 |     await page.waitForURL("**/auth/login");
+         |                ^
+      91 |     await expect(page.locator("text=欢迎回来")).toBeVisible();
+      92 |   });
+      93 | });
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:90:16
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-路由守卫-访-10b5e-is-detail-→-重定向到-auth-login-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-路由守卫-访-10b5e-is-detail-→-重定向到-auth-login-chrome\error-context.md
+
+  17) [chrome] › tests\specs\resume-flows.spec.ts:21:3 › 登录后 — 我的简历列表 › ① 导航到我的简历列表：展示简历卡片 ─────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator:  locator('h1')
+    Expected: [32m"我的简历"[39m
+    Received: [31m"Resume Admin"[39m
+    Timeout:  10000ms
+
+    Call log:
+    [2m  - Expect "toHaveText" with timeout 10000ms[22m
+    [2m  - waiting for locator('h1')[22m
+    [2m    18 × locator resolved to <h1 data-v-0355add9="">Resume Admin</h1>[22m
+    [2m       - unexpected value "Resume Admin"[22m
+
+
+      23 |
+      24 |     // 页面标题
+    > 25 |     await expect(page.locator("h1")).toHaveText("我的简历");
+         |                                      ^
+      26 |
+      27 |     // 等待简历卡片加载（mock 返回 3 条）
+      28 |     await page.waitForTimeout(2000);
+        at D:\ai-msw\test\ai-resume\tests\specs\resume-flows.spec.ts:25:38
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\resume-flows-登录后-—-我的简历列表-①-导航到我的简历列表：展示简历卡片-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\resume-flows-登录后-—-我的简历列表-①-导航到我的简历列表：展示简历卡片-chrome\error-context.md
+
+  18) [chrome] › tests\specs\resume-flows.spec.ts:54:3 › 登录后 — 创建简历流程 › ③ 从模板详情页使用模板 → 跳转编辑器 ───────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('button:has-text("使用该模板")').first()
+    Expected: visible
+    Timeout: 8000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 8000ms[22m
+    [2m  - waiting for locator('button:has-text("使用该模板")').first()[22m
+
+
+      61 |     // 使用模板按钮
+      62 |     const useButton = page.locator('button:has-text("使用该模板")').first();
+    > 63 |     await expect(useButton).toBeVisible({ timeout: 8000 });
+         |                             ^
+      64 |
+      65 |     // 点击
+      66 |     await useButton.click();
+        at D:\ai-msw\test\ai-resume\tests\specs\resume-flows.spec.ts:63:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\resume-flows-登录后-—-创建简历流程-③-从模板详情页使用模板-→-跳转编辑器-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\resume-flows-登录后-—-创建简历流程-③-从模板详情页使用模板-→-跳转编辑器-chrome\error-context.md
+
+  18 failed
+    [chrome] › tests\specs\auth-flows.spec.ts:36:3 › 认证流程 — 登录 › ① 登录页加载：显示标题和表单字段 ─────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:51:3 › 认证流程 — 登录 › ② 表单验证：空字段提交显示错误信息 ────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:61:3 › 认证流程 — 登录 › ③ 表单验证：无效邮箱格式 ─────────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:70:3 › 认证流程 — 登录 › ④ 登录失败：凭据错误显示错误提示 ─────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:81:3 › 认证流程 — 登录 › ⑤ 登录成功：跳转首页，导航栏显示用户名 ──────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:101:3 › 认证流程 — 注册 › ⑥ 注册页加载：显示标题和表单字段 ────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:109:3 › 认证流程 — 注册 › ⑦ 注册表单验证：空字段提交 ───────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:125:3 › 认证流程 — 游客体验 & 退出 › ⑧ 点击游客体验按钮跳转首页 ────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:140:3 › 认证流程 — 游客体验 & 退出 › ⑨ 登录后退出：导航栏用户菜单退出 ─────────
+    [chrome] › tests\specs\guest-flows.spec.ts:20:3 › 未登录用户 — 公开页面 › ① 首页加载：显示导航栏、Hero 区域和开始制作按钮 ───
+    [chrome] › tests\specs\guest-flows.spec.ts:32:3 › 未登录用户 — 公开页面 › ② 模板列表页：加载后展示模板卡片 ─────────────
+    [chrome] › tests\specs\guest-flows.spec.ts:55:3 › 未登录用户 — 公开页面 › ④ 页面未找到：访问不存在的路由显示 404 ────────
+    [chrome] › tests\specs\guest-flows.spec.ts:70:3 › 未登录用户 — 路由守卫 › 访问 /editor → 重定向到 /auth/login ─
+    [chrome] › tests\specs\guest-flows.spec.ts:76:3 › 未登录用户 — 路由守卫 › 访问 /user/resumes → 重定向到 /auth/login 
+    [chrome] › tests\specs\guest-flows.spec.ts:82:3 › 未登录用户 — 路由守卫 › 访问 /user/generations → 重定向到 /auth/login 
+    [chrome] › tests\specs\guest-flows.spec.ts:88:3 › 未登录用户 — 路由守卫 › 访问 /analysis-detail → 重定向到 /auth/login 
+    [chrome] › tests\specs\resume-flows.spec.ts:21:3 › 登录后 — 我的简历列表 › ① 导航到我的简历列表：展示简历卡片 ───────────
+    [chrome] › tests\specs\resume-flows.spec.ts:54:3 › 登录后 — 创建简历流程 › ③ 从模板详情页使用模板 → 跳转编辑器 ─────────
+  6 passed (46.9s)
+undefined
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "playwright" not found
+
+Did you mean "pnpm exec playwright"?
