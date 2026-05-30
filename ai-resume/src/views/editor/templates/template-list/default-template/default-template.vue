@@ -13,7 +13,7 @@
       <!-- 首页 header -->
       <div class="flex items-center justify-between mb-6 border-b-4 border-gray-800 pb-2">
         <div class="flex items-end gap-4">
-          <h1 class="text-4xl font-bold text-gray-800 leading-none">个人简历</h1>
+          <h1 class="text-3xl font-bold text-gray-800 leading-none">个人简历</h1>
           <div class="flex flex-col text-gray-500">
             <span class="text-xs">细心从每一个细节开始</span>
             <span class="text-lg font-medium leading-none">Personal resume</span>
@@ -34,7 +34,14 @@
         v-for="item in activeModules"
         :key="item.moduleKey"
         :class="{
-          'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+          'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
+            ![
+              'workExperience',
+              'educationBackground',
+              'projectExperience',
+              'campusExperience',
+              'internshipExperience',
+            ].includes(item.moduleKey),
         }"
         :style="{ marginBottom: globalModuleMargin }"
       >
