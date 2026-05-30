@@ -40,24 +40,12 @@ const status = ref<PageStatus>("loading");
 const errorMsg = ref("");
 
 onMounted(async () => {
-  // 后端 302 重定向到 /auth/gitee/callback#token=eyJ...&state=xxx
+  // 后端 302 重定向到 /auth/gitee/callback#token=eyJ...
   const hash = window.location.hash.substring(1); // 去掉开头的 #
   const params = new URLSearchParams(hash);
   const token = params.get("token");
-  const returnedState = params.get("state");
-
-  // 验证 state 参数 — 防御 CSRF 攻击
-  const savedState = sessionStorage.getItem("gitee_oauth_state");
-  if (!returnedState || returnedState !== savedState) {
-    sessionStorage.removeItem("gitee_oauth_state");
-    status.value = "error";
-    errorMsg.value = "授权验证失败（state 不匹配），请重新登录。";
-    setTimeout(() => router.replace({ name: "Login" }), 2500);
-    return;
-  }
 
   if (!token) {
-    sessionStorage.removeItem("gitee_oauth_state");
     status.value = "error";
     errorMsg.value = "授权回调缺少 Token，请重新登录。";
     setTimeout(() => router.replace({ name: "Login" }), 2500);
@@ -78,7 +66,6 @@ onMounted(async () => {
   } catch (err: unknown) {
     // 拉取用户信息失败，清除已写入的 token
     authStore.logout();
-    sessionStorage.removeItem("gitee_oauth_state");
 
     status.value = "error";
     const msg = err instanceof Error ? err.message : "获取用户信息失败，请重试。";

@@ -18,9 +18,9 @@ const props = defineProps<Props>();
 
 const { updateModuleContent } = useResumeStore();
 
-const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef", ref());
+const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef")!;
 const getPopupContainer = (trigger: HTMLElement) =>
-  drawerContentRef.value ?? (trigger.parentNode as HTMLElement) ?? document.body;
+  (drawerContentRef.value ?? (trigger.parentNode as HTMLElement) ?? document.body) as HTMLElement;
 
 const open = ref(false);
 const description = ref("");

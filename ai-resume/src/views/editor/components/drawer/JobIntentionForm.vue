@@ -12,7 +12,7 @@ defineProps<{
 const { setJobIntention } = useResumeStore();
 
 const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
-const getPopupContainer = (trigger: HTMLElement) => drawerContentRef?.value ?? trigger.parentNode;
+const getPopupContainer = (trigger: HTMLElement) => (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
 
 // 处理表单变化
 const update = (key: keyof JobIntention, value: any) => {

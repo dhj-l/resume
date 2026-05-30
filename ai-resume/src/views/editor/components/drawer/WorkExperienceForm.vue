@@ -22,7 +22,7 @@ const { addWorkExperience, removeWorkExperience, updateWorkExperience, moveWorkE
   useResumeStore();
 
 const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
-const getPopupContainer = (trigger: HTMLElement) => drawerContentRef?.value ?? trigger.parentNode;
+const getPopupContainer = (trigger: HTMLElement) => (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
 
 const handleAdd = () => {
   addWorkExperience();

@@ -19,8 +19,8 @@ const intensityColors: Record<string, { bg: string; text: string }> = {
 };
 
 function getIntensityStyle(intensity: string): Record<string, string> {
-  const colors = intensityColors[intensity] || intensityColors.medium;
-  return { backgroundColor: colors.bg, color: colors.text };
+  const colors = intensityColors[intensity] ?? intensityColors.medium;
+  return { backgroundColor: colors!.bg, color: colors!.text };
 }
 </script>
 

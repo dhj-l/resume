@@ -40,7 +40,7 @@ const handleExport = async () => {
   exportLoading.value = true;
   try {
     const res = await exportAnalysisAPI(id);
-    downloadFile(res, "分析报告.md", "text/markdown");
+    downloadFile(res as unknown as Blob, "分析报告.md", "text/markdown");
     message.success("导出成功");
   } catch {
     message.error("导出失败");
