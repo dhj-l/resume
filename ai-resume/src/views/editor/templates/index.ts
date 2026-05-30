@@ -29,19 +29,19 @@ export const templateList: TemplateItem[] = [
     value: "modern",
     component: ModernTemplate,
   },
-  {
-    label: "雅致杂志风",
-    value: "elegant",
-    component: ElegantTemplate,
-  },
+  // {
+  //   label: "雅致杂志风",
+  //   value: "elegant",
+  //   component: ElegantTemplate,
+  // },
   {
     label: "极致简约",
     value: "minimal",
     component: MinimalTemplate,
   },
-  {
-    label: "奢华黑金",
-    value: "luxury",
-    component: LuxuryTemplate,
-  },
+  // {
+  //   label: "奢华黑金",
+  //   value: "luxury",
+  //   component: LuxuryTemplate,
+  // },
 ];
