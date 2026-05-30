@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref } from "vue";
+import { h, inject, ref, type Ref } from "vue";
 
 import {
   DeleteOutlined,
@@ -19,6 +19,9 @@ const props = defineProps<{
 }>();
 
 const { addEducation, removeEducation, updateEducation, moveEducation } = useResumeStore();
+
+const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
+const getPopupContainer = (trigger: HTMLElement) => drawerContentRef?.value ?? trigger.parentNode;
 
 const degreeOptions = [
   { label: "初中", value: "初中" },
@@ -98,6 +101,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
                   value-format="YYYY-MM"
                   placeholder="入学时间"
                   style="width: 110px"
+                  placement="topLeft"
+                  :get-popup-container="getPopupContainer"
                   @update:value="(val) => update(index, 'enrollmentTime', val)"
                 />
                 <span class="text-gray-400">-</span>
@@ -108,6 +113,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
                   value-format="YYYY-MM"
                   placeholder="毕业时间"
                   style="width: 110px"
+                  placement="topLeft"
+                  :get-popup-container="getPopupContainer"
                   @update:value="(val) => update(index, 'graduationTime', val)"
                 />
                 <span v-else class="text-gray-500 text-sm px-2">至今</span>
@@ -126,6 +133,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
                 :options="degreeOptions"
                 placeholder="请选择"
                 style="width: 100px"
+                placement="topLeft"
+                :get-popup-container="getPopupContainer"
                 @update:value="(val) => update(index, 'degree', val)"
               />
             </FormItem>

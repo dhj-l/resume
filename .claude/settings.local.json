@@ -19,7 +19,10 @@
       "Bash(git pull *)",
       "Bash(pnpm install *)",
       "mcp__plugin_context7_context7__resolve-library-id",
-      "mcp__plugin_context7_context7__query-docs"
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(dir *)",
+      "Bash(npx eslint *)",
+      "Bash(npx prettier *)"
     ]
   }
 }

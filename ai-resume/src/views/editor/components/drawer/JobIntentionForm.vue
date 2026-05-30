@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { inject, type Ref } from "vue";
 import { Form, FormItem, Input, Row, Col, Select } from "ant-design-vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
@@ -9,6 +10,9 @@ defineProps<{
 }>();
 
 const { setJobIntention } = useResumeStore();
+
+const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
+const getPopupContainer = (trigger: HTMLElement) => drawerContentRef?.value ?? trigger.parentNode;
 
 // 处理表单变化
 const update = (key: keyof JobIntention, value: any) => {
@@ -61,6 +65,8 @@ const entryTimeOptions = [
             :value="data.entryTime"
             placeholder="请选择入职时间"
             :options="entryTimeOptions"
+            placement="topLeft"
+            :get-popup-container="getPopupContainer"
             @update:value="(val) => update('entryTime', val)"
           />
         </FormItem>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { h, ref } from "vue";
+import { h, inject, ref, type Ref } from "vue";
 
 import {
   DeleteOutlined,
@@ -24,6 +24,9 @@ const {
   updateCampusExperience,
   moveCampusExperience,
 } = useResumeStore();
+
+const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
+const getPopupContainer = (trigger: HTMLElement) => drawerContentRef?.value ?? trigger.parentNode;
 
 const lastEndTime = ref("");
 const handleAdd = () => {
@@ -90,6 +93,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
                   value-format="YYYY-MM"
                   placeholder="开始时间"
                   style="width: 110px"
+                  placement="topLeft"
+                  :get-popup-container="getPopupContainer"
                   @update:value="(val) => update(index, 'startTime', val)"
                 />
                 <span class="text-gray-400">-</span>
@@ -100,6 +105,8 @@ const handleTillNowChange = (index: number, checked: boolean) => {
                   value-format="YYYY-MM"
                   placeholder="结束时间"
                   style="width: 110px"
+                  placement="topLeft"
+                  :get-popup-container="getPopupContainer"
                   @update:value="(val) => update(index, 'endTime', val)"
                 />
                 <span v-else class="text-gray-500 text-sm px-2">至今</span>

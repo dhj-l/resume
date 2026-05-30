@@ -9,7 +9,7 @@
       }"
     >
       <!-- Hero Header: 渐变背景 + 基本信息 + 求职意向 -->
-      <div v-if="basicInfoModule" class="bg-primary-600 text-white px-8 py-6">
+      <div v-if="basicInfoModule" class="bg-primary-600 text-white" :style="{ padding: globalPageMargin }">
         <div class="flex items-start gap-6">
           <!-- BasicInfo via section component -->
           <component

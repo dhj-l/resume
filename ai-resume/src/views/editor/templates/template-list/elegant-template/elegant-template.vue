@@ -242,10 +242,6 @@ const { markers } = usePageMarkers(contentRef);
 <style scoped>
 :deep(.resume-section) {
   margin-bottom: 0 !important;
-}
-
-/* Elegant template custom styles */
-:deep(.resume-section) {
   padding: 0.5rem 0;
 }
 

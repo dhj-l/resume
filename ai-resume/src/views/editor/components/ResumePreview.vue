@@ -7,7 +7,7 @@ import { useRoute } from "vue-router";
 import { useResumeStore } from "@/stores/resumeStore";
 import { templateList } from "@/views/editor/templates/index";
 
-const { resumeData, globalLineHeight } = storeToRefs(useResumeStore());
+const { resumeData, globalFontSize, globalLineHeight } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
 
 const route = useRoute();
@@ -28,7 +28,15 @@ watch(
   这里只展示模板，不涉及复杂的逻辑。
 -->
 <template>
-  <div class="resume-preview-wrapper w-[210mm]" :style="{ lineHeight: globalLineHeight }">
+  <div
+    class="resume-preview-wrapper w-[210mm]"
+    :style="{
+      fontSize: globalFontSize,
+      lineHeight: globalLineHeight,
+      '--resume-fs': globalFontSize,
+      '--resume-lh': globalLineHeight,
+    }"
+  >
     <template v-for="item in templateList" :key="item.value">
       <component :is="item.component" v-if="item.value === resumeData.type" />
     </template>
@@ -58,6 +66,15 @@ watch(
     p {
       margin: 0;
     }
+  }
+
+  // 覆盖子组件 Tailwind 固定字号，使用 globalStyle
+  .text-xs, .text-sm, .text-base, .text-lg,
+  .text-xl, .text-2xl, .text-3xl {
+    font-size: var(--resume-fs) !important;
+  }
+  .leading-relaxed, .leading-\[1\.7\] {
+    line-height: var(--resume-lh) !important;
   }
 }
 </style>
