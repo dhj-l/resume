@@ -155,7 +155,7 @@ const handleViewDetail = () => {
     <div class="h-14 border-t border-gray-200 flex items-center justify-end px-4 gap-2 shrink-0">
       <template v-if="showInput">
         <Button
-          :disabled="!btnDisabled"
+          :disabled="btnDisabled"
           :loading="loading"
           type="primary"
           class="flex items-center"

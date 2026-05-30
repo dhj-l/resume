@@ -11,9 +11,8 @@ const { resumeData, globalFontSize, globalLineHeight } = storeToRefs(useResumeSt
 const { getResumeDetail } = useResumeStore();
 
 const route = useRoute();
-const id = route.query.id;
 watch(
-  () => id,
+  () => route.query.id,
   (newVal) => {
     if (newVal) {
       getResumeDetail(newVal as string);
@@ -31,7 +30,6 @@ watch(
   <div
     class="resume-preview-wrapper w-[210mm]"
     :style="{
-      fontSize: globalFontSize,
       lineHeight: globalLineHeight,
       '--resume-fs': globalFontSize,
       '--resume-lh': globalLineHeight,
@@ -68,7 +66,7 @@ watch(
     }
   }
 
-  // 覆盖子组件 Tailwind 固定字号，使用 globalStyle
+  /* 覆盖子组件 Tailwind 固定字号，使用 globalStyle */
   .text-xs, .text-sm, .text-base, .text-lg,
   .text-xl, .text-2xl, .text-3xl, .text-4xl {
     font-size: var(--resume-fs) !important;
@@ -77,7 +75,7 @@ watch(
     line-height: var(--resume-lh) !important;
   }
 
-  // 覆盖富文本 (v-safe-html) 中的内联 font-size / line-height
+  /* 覆盖富文本 (v-safe-html) 中的内联 font-size / line-height */
   p[style], span[style], li[style], strong[style], em[style],
   h1[style], h2[style], h3[style], h4[style], h5[style] {
     font-size: inherit !important;

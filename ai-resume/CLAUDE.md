@@ -30,7 +30,7 @@ No test framework is configured. There are no unit or e2e tests.
 
 ### Entry Flow
 
-`main.ts` → installs Pinia (with persistedstate plugin), Vue Router, Element Plus (full import), Ant Design Vue (full import) → mounts `App.vue` which wraps `<router-view>` in Ant Design's `<a-config-provider :locale="zhCN">`.
+`main.ts` → installs Pinia (with persistedstate plugin), Vue Router, Ant Design Vue (full import), and registers global directives (v-safe-html via DOMPurify) → mounts `App.vue` which wraps `<router-view>` in Ant Design's `<a-config-provider :locale="zhCN">`.
 
 ### Routing (`src/router/index.ts`)
 
@@ -67,7 +67,7 @@ The core feature. Structure:
 
 ### UI Libraries
 
-Both **Ant Design Vue** and **Element Plus** are used together. Primary UI is Ant Design Vue (`a-` prefix components). Element Plus is used selectively. Icons come from three sources: `@ant-design/icons-vue`, `@element-plus/icons-vue`, and `lucide-vue-next`.
+**Ant Design Vue** is the sole UI component library (`a-` prefix components). Icons come from two sources: `@ant-design/icons-vue` and `lucide-vue-next`. Rich text HTML is sanitized via DOMPurify through the global `v-safe-html` directive.
 
 ## Code Conventions
 

@@ -172,22 +172,26 @@ export async function setupApiMocks(page: Page) {
 
 /** 向 localStorage 注入登录态，模拟已登录用户 */
 export async function injectAuthToPage(page: Page) {
+  const testEmail = process.env.TEST_USER_EMAIL || "test@example.com";
   await page.goto("/");
-  await page.evaluate(() => {
-    localStorage.setItem(
-      "auth",
-      JSON.stringify({
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-token",
-        userInfo: {
-          _id: "user001",
-          username: "testuser",
-          email: process.env.TEST_USER_EMAIL || "test@example.com",
-          createdAt: "2025-01-01T00:00:00Z",
-          updatedAt: "2025-06-01T08:00:00Z",
-        },
-      }),
-    );
-  });
+  await page.evaluate(
+    (email) => {
+      localStorage.setItem(
+        "auth",
+        JSON.stringify({
+          token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-token",
+          userInfo: {
+            _id: "user001",
+            username: "testuser",
+            email,
+            createdAt: "2025-01-01T00:00:00Z",
+            updatedAt: "2025-06-01T08:00:00Z",
+          },
+        }),
+      );
+    },
+    testEmail,
+  );
   // 重新加载以让 Pinia 读取 localStorage
   await page.reload();
 }

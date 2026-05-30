@@ -2,14 +2,13 @@
   <div class="relative mx-auto w-full max-w-[210mm]">
     <div
       ref="contentRef"
-      class="w-full bg-white shadow-lg box-border overflow-hidden"
+      class="w-full bg-white shadow-lg box-border overflow-hidden min-h-[297mm]"
       :style="{
-        fontSize: globalFontSize,
         lineHeight: globalLineHeight,
       }"
     >
       <!-- Hero Header: 渐变背景 + 基本信息 + 求职意向 -->
-      <div v-if="basicInfoModule" class="bg-primary-600 text-white" :style="{ padding: globalPageMargin }">
+      <div v-if="basicInfoModule" class="bg-primary-600 text-white" :style="{ padding: globalPageMargin, fontSize: globalFontSize }">
         <div class="flex items-start gap-6">
           <!-- BasicInfo via section component -->
           <component
@@ -30,7 +29,7 @@
       </div>
 
       <!-- 内容模块区 -->
-      <div :style="{ padding: globalPageMargin }">
+      <div :style="{ padding: globalPageMargin, fontSize: globalFontSize }">
         <template v-for="item in contentModules" :key="item.moduleKey">
           <div
             :class="{

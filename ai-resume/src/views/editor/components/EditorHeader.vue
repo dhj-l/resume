@@ -164,7 +164,7 @@ const handleTemplateChange = (key: templateType) => {
 };
 
 const handleThemeChange = () => {
-  // TODO: 实现主题切换功能
+  message.info("主题切换功能开发中");
 };
 
 const validateTitle = (title: string): string => {

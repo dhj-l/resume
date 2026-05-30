@@ -2,10 +2,10 @@
   <div class="relative mx-auto w-full max-w-[210mm]">
     <div
       ref="contentRef"
-      class="w-full shadow-xl flex box-border overflow-hidden"
+      class="w-full shadow-xl flex box-border overflow-hidden min-h-[297mm]"
       :style="{
-        fontSize: globalFontSize,
         lineHeight: globalLineHeight,
+        fontSize: globalFontSize,
       }"
     >
       <!-- ═══════════════════════════════════════════ -->

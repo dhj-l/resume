@@ -3,10 +3,10 @@
     <!-- 连续内容区：双栏 -->
     <div
       ref="containerRef"
-      class="w-full bg-white shadow-lg flex box-border"
+      class="w-full bg-white shadow-lg flex box-border min-h-[297mm]"
       :style="{
-        fontSize: globalFontSize,
         lineHeight: globalLineHeight,
+        fontSize: globalFontSize,
       }"
     >
       <!-- 左栏 32% -->

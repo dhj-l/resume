@@ -25,7 +25,9 @@
       "Bash(npx prettier *)",
       "Bash(pnpm remove *)",
       "Bash(npx vite *)",
-      "Bash(git rm *)"
+      "Bash(git rm *)",
+      "Bash(node -e \"const pkg = require\\('./package.json'\\); console.log\\('dompurify:', pkg.dependencies?.['dompurify'] || pkg.devDependencies?.['dompurify'] || 'NOT FOUND'\\); console.log\\('postcss:', pkg.devDependencies?.['postcss'] || 'NOT FOUND'\\); console.log\\('sass:', pkg.devDependencies?.['sass'] || 'NOT FOUND'\\)\")",
+      "Bash(node -e \"const pkg = require\\('./node_modules/dompurify/package.json'\\); console.log\\('version:', pkg.version\\); console.log\\('module:', pkg.module || 'N/A'\\); console.log\\('exports:', JSON.stringify\\(pkg.exports || 'N/A', null, 2\\)\\)\")"
     ]
   }
 }

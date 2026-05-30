@@ -2,9 +2,8 @@
   <div class="relative mx-auto w-full max-w-[210mm]">
     <div
       ref="contentRef"
-      class="w-full bg-[#fefdfb] shadow-xl box-border overflow-hidden"
+      class="w-full bg-[#fefdfb] shadow-xl box-border overflow-hidden min-h-[297mm]"
       :style="{
-        fontSize: globalFontSize,
         lineHeight: globalLineHeight,
       }"
     >
@@ -38,7 +37,7 @@
         </div>
 
         <!-- BasicInfo inside hero -->
-        <div :style="{ padding: globalPageMargin }" class="relative z-10">
+        <div :style="{ padding: globalPageMargin, fontSize: globalFontSize }" class="relative z-10">
           <component
             :is="getComponent(basicInfoModule)"
             :data="resumeData.basicInfo"
@@ -69,7 +68,7 @@
       <!-- ═══════════════════════════════════════════ -->
       <!-- CONTENT BODY                               -->
       <!-- ═══════════════════════════════════════════ -->
-      <div :style="{ padding: globalPageMargin }" class="relative">
+      <div :style="{ padding: globalPageMargin, fontSize: globalFontSize }" class="relative">
         <!-- Subtle background decoration -->
         <div
           class="absolute top-0 right-0 w-64 h-64 bg-[#c9a96e] opacity-[0.02] rounded-full -translate-y-32 translate-x-32 pointer-events-none"

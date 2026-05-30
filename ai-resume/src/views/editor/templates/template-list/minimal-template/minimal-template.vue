@@ -2,11 +2,11 @@
   <div class="relative mx-auto w-full max-w-[210mm]">
     <div
       ref="contentRef"
-      class="w-full bg-white shadow-lg box-border"
+      class="w-full bg-white shadow-lg box-border min-h-[297mm]"
       :style="{
         padding: globalPageMargin,
-        fontSize: globalFontSize,
         lineHeight: globalLineHeight,
+        fontSize: globalFontSize,
       }"
     >
       <!-- ═══════════════════════════════════════════ -->
