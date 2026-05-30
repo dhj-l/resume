@@ -26,7 +26,7 @@
                 <path d="M16 17H8" />
               </svg>
             </div>
-            <span class="text-lg font-bold text-gray-900">大学牲简历</span>
+            <span class="text-lg font-bold text-gray-900">大学生简历</span>
           </div>
           <p class="text-gray-500 text-sm leading-relaxed">
             专为大学生打造的专业简历制作平台。免费制作，AI辅助，助你轻松获得心仪Offer。
@@ -85,7 +85,7 @@
           <h4 class="font-semibold text-gray-900 mb-4">联系我们</h4>
           <ul class="space-y-2">
             <li class="flex items-center gap-2 text-gray-500 text-sm">
-              <MailOutlined /> support@example.com
+              <MailOutlined /> 3134504258@qq.com
             </li>
             <li class="flex items-center gap-4 mt-4">
               <!-- Social Icons -->
@@ -114,7 +114,7 @@
 
       <div class="border-t border-gray-100 pt-8 text-center">
         <p class="text-gray-400 text-sm">
-          © {{ new Date().getFullYear() }} 大学牲简历. All rights reserved.
+          © {{ new Date().getFullYear() }} 大学生简历. All rights reserved.
         </p>
       </div>
     </div>

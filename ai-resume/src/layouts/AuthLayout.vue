@@ -33,7 +33,7 @@
               />
             </svg>
           </div>
-          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">大学牲简历</h1>
+          <h1 class="text-2xl font-bold text-gray-900 tracking-tight">大学生简历</h1>
         </div>
         <h2 class="text-4xl font-bold text-gray-900 mb-6 leading-tight">
           打造你的未来，<br />

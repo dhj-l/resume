@@ -190,7 +190,7 @@ export default [
       "vue/no-mutating-props": "warn",
       "vue/require-default-prop": "off",
       "vue/require-prop-types": "warn",
-      "vue/no-v-html": "warn",
+      "vue/no-v-html": "error",
       "vue/no-unused-refs": "warn",
       "vue/no-unused-components": "warn",
       // 由于从同名 .ts 文件导入函数可能导致误判，禁用此规则

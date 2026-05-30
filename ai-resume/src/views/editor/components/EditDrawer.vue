@@ -18,15 +18,12 @@ const drawerHeight = ref("40vh");
 const drawerContentRef = ref<HTMLDivElement>();
 provide("drawerContentRef", drawerContentRef);
 
-// TODO: 处理抽屉展开/收起
 const toggleDrawer = () => {
   setIsExpanded(!isExpanded.value);
 };
 
-// TODO: 处理拖拽调整高度
 const handleDragStart = () => {
-  // 静态演示，仅占位
-  console.log("Drag started");
+  // TODO: 实现拖拽调整高度
 };
 </script>
 

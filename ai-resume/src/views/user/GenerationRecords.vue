@@ -87,8 +87,6 @@ const fetchRecords = async () => {
       page: page.value,
       pageSize: pageSize.value,
     });
-    console.log(data);
-
     records.value = data.list;
     total.value = data.total;
   } finally {

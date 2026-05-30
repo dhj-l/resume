@@ -15,8 +15,8 @@ import { expect, test } from "@playwright/test";
 
 import { setupApiMocks } from "../mocks/api";
 
-const VALID_EMAIL = "3134504258@qq.com";
-const VALID_PASSWORD = "20041202Dhj.";
+const VALID_EMAIL = process.env.TEST_USER_EMAIL || "test@example.com";
+const VALID_PASSWORD = process.env.TEST_USER_PASSWORD || "TestPassword123";
 
 /** 填写登录表单 */
 async function fillLoginForm(

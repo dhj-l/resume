@@ -68,7 +68,6 @@ const handleOpenPublishModal = () => {
   publishModalRef.value?.open();
 };
 
-// TODO: 处理返回点击
 const handleBack = () => {
   router.back();
 };
@@ -111,7 +110,6 @@ const autoSave = async (isUpdateCover: boolean = false) => {
   await saveResume();
 };
 
-// TODO: 处理导出PDF
 const handleExport = async () => {
   const element = getElement(".resume-preview-wrapper");
   if (!element) return;
@@ -161,14 +159,12 @@ const handleExport = async () => {
   }
 };
 
-// TODO: 处理模板切换
 const handleTemplateChange = (key: templateType) => {
   setCurrentTemplate(key);
 };
 
-// TODO: 处理主题切换
 const handleThemeChange = () => {
-  console.log("Theme toggle clicked");
+  // TODO: 实现主题切换功能
 };
 
 const validateTitle = (title: string): string => {

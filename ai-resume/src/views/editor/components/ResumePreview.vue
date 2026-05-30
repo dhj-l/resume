@@ -70,11 +70,18 @@ watch(
 
   // 覆盖子组件 Tailwind 固定字号，使用 globalStyle
   .text-xs, .text-sm, .text-base, .text-lg,
-  .text-xl, .text-2xl, .text-3xl {
+  .text-xl, .text-2xl, .text-3xl, .text-4xl {
     font-size: var(--resume-fs) !important;
   }
-  .leading-relaxed, .leading-\[1\.7\] {
+  .leading-relaxed, .leading-\[1\.7\], .leading-\[1\.8\] {
     line-height: var(--resume-lh) !important;
+  }
+
+  // 覆盖富文本 (v-safe-html) 中的内联 font-size / line-height
+  p[style], span[style], li[style], strong[style], em[style],
+  h1[style], h2[style], h3[style], h4[style], h5[style] {
+    font-size: inherit !important;
+    line-height: inherit !important;
   }
 }
 </style>

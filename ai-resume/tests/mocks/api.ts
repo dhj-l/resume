@@ -45,7 +45,9 @@ export async function setupApiMocks(page: Page) {
   await page.route("**/api/v1/user/login", async (route) => {
     const body = parseBody(route);
     // 模拟登录验证
-    if (body.email === "3134504258@qq.com" && body.password === "20041202Dhj.") {
+    const testEmail = process.env.TEST_USER_EMAIL || "test@example.com";
+    const testPassword = process.env.TEST_USER_PASSWORD || "TestPassword123";
+    if (body.email === testEmail && body.password === testPassword) {
       await route.fulfill({ json: apiJson(mockLoginResponse) });
     } else {
       await route.fulfill({
@@ -178,8 +180,8 @@ export async function injectAuthToPage(page: Page) {
         token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-token",
         userInfo: {
           _id: "user001",
-          username: "3134504258",
-          email: "3134504258@qq.com",
+          username: "testuser",
+          email: process.env.TEST_USER_EMAIL || "test@example.com",
           createdAt: "2025-01-01T00:00:00Z",
           updatedAt: "2025-06-01T08:00:00Z",
         },

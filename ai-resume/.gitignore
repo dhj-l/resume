@@ -11,6 +11,9 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
 
 # Editor directories and files
 .vscode/*
@@ -25,6 +28,7 @@ dist-ssr
 
 .agents
 .agent
+.vercel
 
 # Playwright
 playwright-report/

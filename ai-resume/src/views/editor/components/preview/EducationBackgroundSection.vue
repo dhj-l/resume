@@ -46,7 +46,7 @@ const handleClick = () => {
             >
           </div>
           <div :class="styles.detailsWrapper">
-            <div v-html="edu.content"></div>
+            <div v-safe-html="edu.content"></div>
           </div>
         </div>
       </div>

@@ -44,7 +44,7 @@
           <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
             <button
               class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/30 hover:shadow-primary-500/40 hover:-translate-y-1 cursor-pointer"
-              @click="router.push('/dashboard/templates')"
+              @click="router.push('/templates')"
             >
               免费开始制作
             </button>

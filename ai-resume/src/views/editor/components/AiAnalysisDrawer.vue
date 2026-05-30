@@ -61,7 +61,7 @@ watch(
 );
 
 const btnDisabled = computed(() => {
-  return jobDescription.value.length >= 10;
+  return jobDescription.value.length < 10;
 });
 
 const handleAnalyze = async () => {

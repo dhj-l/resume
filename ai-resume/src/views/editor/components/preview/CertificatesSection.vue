@@ -42,6 +42,6 @@ const isVisible = computed(() => {
     <h3 :class="styles.title">
       {{ label || "荣誉证书" }}
     </h3>
-    <div v-html="data?.content"></div>
+    <div v-safe-html="data?.content"></div>
   </div>
 </template>
