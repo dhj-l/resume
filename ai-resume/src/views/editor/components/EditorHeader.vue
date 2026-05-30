@@ -8,7 +8,6 @@ import {
   SettingOutlined,
   DownOutlined,
   UploadOutlined,
-  SkinOutlined,
   EditOutlined,
 } from "@ant-design/icons-vue";
 import { Button, Dropdown, Menu, MenuItem, Popover, Space, message, Input } from "ant-design-vue";
@@ -163,10 +162,6 @@ const handleTemplateChange = (key: templateType) => {
   setCurrentTemplate(key);
 };
 
-const handleThemeChange = () => {
-  message.info("主题切换功能开发中");
-};
-
 const validateTitle = (title: string): string => {
   const trimmedTitle = title.trim();
   if (!trimmedTitle) {
@@ -232,12 +227,6 @@ interface HeaderPopoverConfig {
 
 const middleButtons: HeaderButtonConfig[] = [
   {
-    key: "theme",
-    label: "主题切换",
-    icon: toRaw(SkinOutlined),
-    onClick: handleThemeChange,
-  },
-  {
     key: "ai-analysis",
     label: "AI分析",
     icon: toRaw(Sparkles),
@@ -282,7 +271,7 @@ let timer: number | null = null;
 onMounted(() => {
   timer = setInterval(() => {
     autoSave();
-  }, 12000);
+  }, 45000);
 });
 
 onUnmounted(() => {

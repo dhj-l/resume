@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
-    "@eslint/js": "^10.0.1",
     "@vueuse/core": "^14.3.0",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
@@ -37,6 +36,7 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.60.0",
     "@types/node": "^24.10.1",
     "@typescript-eslint/eslint-plugin": "^8.58.2",
