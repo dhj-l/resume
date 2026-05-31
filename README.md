@@ -56,7 +56,7 @@
 
 ## 截图预览
 
-> ![项目截图](ai-resume\src\assets\images\image.png)
+> ![项目截图](ai-resume/src/assets/images/image.png)
 
 ---
 
