@@ -2,14 +2,13 @@
   <div class="relative mx-auto w-full max-w-[210mm]">
     <div
       ref="contentRef"
-      class="w-full bg-white shadow-lg box-border overflow-hidden"
+      class="w-full bg-white shadow-lg box-border overflow-hidden min-h-[297mm]"
       :style="{
-        fontSize: globalFontSize,
         lineHeight: globalLineHeight,
       }"
     >
       <!-- Hero Header: 渐变背景 + 基本信息 + 求职意向 -->
-      <div v-if="basicInfoModule" class="bg-primary-600 text-white px-8 py-6">
+      <div v-if="basicInfoModule" class="bg-primary-600 text-white" :style="{ padding: globalPageMargin, fontSize: globalFontSize }">
         <div class="flex items-start gap-6">
           <!-- BasicInfo via section component -->
           <component
@@ -20,8 +19,8 @@
           />
           <!-- JobIntention via section component -->
           <component
-            v-if="jobIntentionModule"
             :is="getComponent(jobIntentionModule)"
+            v-if="jobIntentionModule"
             :data="resumeData.jobIntention"
             :label="jobIntentionModule.label"
             :template-type="currentTemplateType"
@@ -30,9 +29,14 @@
       </div>
 
       <!-- 内容模块区 -->
-      <div :style="{ padding: globalPageMargin }">
+      <div :style="{ padding: globalPageMargin, fontSize: globalFontSize }">
         <template v-for="item in contentModules" :key="item.moduleKey">
-          <div :style="{ marginBottom: globalModuleMargin }">
+          <div
+            :class="{
+              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+            }"
+            :style="{ marginBottom: globalModuleMargin }"
+          >
             <component
               :is="getComponent(item)"
               :data="resumeData[item.moduleKey]"

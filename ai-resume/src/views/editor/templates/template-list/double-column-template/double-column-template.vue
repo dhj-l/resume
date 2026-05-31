@@ -3,10 +3,10 @@
     <!-- 连续内容区：双栏 -->
     <div
       ref="containerRef"
-      class="w-full bg-white shadow-lg flex box-border"
+      class="w-full bg-white shadow-lg flex box-border min-h-[297mm]"
       :style="{
-        fontSize: globalFontSize,
         lineHeight: globalLineHeight,
+        fontSize: globalFontSize,
       }"
     >
       <!-- 左栏 32% -->
@@ -23,13 +23,17 @@
           :template-type="currentTemplateType"
         />
         <template v-for="item in leftModules" :key="item.moduleKey">
-          <component
-            :is="item.component"
-            v-if="item.isShow && item.component"
-            :data="resumeData?.[item.moduleKey]"
-            :label="item.label"
-            :template-type="currentTemplateType"
-          />
+          <div
+            class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
+          >
+            <component
+              :is="item.component"
+              v-if="item.isShow && item.component"
+              :data="resumeData?.[item.moduleKey]"
+              :label="item.label"
+              :template-type="currentTemplateType"
+            />
+          </div>
         </template>
       </div>
 
@@ -47,13 +51,19 @@
           :template-type="currentTemplateType"
         />
         <template v-for="item in rightModules" :key="item.moduleKey">
-          <component
-            :is="item.component"
-            v-if="item.isShow && item.component"
-            :data="resumeData?.[item.moduleKey]"
-            :label="item.label"
-            :template-type="currentTemplateType"
-          />
+          <div
+            :class="{
+              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+            }"
+          >
+            <component
+              :is="item.component"
+              v-if="item.isShow && item.component"
+              :data="resumeData?.[item.moduleKey]"
+              :label="item.label"
+              :template-type="currentTemplateType"
+            />
+          </div>
         </template>
       </div>
     </div>

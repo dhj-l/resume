@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { provide, ref } from "vue";
 
 import { UpOutlined, DownOutlined } from "@ant-design/icons-vue";
 import { storeToRefs } from "pinia";
@@ -15,16 +15,15 @@ defineProps<{
 const { isExpanded } = storeToRefs(useResumeStore());
 const { setIsExpanded } = useResumeStore();
 const drawerHeight = ref("40vh");
+const drawerContentRef = ref<HTMLDivElement>();
+provide("drawerContentRef", drawerContentRef);
 
-// TODO: 处理抽屉展开/收起
 const toggleDrawer = () => {
   setIsExpanded(!isExpanded.value);
 };
 
-// TODO: 处理拖拽调整高度
 const handleDragStart = () => {
-  // 静态演示，仅占位
-  console.log("Drag started");
+  // TODO: 实现拖拽调整高度
 };
 </script>
 
@@ -52,7 +51,7 @@ const handleDragStart = () => {
     </div>
 
     <!-- 内容区域 -->
-    <div v-if="isExpanded" class="flex-1 overflow-hidden flex flex-col">
+    <div v-if="isExpanded" ref="drawerContentRef" class="flex-1 overflow-hidden flex flex-col">
       <ModuleTabs :resume-data="resumeData" />
     </div>
   </div>

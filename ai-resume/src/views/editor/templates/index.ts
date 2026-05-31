@@ -1,7 +1,6 @@
 import DefaultTemplate from "./template-list/default-template/default-template.vue";
 import DoubleColumnTemplate from "./template-list/double-column-template/double-column-template.vue";
-import ElegantTemplate from "./template-list/elegant-template/elegant-template.vue";
-import LuxuryTemplate from "./template-list/luxury-template/luxury-template.vue";
+// ElegantTemplate / LuxuryTemplate 暂未启用
 import MinimalTemplate from "./template-list/minimal-template/minimal-template.vue";
 import ModernTemplate from "./template-list/modern-template/modern-template.vue";
 import SimpleTemplate from "./template-list/simple-template/simple-template.vue";
@@ -29,19 +28,19 @@ export const templateList: TemplateItem[] = [
     value: "modern",
     component: ModernTemplate,
   },
-  {
-    label: "雅致杂志风",
-    value: "elegant",
-    component: ElegantTemplate,
-  },
+  // {
+  //   label: "雅致杂志风",
+  //   value: "elegant",
+  //   component: ElegantTemplate,
+  // },
   {
     label: "极致简约",
     value: "minimal",
     component: MinimalTemplate,
   },
-  {
-    label: "奢华黑金",
-    value: "luxury",
-    component: LuxuryTemplate,
-  },
+  // {
+  //   label: "奢华黑金",
+  //   value: "luxury",
+  //   component: LuxuryTemplate,
+  // },
 ];

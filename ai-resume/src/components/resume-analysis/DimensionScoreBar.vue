@@ -9,6 +9,7 @@ interface Props {
   max: number;
   weight?: number;
   color: string;
+  comment?: string;
 }
 
 const props = defineProps<Props>();
@@ -45,6 +46,7 @@ onMounted(() => {
           }"
         />
       </div>
+      <p v-if="comment" class="text-xs text-neutral-400 leading-relaxed">{{ comment }}</p>
     </div>
 
     <!-- Desktop Layout -->
@@ -52,9 +54,14 @@ onMounted(() => {
       v-if="isDesktop"
       class="grid grid-cols-[1.2fr_1.5fr_1fr] items-center gap-4 py-3 border-b border-neutral-50 last:border-0"
     >
-      <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: color }" />
-        <span class="text-sm font-medium text-neutral-700">{{ name }}</span>
+      <div class="flex flex-col">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full shrink-0" :style="{ backgroundColor: color }" />
+          <span class="text-sm font-medium text-neutral-700">{{ name }}</span>
+        </div>
+        <p v-if="comment" class="text-xs text-neutral-400 mt-1 ml-4 leading-relaxed">
+          {{ comment }}
+        </p>
       </div>
       <div class="flex flex-col">
         <div class="text-sm font-bold text-neutral-800 text-center mb-1">

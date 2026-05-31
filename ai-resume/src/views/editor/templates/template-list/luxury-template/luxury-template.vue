@@ -2,10 +2,10 @@
   <div class="relative mx-auto w-full max-w-[210mm]">
     <div
       ref="contentRef"
-      class="w-full shadow-xl flex box-border overflow-hidden"
+      class="w-full shadow-xl flex box-border overflow-hidden min-h-[297mm]"
       :style="{
-        fontSize: globalFontSize,
         lineHeight: globalLineHeight,
+        fontSize: globalFontSize,
       }"
     >
       <!-- ═══════════════════════════════════════════ -->
@@ -22,29 +22,39 @@
         <div class="h-[3px] bg-gradient-to-r from-[#c9a050] to-transparent w-2/3 mb-1"></div>
 
         <!-- BasicInfo -->
-        <component
-          :is="getComponent(basicInfoModule)"
-          v-if="basicInfoModule"
-          :data="resumeData.basicInfo"
-          :label="basicInfoModule.label"
-          :template-type="currentTemplateType"
-        />
+        <div
+          class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
+        >
+          <component
+            :is="getComponent(basicInfoModule)"
+            v-if="basicInfoModule"
+            :data="resumeData.basicInfo"
+            :label="basicInfoModule.label"
+            :template-type="currentTemplateType"
+          />
+        </div>
 
         <!-- Thin gold rule -->
         <div class="border-t border-[#c9a050]/20"></div>
 
         <!-- JobIntention -->
-        <component
-          :is="getComponent(jobIntentionModule)"
-          v-if="jobIntentionModule"
-          :data="resumeData.jobIntention"
-          :label="jobIntentionModule.label"
-          :template-type="currentTemplateType"
-        />
+        <div
+          class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
+        >
+          <component
+            :is="getComponent(jobIntentionModule)"
+            v-if="jobIntentionModule"
+            :data="resumeData.jobIntention"
+            :label="jobIntentionModule.label"
+            :template-type="currentTemplateType"
+          />
+        </div>
 
         <!-- Sidebar modules -->
         <template v-for="item in sidebarModules" :key="item.moduleKey">
-          <div class="border-t border-white/5 pt-0">
+          <div
+            class="border-t border-white/5 pt-0 outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
+          >
             <component
               :is="getComponent(item)"
               v-if="item.component"
@@ -56,7 +66,9 @@
         </template>
 
         <!-- Decorative gold bottom bar -->
-        <div class="mt-auto h-[3px] bg-gradient-to-l from-[#c9a050] to-transparent w-2/3 self-end"></div>
+        <div
+          class="mt-auto h-[3px] bg-gradient-to-l from-[#c9a050] to-transparent w-2/3 self-end"
+        ></div>
       </div>
 
       <!-- ═══════════════════════════════════════════ -->
@@ -70,13 +82,19 @@
         }"
       >
         <template v-for="item in contentModules" :key="item.moduleKey">
-          <component
-            :is="getComponent(item)"
-            v-if="item.component"
-            :data="resumeData[item.moduleKey]"
-            :label="item.label"
-            :template-type="currentTemplateType"
-          />
+          <div
+            :class="{
+              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+            }"
+          >
+            <component
+              :is="getComponent(item)"
+              v-if="item.component"
+              :data="resumeData[item.moduleKey]"
+              :label="item.label"
+              :template-type="currentTemplateType"
+            />
+          </div>
         </template>
       </div>
     </div>

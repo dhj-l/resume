@@ -59,6 +59,7 @@ onMounted(async () => {
     // 拉取用户完整信息（name / avatar 等扩展字段）
     await authStore.fetchProfile();
 
+    sessionStorage.removeItem("gitee_oauth_state");
     status.value = "success";
     message.success("Gitee 登录成功！");
     setTimeout(() => router.replace({ path: "/home" }), 800);

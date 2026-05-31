@@ -52,11 +52,12 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
     case "elegant":
       return {
         ...commonStyles,
-        title: "text-xs tracking-[0.15em] uppercase font-semibold text-[#8a8780] mb-3",
+        title:
+          "text-xs tracking-[0.2em] uppercase font-semibold text-[#8a8780] mb-4 flex items-center gap-3",
         container: `${commonStyles.container}`,
-        contentWrapper: "flex flex-wrap gap-x-6 gap-y-2",
-        label: "text-[#c9a96e] text-xs tracking-wider uppercase",
-        value: "font-medium text-[#2d3436]",
+        contentWrapper: "flex flex-wrap gap-x-8 gap-y-2 pl-0",
+        label: "text-[#c9a96e] text-xs tracking-[0.15em] uppercase font-medium",
+        value: "font-medium text-[#2d3436] tracking-wide",
       };
     case "minimal":
       return {

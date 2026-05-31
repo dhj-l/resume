@@ -15,7 +15,19 @@
       "Bash(pnpm lint:fix)",
       "Bash(git checkout *)",
       "mcp__zread__search_doc",
-      "Bash(pnpm dev *)"
+      "Bash(pnpm dev *)",
+      "Bash(git pull *)",
+      "Bash(pnpm install *)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(dir *)",
+      "Bash(npx eslint *)",
+      "Bash(npx prettier *)",
+      "Bash(pnpm remove *)",
+      "Bash(npx vite *)",
+      "Bash(git rm *)",
+      "Bash(node -e \"const pkg = require\\('./package.json'\\); console.log\\('dompurify:', pkg.dependencies?.['dompurify'] || pkg.devDependencies?.['dompurify'] || 'NOT FOUND'\\); console.log\\('postcss:', pkg.devDependencies?.['postcss'] || 'NOT FOUND'\\); console.log\\('sass:', pkg.devDependencies?.['sass'] || 'NOT FOUND'\\)\")",
+      "Bash(node -e \"const pkg = require\\('./node_modules/dompurify/package.json'\\); console.log\\('version:', pkg.version\\); console.log\\('module:', pkg.module || 'N/A'\\); console.log\\('exports:', JSON.stringify\\(pkg.exports || 'N/A', null, 2\\)\\)\")"
     ]
   }
 }

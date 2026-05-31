@@ -41,6 +41,7 @@ function getColor(index: number): string {
         :max="dim.max"
         :weight="dim.weight"
         :color="getColor(index)"
+        :comment="dim.comment"
       />
     </div>
   </div>

@@ -1,0 +1,406 @@
+$ pnpm --prefix ai-resume exec playwright test --reporter=list
+[exit 1]
+
+Running 24 tests using 12 workers
+
+  ok 12 [chrome] › tests\specs\guest-flows.spec.ts:44:3 › 未登录用户 — 公开页面 › ③ 导航栏链接：点击「我的简历」跳转到登录页 (1.8s)
+  x  13 [chrome] › tests\specs\guest-flows.spec.ts:56:3 › 未登录用户 — 公开页面 › ④ 页面未找到：访问不存在的路由显示 404 (1.1s)
+  x   8 [chrome] › tests\specs\auth-flows.spec.ts:99:3 › 认证流程 — 注册 › ⑥ 注册页加载：显示标题和表单字段 (3.3s)
+  x   2 [chrome] › tests\specs\auth-flows.spec.ts:33:3 › 认证流程 — 登录 › ① 登录页加载：显示标题和表单字段 (3.9s)
+  x   3 [chrome] › tests\specs\auth-flows.spec.ts:48:3 › 认证流程 — 登录 › ② 表单验证：空字段提交显示错误信息 (4.0s)
+  x  11 [chrome] › tests\specs\guest-flows.spec.ts:20:3 › 未登录用户 — 公开页面 › ① 首页加载：显示导航栏、Hero 区域和「开始制作」按钮 (3.2s)
+  ok 10 [chrome] › tests\specs\guest-flows.spec.ts:32:3 › 未登录用户 — 公开页面 › ② 模板列表页：加载后展示模板卡片和分页 (4.2s)
+  ok 14 [chrome] › tests\specs\resume-flows.spec.ts:35:3 › 登录后 — 我的简历列表 › ② 从导航栏「我的简历」链接正确跳转 (1.1s)
+  ok 15 [chrome] › tests\specs\guest-flows.spec.ts:77:3 › 未登录用户 — 路由守卫 › 访问 /user/resumes → 重定向到 /auth/login (1.7s)
+  ok 17 [chrome] › tests\specs\guest-flows.spec.ts:83:3 › 未登录用户 — 路由守卫 › 访问 /user/generations → 重定向到 /auth/login (1.8s)
+  ok 16 [chrome] › tests\specs\guest-flows.spec.ts:71:3 › 未登录用户 — 路由守卫 › 访问 /editor → 重定向到 /auth/login (1.9s)
+  ok 18 [chrome] › tests\specs\guest-flows.spec.ts:89:3 › 未登录用户 — 路由守卫 › 访问 /analysis-detail → 重定向到 /auth/login (1.8s)
+  ok 22 [chrome] › tests\specs\resume-flows.spec.ts:102:3 › 登录后 — 简历操作（删除/复制） › ⑤ 点击简历卡片「编辑」按钮 → 跳转编辑器 (2.7s)
+  ok 24 [chrome] › tests\specs\resume-flows.spec.ts:131:3 › 登录后 — 简历操作（删除/复制） › ⑦ 点击简历卡片「复制」按钮 → 创建副本 (2.9s)
+  ok 21 [chrome] › tests\specs\resume-flows.spec.ts:81:3 › 登录后 — 编辑器页面 › ④ 编辑器页面加载 & 显示标题 (3.2s)
+  ok 23 [chrome] › tests\specs\resume-flows.spec.ts:117:3 › 登录后 — 简历操作（删除/复制） › ⑥ 点击简历卡片「删除」按钮 → 弹出确认弹窗 (3.3s)
+  x   6 [chrome] › tests\specs\auth-flows.spec.ts:122:3 › 认证流程 — 游客体验 & 退出 › ⑧ 点击「以游客身份体验」跳转首页 (12.4s)
+  x  20 [chrome] › tests\specs\resume-flows.spec.ts:54:3 › 登录后 — 创建简历流程 › ③ 从模板详情页'使用此模板' → 跳转编辑器 (8.1s)
+  x  19 [chrome] › tests\specs\resume-flows.spec.ts:21:3 › 登录后 — 我的简历列表 › ① 导航到我的简历列表：展示简历卡片 (8.4s)
+  x   1 [chrome] › tests\specs\auth-flows.spec.ts:58:3 › 认证流程 — 登录 › ③ 表单验证：无效邮箱格式 (30.1s)
+  x   4 [chrome] › tests\specs\auth-flows.spec.ts:67:3 › 认证流程 — 登录 › ④ 登录失败：凭据错误显示错误提示 (30.1s)
+  x   5 [chrome] › tests\specs\auth-flows.spec.ts:79:3 › 认证流程 — 登录 › ⑤ 登录成功：跳转首页，导航栏显示用户名 (30.1s)
+  x   7 [chrome] › tests\specs\auth-flows.spec.ts:106:3 › 认证流程 — 注册 › ⑦ 注册表单验证：空字段提交 (30.1s)
+  x   9 [chrome] › tests\specs\auth-flows.spec.ts:135:3 › 认证流程 — 游客体验 & 退出 › ⑨ 登录后退出：导航栏用户菜单退出 (30.1s)
+
+
+  1) [chrome] › tests\specs\auth-flows.spec.ts:33:3 › 认证流程 — 登录 › ① 登录页加载：显示标题和表单字段 ────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: '登录' })
+    Expected: visible
+    Error: strict mode violation: getByRole('button', { name: '登录' }) resolved to 2 elements:
+        1) <button type="button" data-v-a0b48162="" class="css-dev-only-do-not-override-1p3hq3p ant-btn ant-btn-default ant-btn-lg ant-btn-block !h-12 !rounded-lg !border !border-gray-300 !text-gray-700 hover:!border-[#C71D23] hover:!text-[#C71D23] !flex !items-center !justify-center !gap-2.5 !transition-all !duration-300">…</button> aka getByRole('button', { name: 'Gitee 登录' })
+        2) <button type="button" data-v-a0b48162="" class="css-dev-only-do-not-override-1p3hq3p ant-btn ant-btn-default ant-btn-lg ant-btn-block !h-12 !rounded-lg !border !border-gray-300 !text-gray-700 hover:!border-gray-900 hover:!text-gray-900 !flex !items-center !justify-center !gap-2.5 !transition-all !duration-300 mt-3">…</button> aka getByRole('button', { name: 'GitHub 登录' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: '登录' })[22m
+
+
+      41 |     await expect(page.locator('[placeholder="请输入密码"]')).toBeVisible();
+      42 |     // 登录按钮存在
+    > 43 |     await expect(page.getByRole("button", { name: "登录" })).toBeVisible();
+         |                                                            ^
+      44 |     // Gitee 登录按钮
+      45 |     await expect(page.getByText("Gitee 登录")).toBeVisible();
+      46 |   });
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:43:60
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-①-登录页加载：显示标题和表单字段-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-①-登录页加载：显示标题和表单字段-chrome\error-context.md
+
+  2) [chrome] › tests\specs\auth-flows.spec.ts:48:3 › 认证流程 — 登录 › ② 表单验证：空字段提交显示错误信息 ───────────────
+
+    Error: locator.click: Error: strict mode violation: getByRole('button', { name: '登录' }) resolved to 2 elements:
+        1) <button type="button" data-v-a0b48162="" class="css-dev-only-do-not-override-1p3hq3p ant-btn ant-btn-default ant-btn-lg ant-btn-block !h-12 !rounded-lg !border !border-gray-300 !text-gray-700 hover:!border-[#C71D23] hover:!text-[#C71D23] !flex !items-center !justify-center !gap-2.5 !transition-all !duration-300">…</button> aka getByRole('button', { name: 'Gitee 登录' })
+        2) <button type="button" data-v-a0b48162="" class="css-dev-only-do-not-override-1p3hq3p ant-btn ant-btn-default ant-btn-lg ant-btn-block !h-12 !rounded-lg !border !border-gray-300 !text-gray-700 hover:!border-gray-900 hover:!text-gray-900 !flex !items-center !justify-center !gap-2.5 !transition-all !duration-300 mt-3">…</button> aka getByRole('button', { name: 'GitHub 登录' })
+
+    Call log:
+    [2m  - waiting for getByRole('button', { name: '登录' })[22m
+
+
+      50 |
+      51 |     // 直接点击登录按钮，触发表单验证
+    > 52 |     await page.getByRole("button", { name: "登录" }).click();
+         |                                                    ^
+      53 |
+      54 |     // ant-design 表单验证：应有"请输入你的邮箱"错误提示
+      55 |     await expect(page.locator("text=请输入你的邮箱")).toBeVisible({ timeout: 3000 });
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:52:52
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-②-表单验证：空字段提交显示错误信息-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-②-表单验证：空字段提交显示错误信息-chrome\error-context.md
+
+  3) [chrome] › tests\specs\auth-flows.spec.ts:58:3 › 认证流程 — 登录 › ③ 表单验证：无效邮箱格式 ────────────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('#email').first()[22m
+
+
+      22 |   password: string,
+      23 | ) {
+    > 24 |   await page.locator("#email").first().fill(email);
+         |                                        ^
+      25 |   await page.locator("#password").first().fill(password);
+      26 | }
+      27 |
+        at fillLoginForm (D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:24:40)
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:61:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-③-表单验证：无效邮箱格式-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-③-表单验证：无效邮箱格式-chrome\error-context.md
+
+  4) [chrome] › tests\specs\auth-flows.spec.ts:67:3 › 认证流程 — 登录 › ④ 登录失败：凭据错误显示错误提示 ────────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('#email').first()[22m
+
+
+      22 |   password: string,
+      23 | ) {
+    > 24 |   await page.locator("#email").first().fill(email);
+         |                                        ^
+      25 |   await page.locator("#password").first().fill(password);
+      26 | }
+      27 |
+        at fillLoginForm (D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:24:40)
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:71:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-④-登录失败：凭据错误显示错误提示-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-④-登录失败：凭据错误显示错误提示-chrome\error-context.md
+
+  5) [chrome] › tests\specs\auth-flows.spec.ts:79:3 › 认证流程 — 登录 › ⑤ 登录成功：跳转首页，导航栏显示用户名 ─────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('#email').first()[22m
+
+
+      22 |   password: string,
+      23 | ) {
+    > 24 |   await page.locator("#email").first().fill(email);
+         |                                        ^
+      25 |   await page.locator("#password").first().fill(password);
+      26 | }
+      27 |
+        at fillLoginForm (D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:24:40)
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:83:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-登录-⑤-登录成功：跳转首页，导航栏显示用户名-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-登录-⑤-登录成功：跳转首页，导航栏显示用户名-chrome\error-context.md
+
+  6) [chrome] › tests\specs\auth-flows.spec.ts:99:3 › 认证流程 — 注册 › ⑥ 注册页加载：显示标题和表单字段 ────────────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=创建账号')
+    Expected: visible
+    Error: strict mode violation: locator('text=创建账号') resolved to 2 elements:
+        1) <h2 data-v-aed07c09="" class="text-3xl font-bold text-gray-900 mb-2">创建账号</h2> aka getByRole('heading', { name: '创建账号' })
+        2) <span>创建账号</span> aka getByRole('button', { name: '创建账号' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for locator('text=创建账号')[22m
+
+
+      100 |     await page.goto("/auth/register");
+      101 |
+    > 102 |     await expect(page.locator("text=创建账号")).toBeVisible();
+          |                                             ^
+      103 |     await expect(page.locator('[placeholder="请输入用户名"]')).toBeVisible();
+      104 |   });
+      105 |
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:102:45
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-注册-⑥-注册页加载：显示标题和表单字段-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-注册-⑥-注册页加载：显示标题和表单字段-chrome\error-context.md
+
+  7) [chrome] › tests\specs\auth-flows.spec.ts:106:3 › 认证流程 — 注册 › ⑦ 注册表单验证：空字段提交 ──────────────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('button', { name: '注册' })[22m
+
+
+      108 |
+      109 |     // 点击注册按钮触发表单验证
+    > 110 |     await page.getByRole("button", { name: "注册" }).click();
+          |                                                    ^
+      111 |
+      112 |     // 应有用户名必填提示
+      113 |     await expect(page.locator("text=请输入你的用户名")).toBeVisible({ timeout: 3000 });
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:110:52
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-注册-⑦-注册表单验证：空字段提交-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-注册-⑦-注册表单验证：空字段提交-chrome\error-context.md
+
+  8) [chrome] › tests\specs\auth-flows.spec.ts:122:3 › 认证流程 — 游客体验 & 退出 › ⑧ 点击「以游客身份体验」跳转首页 ────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: '以游客身份体验' })
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: '以游客身份体验' })[22m
+
+
+      124 |
+      125 |     const guestBtn = page.getByRole("button", { name: "以游客身份体验" });
+    > 126 |     await expect(guestBtn).toBeVisible();
+          |                            ^
+      127 |
+      128 |     await guestBtn.click();
+      129 |
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:126:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-游客体验-退出-⑧-点击「以游客身份体验」跳转首页-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-游客体验-退出-⑧-点击「以游客身份体验」跳转首页-chrome\error-context.md
+
+  9) [chrome] › tests\specs\auth-flows.spec.ts:135:3 › 认证流程 — 游客体验 & 退出 › ⑨ 登录后退出：导航栏用户菜单退出 ────────
+
+    [31mTest timeout of 30000ms exceeded.[39m
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('#email').first()[22m
+
+
+      22 |   password: string,
+      23 | ) {
+    > 24 |   await page.locator("#email").first().fill(email);
+         |                                        ^
+      25 |   await page.locator("#password").first().fill(password);
+      26 | }
+      27 |
+        at fillLoginForm (D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:24:40)
+        at D:\ai-msw\test\ai-resume\tests\specs\auth-flows.spec.ts:138:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\auth-flows-认证流程-—-游客体验-退出-⑨-登录后退出：导航栏用户菜单退出-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\auth-flows-认证流程-—-游客体验-退出-⑨-登录后退出：导航栏用户菜单退出-chrome\error-context.md
+
+  10) [chrome] › tests\specs\guest-flows.spec.ts:20:3 › 未登录用户 — 公开页面 › ① 首页加载：显示导航栏、Hero 区域和「开始制作」按钮 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: '开始制作' })
+    Expected: visible
+    Error: strict mode violation: getByRole('button', { name: '开始制作' }) resolved to 2 elements:
+        1) <button class="bg-primary-500 hover:bg-primary-600 text-white px-6 py-2.5 rounded-full text-sm font-medium transition-all shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 hover:-translate-y-0.5 active:translate-y-0"> 开始制作 </button> aka getByRole('button', { name: '开始制作', exact: true })
+        2) <button data-v-c0a1d4d8="" class="inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-primary-600 rounded-xl hover:bg-primary-700 transition-all shadow-lg shadow-primary-500/30 hover:shadow-primary-500/40 hover:-translate-y-1 cursor-pointer"> 免费开始制作 </button> aka getByRole('button', { name: '免费开始制作' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: '开始制作' })[22m
+
+
+      27 |     await expect(page.locator("text=登录 / 注册")).toBeVisible();
+      28 |     // "开始制作"按钮
+    > 29 |     await expect(page.getByRole("button", { name: "开始制作" })).toBeVisible();
+         |                                                              ^
+      30 |   });
+      31 |
+      32 |   test("② 模板列表页：加载后展示模板卡片和分页", async ({ page }) => {
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:29:62
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-公开页面-①-首页加载：显示导航栏、Hero-区域和「开始制作」按钮-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-公开页面-①-首页加载：显示导航栏、Hero-区域和「开始制作」按钮-chrome\error-context.md
+
+  11) [chrome] › tests\specs\guest-flows.spec.ts:56:3 › 未登录用户 — 公开页面 › ④ 页面未找到：访问不存在的路由显示 404 ──────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=页面未找到').or(locator('text=404'))
+    Expected: visible
+    Error: strict mode violation: locator('text=页面未找到').or(locator('text=404')) resolved to 2 elements:
+        1) <h1 class="text-9xl font-bold text-blue-600">404</h1> aka getByRole('heading', { name: '404' })
+        2) <h2 class="text-2xl font-semibold text-gray-900">页面未找到</h2> aka getByRole('heading', { name: '页面未找到' })
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=页面未找到').or(locator('text=404'))[22m
+
+
+      58 |
+      59 |     // 404 页面应包含提示文字
+    > 60 |     await expect(page.locator("text=页面未找到").or(page.locator("text=404"))).toBeVisible({
+         |                                                                           ^
+      61 |       timeout: 5000,
+      62 |     });
+      63 |   });
+        at D:\ai-msw\test\ai-resume\tests\specs\guest-flows.spec.ts:60:75
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\guest-flows-未登录用户-—-公开页面-④-页面未找到：访问不存在的路由显示-404-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\guest-flows-未登录用户-—-公开页面-④-页面未找到：访问不存在的路由显示-404-chrome\error-context.md
+
+  12) [chrome] › tests\specs\resume-flows.spec.ts:21:3 › 登录后 — 我的简历列表 › ① 导航到我的简历列表：展示简历卡片 ─────────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('text=张三 - 前端开发工程师').first()
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for locator('text=张三 - 前端开发工程师').first()[22m
+
+
+      30 |     // 应有简历卡片出现
+      31 |     const card = page.locator("text=张三 - 前端开发工程师");
+    > 32 |     await expect(card.first()).toBeVisible({ timeout: 5000 });
+         |                                ^
+      33 |   });
+      34 |
+      35 |   test('② 从导航栏「我的简历」链接正确跳转', async ({ page }) => {
+        at D:\ai-msw\test\ai-resume\tests\specs\resume-flows.spec.ts:32:32
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\resume-flows-登录后-—-我的简历列表-①-导航到我的简历列表：展示简历卡片-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\resume-flows-登录后-—-我的简历列表-①-导航到我的简历列表：展示简历卡片-chrome\error-context.md
+
+  13) [chrome] › tests\specs\resume-flows.spec.ts:54:3 › 登录后 — 创建简历流程 › ③ 从模板详情页'使用此模板' → 跳转编辑器 ────
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByRole('button', { name: '使用此模板' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 5000ms[22m
+    [2m  - waiting for getByRole('button', { name: '使用此模板' })[22m
+
+
+      61 |     // 查找"使用此模板"按钮
+      62 |     const useButton = page.getByRole("button", { name: "使用此模板" });
+    > 63 |     await expect(useButton).toBeVisible({ timeout: 5000 });
+         |                             ^
+      64 |
+      65 |     // 点击"使用此模板"
+      66 |     await useButton.click();
+        at D:\ai-msw\test\ai-resume\tests\specs\resume-flows.spec.ts:63:29
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\resume-flows-登录后-—-创建简历流程-③-从模板详情页-使用此模板-→-跳转编辑器-chrome\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\resume-flows-登录后-—-创建简历流程-③-从模板详情页-使用此模板-→-跳转编辑器-chrome\error-context.md
+
+  13 failed
+    [chrome] › tests\specs\auth-flows.spec.ts:33:3 › 认证流程 — 登录 › ① 登录页加载：显示标题和表单字段 ─────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:48:3 › 认证流程 — 登录 › ② 表单验证：空字段提交显示错误信息 ────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:58:3 › 认证流程 — 登录 › ③ 表单验证：无效邮箱格式 ─────────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:67:3 › 认证流程 — 登录 › ④ 登录失败：凭据错误显示错误提示 ─────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:79:3 › 认证流程 — 登录 › ⑤ 登录成功：跳转首页，导航栏显示用户名 ──────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:99:3 › 认证流程 — 注册 › ⑥ 注册页加载：显示标题和表单字段 ─────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:106:3 › 认证流程 — 注册 › ⑦ 注册表单验证：空字段提交 ───────────────────
+    [chrome] › tests\specs\auth-flows.spec.ts:122:3 › 认证流程 — 游客体验 & 退出 › ⑧ 点击「以游客身份体验」跳转首页 ─────────
+    [chrome] › tests\specs\auth-flows.spec.ts:135:3 › 认证流程 — 游客体验 & 退出 › ⑨ 登录后退出：导航栏用户菜单退出 ─────────
+    [chrome] › tests\specs\guest-flows.spec.ts:20:3 › 未登录用户 — 公开页面 › ① 首页加载：显示导航栏、Hero 区域和「开始制作」按钮 ─
+    [chrome] › tests\specs\guest-flows.spec.ts:56:3 › 未登录用户 — 公开页面 › ④ 页面未找到：访问不存在的路由显示 404 ────────
+    [chrome] › tests\specs\resume-flows.spec.ts:21:3 › 登录后 — 我的简历列表 › ① 导航到我的简历列表：展示简历卡片 ───────────
+    [chrome] › tests\specs\resume-flows.spec.ts:54:3 › 登录后 — 创建简历流程 › ③ 从模板详情页'使用此模板' → 跳转编辑器 ──────
+  11 passed (35.3s)
+undefined
+ ERR_PNPM_RECURSIVE_EXEC_FIRST_FAIL  Command "playwright" not found
+
+Did you mean "pnpm exec playwright"?

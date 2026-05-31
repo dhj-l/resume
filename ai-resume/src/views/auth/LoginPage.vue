@@ -76,31 +76,23 @@
       block
       size="large"
       class="!h-12 !rounded-lg !border !border-gray-300 !text-gray-700 hover:!border-[#C71D23] hover:!text-[#C71D23] !flex !items-center !justify-center !gap-2.5 !transition-all !duration-300"
-      @click="handleGiteeLogin"
+      @click="handleOAuthLogin('gitee')"
     >
       <GiteeIcon class="w-5 h-5" />
       Gitee 登录
     </a-button>
 
-    <!-- Guest Access -->
-    <div class="relative my-8">
-      <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t border-gray-200"></div>
-      </div>
-      <div class="relative flex justify-center text-sm">
-        <span class="px-4 bg-white text-gray-500">快速体验，无需注册</span>
-      </div>
-    </div>
-
     <a-button
       block
       size="large"
-      class="!h-12 !rounded-lg !border-gray-300 !text-gray-700 hover:!border-blue-500 hover:!text-blue-600"
-      @click="handleGuestAccess"
+      class="!h-12 !rounded-lg !border !border-gray-300 !text-gray-700 hover:!border-gray-900 hover:!text-gray-900 !flex !items-center !justify-center !gap-2.5 !transition-all !duration-300 mt-3"
+      @click="handleOAuthLogin('github')"
     >
-      以游客身份体验
+      <GitHubIcon class="w-5 h-5" />
+      GitHub 登录
     </a-button>
-    <p class="text-center text-xs text-gray-400 mt-2">数据仅保存 24 小时，进入编辑器后提示注册。</p>
+
+    <!-- Guest Access -->
 
     <!-- Sign Up Link -->
     <div class="text-center mt-8">
@@ -121,11 +113,12 @@
 import { reactive, ref } from "vue";
 
 import { MailOutlined, LockOutlined } from "@ant-design/icons-vue";
-import GiteeIcon from "@/components/icons/GiteeIcon.vue";
 import { message } from "ant-design-vue";
 import { useRouter } from "vue-router";
 
-import { getGiteeAuthUrlAPI } from "@/api/auth/auth";
+import { getGiteeAuthUrlAPI, getGitHubAuthUrlAPI } from "@/api/auth/auth";
+import GiteeIcon from "@/components/icons/GiteeIcon.vue";
+import GitHubIcon from "@/components/icons/GitHubIcon.vue";
 import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();
@@ -154,24 +147,16 @@ const handleLogin = async () => {
   }
 };
 
-const handleGuestAccess = () => {
-  message.info("正在进入游客模式...");
-  setTimeout(() => {
-    router.push("/home");
-  }, 1000);
-};
+const handleOAuthLogin = async (provider: "gitee" | "github") => {
+  const apiMap = { gitee: getGiteeAuthUrlAPI, github: getGitHubAuthUrlAPI };
+  const labelMap = { gitee: "Gitee", github: "GitHub" };
 
-const handleGiteeLogin = async () => {
   try {
-    const { data } = await getGiteeAuthUrlAPI();
-    // 存储 state 到 sessionStorage，供回调页 CSRF 校验（后端主导，前端透传）
-    sessionStorage.setItem("gitee_oauth_state", data.state);
-    console.log(data.authUrl);
-
-    // 跳转到 Gitee 授权页面
+    const { data } = await apiMap[provider]();
+    sessionStorage.setItem(`${provider}_oauth_state`, data.state);
     window.location.href = data.authUrl;
   } catch {
-    message.error("获取 Gitee 授权链接失败，请重试。");
+    message.error(`获取 ${labelMap[provider]} 授权链接失败，请重试。`);
   }
 };
 </script>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { inject, ref, type Ref } from "vue";
 
 import { Button, Popover, Input, message } from "ant-design-vue";
 import { Sparkles } from "lucide-vue-next";
@@ -17,6 +17,10 @@ interface Props {
 const props = defineProps<Props>();
 
 const { updateModuleContent } = useResumeStore();
+
+const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef")!;
+const getPopupContainer = (trigger: HTMLElement) =>
+  (drawerContentRef.value ?? (trigger.parentNode as HTMLElement) ?? document.body) as HTMLElement;
 
 const open = ref(false);
 const description = ref("");
@@ -59,7 +63,8 @@ const handleOpenChange = (visible: boolean) => {
   <Popover
     :open="open"
     trigger="click"
-    placement="bottomLeft"
+    placement="topLeft"
+    :get-popup-container="getPopupContainer"
     :overlay-inner-style="{ width: '320px' }"
     @update:open="handleOpenChange"
   >

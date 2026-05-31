@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, inject, type Ref } from "vue";
 
 import { PlusOutlined } from "@ant-design/icons-vue";
 import { Form, FormItem, Input, Row, Col, Upload, Select } from "ant-design-vue";
@@ -13,6 +13,9 @@ const props = defineProps<{
 }>();
 
 const { setBasicInfo } = useResumeStore();
+
+const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
+const getPopupContainer = (trigger: HTMLElement) => (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
 
 // 处理表单变化
 const update = (key: keyof BasicInfo, value: any) => {
@@ -66,6 +69,8 @@ const uploadHandle = async (file: File) => {
                 :value="data.gender"
                 placeholder="请选择性别"
                 :options="genderOptions"
+                placement="topLeft"
+                :get-popup-container="getPopupContainer"
                 @update:value="(val) => update('gender', val)"
               />
             </FormItem>
@@ -76,6 +81,8 @@ const uploadHandle = async (file: File) => {
                 :value="data.workYear"
                 placeholder="请选择工作年限"
                 :options="workYearOptions"
+                placement="topLeft"
+                :get-popup-container="getPopupContainer"
                 @update:value="(val) => update('workYear', val)"
               />
             </FormItem>

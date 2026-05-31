@@ -3,7 +3,7 @@ import { inject } from "vue";
 
 import { CloseCircleFilled } from "@ant-design/icons-vue";
 
-import { ContainerWidthKey } from "./types";
+import { ContainerWidthKey, SEVERITY_LABELS, SEVERITY_COLORS, SEVERITY_BG_COLORS } from "./types";
 import type { WeaknessItem } from "./types";
 
 defineProps<{
@@ -13,15 +13,23 @@ defineProps<{
 const isDesktop = inject(ContainerWidthKey);
 
 const tagColors: Record<string, string> = {
-  工作经历: "bg-blue-50 text-blue-600",
-  专业技能: "bg-green-50 text-green-600",
-  教育背景: "bg-purple-50 text-purple-600",
-  项目成果: "bg-orange-50 text-orange-600",
-  排版与格式: "bg-cyan-50 text-cyan-600",
+  岗位匹配度: "bg-blue-50 text-blue-600",
+  技术栈竞争力: "bg-green-50 text-green-600",
+  教育背景与学习能力: "bg-purple-50 text-purple-600",
+  项目经验深度: "bg-orange-50 text-orange-600",
+  简历呈现质量: "bg-cyan-50 text-cyan-600",
+  职业发展潜力: "bg-pink-50 text-pink-600",
 };
 
 function getTagClass(category: string): string {
   return tagColors[category] || "bg-gray-50 text-gray-600";
+}
+
+function getSeverityStyle(severity: string): Record<string, string> {
+  return {
+    backgroundColor: SEVERITY_BG_COLORS[severity] || "#f5f5f5",
+    color: SEVERITY_COLORS[severity] || "#999",
+  };
 }
 </script>
 
@@ -41,6 +49,13 @@ function getTagClass(category: string): string {
             :class="getTagClass(item.category)"
           >
             {{ item.category }}
+          </span>
+          <span
+            v-if="item.severity"
+            class="text-xs font-medium px-2 py-0.5 rounded-full"
+            :style="getSeverityStyle(item.severity)"
+          >
+            {{ SEVERITY_LABELS[item.severity] }}
           </span>
         </div>
         <p class="text-sm text-neutral-500 leading-relaxed mb-3" :class="!isDesktop && 'truncate'">

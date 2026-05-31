@@ -14,11 +14,12 @@ defineProps<{
 const isDesktop = inject(ContainerWidthKey);
 
 const tagColors: Record<string, string> = {
-  工作经历: "bg-blue-50 text-blue-600",
-  专业技能: "bg-green-50 text-green-600",
-  教育背景: "bg-purple-50 text-purple-600",
-  项目成果: "bg-orange-50 text-orange-600",
-  排版与格式: "bg-cyan-50 text-cyan-600",
+  岗位匹配度: "bg-blue-50 text-blue-600",
+  技术栈竞争力: "bg-green-50 text-green-600",
+  教育背景与学习能力: "bg-purple-50 text-purple-600",
+  项目经验深度: "bg-orange-50 text-orange-600",
+  简历呈现质量: "bg-cyan-50 text-cyan-600",
+  职业发展潜力: "bg-pink-50 text-pink-600",
 };
 
 function getTagClass(category: string): string {

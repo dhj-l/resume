@@ -8,7 +8,6 @@ import {
   SettingOutlined,
   DownOutlined,
   UploadOutlined,
-  SkinOutlined,
   EditOutlined,
 } from "@ant-design/icons-vue";
 import { Button, Dropdown, Menu, MenuItem, Popover, Space, message, Input } from "ant-design-vue";
@@ -68,7 +67,6 @@ const handleOpenPublishModal = () => {
   publishModalRef.value?.open();
 };
 
-// TODO: 处理返回点击
 const handleBack = () => {
   router.back();
 };
@@ -111,7 +109,6 @@ const autoSave = async (isUpdateCover: boolean = false) => {
   await saveResume();
 };
 
-// TODO: 处理导出PDF
 const handleExport = async () => {
   const element = getElement(".resume-preview-wrapper");
   if (!element) return;
@@ -161,14 +158,8 @@ const handleExport = async () => {
   }
 };
 
-// TODO: 处理模板切换
 const handleTemplateChange = (key: templateType) => {
   setCurrentTemplate(key);
-};
-
-// TODO: 处理主题切换
-const handleThemeChange = () => {
-  console.log("Theme toggle clicked");
 };
 
 const validateTitle = (title: string): string => {
@@ -236,12 +227,6 @@ interface HeaderPopoverConfig {
 
 const middleButtons: HeaderButtonConfig[] = [
   {
-    key: "theme",
-    label: "主题切换",
-    icon: toRaw(SkinOutlined),
-    onClick: handleThemeChange,
-  },
-  {
     key: "ai-analysis",
     label: "AI分析",
     icon: toRaw(Sparkles),
@@ -286,7 +271,7 @@ let timer: number | null = null;
 onMounted(() => {
   timer = setInterval(() => {
     autoSave();
-  }, 12000);
+  }, 45000);
 });
 
 onUnmounted(() => {

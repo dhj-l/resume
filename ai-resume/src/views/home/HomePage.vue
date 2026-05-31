@@ -2,8 +2,12 @@
   <div class="min-h-screen bg-white font-sans text-slate-900 flex flex-col">
     <NavBar />
 
-    <main class="flex-grow">
-      <router-view />
+    <main class="flex-grow relative overflow-hidden">
+      <router-view v-slot="{ Component }">
+        <GSAPTransition :preset="childPreset" mode="out-in">
+          <component :is="Component" :key="route.path" />
+        </GSAPTransition>
+      </router-view>
     </main>
 
     <Footer />
@@ -11,8 +15,20 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
+
+import { useRoute } from "vue-router";
+
+import GSAPTransition from "@/components/common/GSAPTransition.vue";
 import Footer from "@/components/layout/Footer.vue";
 import NavBar from "@/components/layout/NavBar.vue";
+import { resolvePresetFromMeta } from "@/utils/transitions";
+
+const route = useRoute();
+
+const childPreset = computed(() =>
+  resolvePresetFromMeta(route.meta as Record<string, unknown>, true),
+);
 </script>
 
 <style scoped>

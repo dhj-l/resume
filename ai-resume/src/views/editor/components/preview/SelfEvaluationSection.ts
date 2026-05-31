@@ -42,23 +42,26 @@ export const getSelfEvaluationStyles = (type: templateType): SelfEvaluationStyle
     case "elegant":
       return {
         ...commonStyles,
-        title: "text-xs tracking-[0.15em] uppercase font-semibold text-[#8a8780] mb-4",
+        title:
+          "text-xs tracking-[0.2em] uppercase font-semibold text-[#8a8780] mb-5 flex items-center gap-3",
         container: `${commonStyles.container}`,
-        content: "text-[#4a4a6a] whitespace-pre-wrap leading-relaxed italic border-l-[3px] border-[#c9a96e]/40 pl-5 py-2",
+        content:
+          "text-[#4a4a6a] whitespace-pre-wrap leading-[1.8] italic border-l-[3px] border-[#c9a96e]/40 pl-6 py-3 bg-gradient-to-r from-[#f8f4ee]/50 to-transparent rounded-r-sm",
       };
     case "minimal":
       return {
         ...commonStyles,
-        title: "text-base font-light text-[#111] tracking-[0.2em] uppercase mb-4",
+        title: "font-light text-[#111] tracking-[0.2em] uppercase mb-4",
         container: `${commonStyles.container}`,
-        content: "text-[#555] whitespace-pre-wrap leading-relaxed text-sm",
+        content: "text-[#555] whitespace-pre-wrap leading-relaxed",
       };
     case "luxury":
       return {
         ...commonStyles,
-        title: "text-xs tracking-[0.2em] uppercase font-semibold text-[#c9a050] mb-3",
+        title: "tracking-[0.2em] uppercase font-semibold text-[#c9a050] mb-3",
         container: `${commonStyles.container}`,
-        content: "text-white/60 whitespace-pre-wrap leading-relaxed text-sm italic border-l-2 border-[#c9a050]/30 pl-3",
+        content:
+          "text-white/60 whitespace-pre-wrap leading-relaxed italic border-l-2 border-[#c9a050]/30 pl-3",
       };
     case "default":
     default:
