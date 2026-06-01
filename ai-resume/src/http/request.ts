@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 30000,
+  timeout: 300000, // 300秒超时(ai生成需要1-2分钟)
 });
 
 http.interceptors.request.use(
