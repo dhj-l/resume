@@ -6,7 +6,7 @@
 
 ## 在线体验
 
-> **[立即免费使用](http://115.159.4.70/home)**
+> **[立即免费使用](https://ai-jl.top/home)**
 > 无需注册，打开即用
 
 ---
@@ -86,7 +86,7 @@ cp .env.example .env
 pnpm dev
 ```
 
-打开浏览器访问 http://localhost:5173
+打开浏览器访问 https://ai-jl.top/home
 
 ### 常用命令
 
