@@ -21,7 +21,8 @@ const props = defineProps<{
 const { addEducation, removeEducation, updateEducation, moveEducation } = useResumeStore();
 
 const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
-const getPopupContainer = (trigger: HTMLElement) => (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
+const getPopupContainer = (trigger: HTMLElement) =>
+  (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
 
 const degreeOptions = [
   { label: "初中", value: "初中" },
@@ -31,7 +32,8 @@ const degreeOptions = [
   { label: "硕士", value: "硕士" },
   { label: "博士", value: "博士" },
 ];
-const lastEndTime = ref("");
+/** 按条目的 localSort（无则退回 index）记录勾选“至今”前的原始毕业时间 */
+const lastEndTimes = ref<Record<string, string>>({});
 
 // 添加教育经历
 const handleAdd = () => {
@@ -54,11 +56,15 @@ const update = (index: number, key: keyof EducationBackground, value: any) => {
 };
 
 const handleTillNowChange = (index: number, checked: boolean) => {
+  const item = props.data[index];
+  if (!item) return;
+  const key = String(item.localSort ?? index);
   if (checked) {
-    lastEndTime.value = props.data[index]!.graduationTime as string;
+    lastEndTimes.value[key] = item.graduationTime || "";
     update(index, "graduationTime", "至今");
   } else {
-    update(index, "graduationTime", lastEndTime.value);
+    update(index, "graduationTime", lastEndTimes.value[key] ?? "");
+    delete lastEndTimes.value[key];
   }
 };
 </script>

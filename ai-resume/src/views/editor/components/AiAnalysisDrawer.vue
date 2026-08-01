@@ -44,9 +44,14 @@ watch(
       return;
     }
 
+    if (!resumeData.value._id) {
+      showInput.value = true;
+      return;
+    }
+
     fetchLoading.value = true;
     try {
-      const { data } = await getLatestAnalysisAPI(resumeData.value._id);
+      const { data } = await getLatestAnalysisAPI(resumeData.value._id, { silent: true });
 
       if (data?.analysisResult) {
         analysisResult.value = data.analysisResult;
@@ -54,6 +59,9 @@ watch(
         jobDescription.value = data.jobDescription || "";
         showInput.value = false;
       }
+    } catch {
+      // 暂无历史分析或请求失败：静默降级为输入模式
+      showInput.value = true;
     } finally {
       fetchLoading.value = false;
     }
@@ -65,6 +73,10 @@ const btnDisabled = computed(() => {
 });
 
 const handleAnalyze = async () => {
+  if (!resumeData.value._id) {
+    message.warning("请先保存简历后再进行分析");
+    return;
+  }
   loading.value = true;
   try {
     const res = await analyzeResumeAPI({

@@ -232,6 +232,8 @@ const handleUseTemplate = async () => {
     if (data && data._id) {
       pushToEditor(data._id);
     }
+  } catch {
+    // 错误提示已由请求拦截器统一处理
   } finally {
     isCreating.value = false;
   }
@@ -270,6 +272,8 @@ const handleAiSubmit = async (data: any) => {
       pushToEditor(resData._id);
       aiDialogOpen.value = false;
     }
+  } catch {
+    // 错误提示已由请求拦截器统一处理
   } finally {
     isAiCreating.value = false;
     isGlobalLoading.value = false;
@@ -294,6 +298,8 @@ const handleSelectResumeSubmit = async (payload: { jd: string; resumeId: string 
       pushToEditor(resData._id);
       selectResumeOpen.value = false;
     }
+  } catch {
+    // 错误提示已由请求拦截器统一处理
   } finally {
     isImporting.value = false;
     isGlobalLoading.value = false;
@@ -318,6 +324,8 @@ const handleUploadResumeSubmit = async (payload: { resumeText: string; jdText: s
       pushToEditor(resData._id);
       uploadResumeOpen.value = false;
     }
+  } catch {
+    // 错误提示已由请求拦截器统一处理
   } finally {
     isImporting.value = false;
     isGlobalLoading.value = false;
@@ -350,6 +358,8 @@ const handleImportResumeSubmit = async (payload: { resumeText: string }) => {
       pushToEditor(resData._id);
       importResumeOpen.value = false;
     }
+  } catch {
+    // 错误提示已由请求拦截器统一处理
   } finally {
     isImportingResume.value = false;
     isGlobalLoading.value = false;

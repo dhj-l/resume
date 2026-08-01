@@ -41,10 +41,11 @@ provide(
   computed(() => props.isDesktop),
 );
 
-const scoreLevel = computed(() => getScoreLevel(props.data.overall_score));
+const overallScore = computed(() => Number(props.data.overall_score) || 0);
+const scoreLevel = computed(() => getScoreLevel(overallScore.value));
 
 const percentileText = computed(() => {
-  const score = props.data.overall_score;
+  const score = overallScore.value;
   const percentile = Math.min(Math.round(score * 0.8 + 10), 99);
   return `超过 ${percentile}% 的同类简历`;
 });
@@ -120,7 +121,7 @@ const analysisDate = computed(() => props.data.meta.analysis_date || today.value
               /></span>
             </h3>
             <AnalysisScoreRing
-              :score="data.overall_score"
+              :score="overallScore"
               :label="scoreLevel"
               :description="percentileText"
             />
@@ -143,12 +144,12 @@ const analysisDate = computed(() => props.data.meta.analysis_date || today.value
               <div :class="isDesktop ? 'flex items-center gap-8' : ''">
                 <!-- Radar Chart (Hidden on mobile) -->
                 <div :class="isDesktop ? 'w-[45%]' : 'hidden'">
-                  <RadarChart :dimensions="data.dimension_scores" />
+                  <RadarChart :dimensions="data.dimension_scores || []" />
                 </div>
 
                 <!-- Dimension Bars -->
                 <div :class="isDesktop ? 'w-[55%]' : 'w-full'">
-                  <DimensionScoresSection :dimensions="data.dimension_scores" />
+                  <DimensionScoresSection :dimensions="data.dimension_scores || []" />
                 </div>
               </div>
               <div v-if="isDesktop" class="text-xs text-neutral-400 mt-4 text-right">
@@ -160,7 +161,7 @@ const analysisDate = computed(() => props.data.meta.analysis_date || today.value
             <KeyFindingsSection v-if="data.key_findings?.length" :findings="data.key_findings" />
 
             <!-- Weaknesses -->
-            <div v-if="data.weaknesses.length" class="space-y-3">
+            <div v-if="(data.weaknesses || []).length" class="space-y-3">
               <h3 class="text-base font-semibold text-neutral-700 flex items-center gap-2">
                 <WarningFilled class="text-red-500" />
                 待改进点
@@ -190,7 +191,7 @@ const analysisDate = computed(() => props.data.meta.analysis_date || today.value
           <!-- Right Column -->
           <div class="space-y-6" :class="isDesktop ? 'col-span-2' : ''">
             <!-- Strengths Section -->
-            <div v-if="data.strengths.length" class="space-y-3">
+            <div v-if="(data.strengths || []).length" class="space-y-3">
               <h3 class="text-base font-semibold text-neutral-700 flex items-center gap-2">
                 <LikeFilled class="text-green-500" />
                 优势亮点
@@ -205,7 +206,7 @@ const analysisDate = computed(() => props.data.meta.analysis_date || today.value
 
             <!-- Suggestions Section -->
             <div
-              v-if="data.suggestions.length"
+              v-if="(data.suggestions || []).length"
               class="rounded-xl bg-white shadow-card"
               :class="isDesktop ? 'p-6' : 'p-5'"
             >

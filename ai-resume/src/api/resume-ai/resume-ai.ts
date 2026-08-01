@@ -1,3 +1,5 @@
+import type { AxiosRequestConfig } from "axios";
+
 import { http } from "@/http/request";
 
 import type {
@@ -34,8 +36,11 @@ export const getAnalysisDetailAPI = (id: string) => {
   });
 };
 
-export const getLatestAnalysisAPI = (resumeId: string) => {
-  return http.get<AnalysisDetailResult>("/resume-ai/latest-analysis", { params: { resumeId } });
+export const getLatestAnalysisAPI = (resumeId: string, config?: AxiosRequestConfig) => {
+  return http.get<AnalysisDetailResult>("/resume-ai/latest-analysis", {
+    params: { resumeId },
+    ...config,
+  });
 };
 
 export const exportAnalysisAPI = (id: string) => {

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { provide, ref } from "vue";
+import { onMounted, provide, ref } from "vue";
 
-import { Layout } from "ant-design-vue";
+import { Layout, message } from "ant-design-vue";
 import { storeToRefs } from "pinia";
+import { useRoute, useRouter } from "vue-router";
 
 import { useResumeStore } from "@/stores/resumeStore";
 
@@ -13,6 +14,8 @@ import ResumePreview from "./components/ResumePreview.vue";
 
 const { resumeData } = storeToRefs(useResumeStore());
 const { setResumeDataString } = useResumeStore();
+const route = useRoute();
+const router = useRouter();
 
 const showAiDrawer = ref(false);
 
@@ -25,6 +28,14 @@ provide("resumeData", resumeData);
 const handleTitleUpdate = (newTitle: string) => {
   setResumeDataString("title", newTitle);
 };
+
+onMounted(() => {
+  // 编辑器必须从“我的简历/模板详情”等入口携带简历 id 进入
+  if (!route.query.id) {
+    message.warning("请先创建或选择一份简历");
+    router.replace("/user/resumes");
+  }
+});
 </script>
 
 <template>

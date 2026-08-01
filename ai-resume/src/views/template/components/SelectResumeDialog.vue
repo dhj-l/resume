@@ -153,6 +153,8 @@ const fetchResumes = async () => {
   try {
     const res = await getUserResumesAPI();
     resumes.value = res?.data?.list || [];
+  } catch {
+    error.value = "加载简历列表失败，请重试";
   } finally {
     loading.value = false;
   }
@@ -186,19 +188,11 @@ watch(
   () => props.open,
   (newVal) => {
     if (newVal) {
-      // Reset selection when opening, but keep JD maybe?
-      // Or reset everything? Let's keep it simple and reset selection only if needed.
-      // Or maybe we want to fetch fresh data every time.
-      if (resumes.value.length === 0) {
-        fetchResumes();
-      } else {
-        // Optionally refresh silently or check if stale
-        fetchResumes();
-      }
-      // Reset selection?
+      // 打开时重置状态并拉取最新简历列表
       selectedResumeId.value = null;
-      // Reset JD? Ideally clear it for a new task.
       jobDescription.value = "";
+      error.value = null;
+      fetchResumes();
     }
   },
 );

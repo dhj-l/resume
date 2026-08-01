@@ -26,9 +26,11 @@ const {
 } = useResumeStore();
 
 const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
-const getPopupContainer = (trigger: HTMLElement) => (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
+const getPopupContainer = (trigger: HTMLElement) =>
+  (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
 
-const lastEndTime = ref("");
+/** 按条目的 localSort（无则退回 index）记录勾选“至今”前的原始结束时间 */
+const lastEndTimes = ref<Record<string, string>>({});
 const handleAdd = () => {
   addProjectExperience();
 };
@@ -46,11 +48,15 @@ const update = (index: number, key: keyof ProjectExperience, value: any) => {
 };
 
 const handleTillNowChange = (index: number, checked: boolean) => {
+  const item = props.data[index];
+  if (!item) return;
+  const key = String(item.localSort ?? index);
   if (checked) {
-    lastEndTime.value = props.data[index]!.endTime as string;
+    lastEndTimes.value[key] = item.endTime || "";
     update(index, "endTime", "至今");
   } else {
-    update(index, "endTime", lastEndTime.value);
+    update(index, "endTime", lastEndTimes.value[key] ?? "");
+    delete lastEndTimes.value[key];
   }
 };
 </script>

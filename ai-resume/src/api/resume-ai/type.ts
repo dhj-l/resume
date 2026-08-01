@@ -1,5 +1,7 @@
 export interface GenerationRecord {
   _id: string;
+  /** 生成成功后对应的简历 ID（后端可能不回传，回传时优先使用） */
+  resumeId?: string;
   jobDescription: string;
   status: string;
   templateType: string;

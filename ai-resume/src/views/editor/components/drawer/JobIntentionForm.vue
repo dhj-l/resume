@@ -12,7 +12,8 @@ defineProps<{
 const { setJobIntention } = useResumeStore();
 
 const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
-const getPopupContainer = (trigger: HTMLElement) => (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
+const getPopupContainer = (trigger: HTMLElement) =>
+  (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
 
 // 处理表单变化
 const update = (key: keyof JobIntention, value: any) => {
@@ -30,7 +31,7 @@ const entryTimeOptions = [
 </script>
 
 <template>
-  <Form layout="vertical">
+  <Form v-if="data" layout="vertical">
     <Row :gutter="24">
       <Col :span="6">
         <FormItem label="求职意向">

@@ -22,13 +22,15 @@ const { addWorkExperience, removeWorkExperience, updateWorkExperience, moveWorkE
   useResumeStore();
 
 const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
-const getPopupContainer = (trigger: HTMLElement) => (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
+const getPopupContainer = (trigger: HTMLElement) =>
+  (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
 
 const handleAdd = () => {
   addWorkExperience();
 };
 
-const lastEndTime = ref("");
+/** 按条目的 localSort（无则退回 index）记录勾选“至今”前的原始离职时间 */
+const lastEndTimes = ref<Record<string, string>>({});
 
 const handleDelete = (index: number) => {
   removeWorkExperience(index);
@@ -43,11 +45,15 @@ const update = (index: number, key: keyof WorkExperience, value: any) => {
 };
 
 const handleTillNowChange = (index: number, checked: boolean) => {
+  const item = props.data[index];
+  if (!item) return;
+  const key = String(item.localSort ?? index);
   if (checked) {
-    lastEndTime.value = props.data[index]!.dismissalTime as string;
+    lastEndTimes.value[key] = item.dismissalTime || "";
     update(index, "dismissalTime", "至今");
   } else {
-    update(index, "dismissalTime", lastEndTime.value);
+    update(index, "dismissalTime", lastEndTimes.value[key] ?? "");
+    delete lastEndTimes.value[key];
   }
 };
 </script>

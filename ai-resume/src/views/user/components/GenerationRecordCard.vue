@@ -36,7 +36,7 @@
           type="primary"
           size="small"
           class="flex items-center"
-          @click="$emit('view', record._id)"
+          @click="$emit('view', record)"
         >
           <template #icon><EyeOutlined /></template>
           查看
@@ -60,7 +60,7 @@ const props = defineProps<{
 }>();
 
 defineEmits<{
-  (e: "view", id: string): void;
+  (e: "view", record: GenerationRecord): void;
 }>();
 
 const jobTitle = computed(() => {

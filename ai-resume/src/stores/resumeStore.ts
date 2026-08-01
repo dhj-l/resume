@@ -22,7 +22,7 @@ import SelfEvaluationSection from "@/views/editor/components/preview/SelfEvaluat
 import SkillsSection from "@/views/editor/components/preview/SkillsSection.vue";
 import type { templateType } from "@/views/editor/components/preview/type";
 import WorkExperienceSection from "@/views/editor/components/preview/WorkExperienceSection.vue";
-import { mockResumeData } from "@/views/editor/data/mockData";
+import { createEmptyResumeData } from "@/views/editor/data/mockData";
 
 import type {
   ModuleItem,
@@ -121,41 +121,47 @@ const DEFAULT_MODULE_ORDER: ModuleItem[] = [
   },
 ];
 const MAX_GLOBAL_SORT = Number.MAX_SAFE_INTEGER;
+const MODULE_DEFAULT_SORT: Record<string, number> = Object.fromEntries(
+  DEFAULT_MODULE_ORDER.map((module) => [module.moduleKey, module.globalSort]),
+);
 const FIXED_MODULES = ["basicInfo", "jobIntention"] as const;
 
 const isFixedModule = (moduleKey: string): boolean => {
   return FIXED_MODULES.includes(moduleKey as any);
 };
 
-const getGlobalSortFromResumeData = (resumeData: ResumeData, moduleKey: string): number => {
+const getGlobalSortFromResumeData = (
+  resumeData: ResumeData,
+  moduleKey: string,
+  sortHints: Record<string, number>,
+): number => {
   const moduleData = (resumeData as any)[moduleKey];
+  const fallbackSort = sortHints[moduleKey] ?? MODULE_DEFAULT_SORT[moduleKey] ?? MAX_GLOBAL_SORT;
 
   if (moduleData === null || moduleData === undefined) {
-    return MAX_GLOBAL_SORT;
+    return fallbackSort;
   }
 
   if (Array.isArray(moduleData)) {
     if (moduleData.length === 0) {
-      return MAX_GLOBAL_SORT;
+      return fallbackSort;
     }
-    return moduleData[0]?.globalSort ?? MAX_GLOBAL_SORT;
+    return moduleData[0]?.globalSort ?? fallbackSort;
   }
 
   if (typeof moduleData === "object") {
-    const keys = Object.keys(moduleData);
-    if (keys.length === 0) {
-      return MAX_GLOBAL_SORT;
-    }
-    return moduleData.globalSort ?? MAX_GLOBAL_SORT;
+    return moduleData.globalSort ?? fallbackSort;
   }
 
-  return MAX_GLOBAL_SORT;
+  return fallbackSort;
 };
 
 export const useResumeStore = defineStore("resume", () => {
-  const resumeData = ref<ResumeData>(mockResumeData);
+  const resumeData = ref<ResumeData>(createEmptyResumeData());
   const currentModule = ref<string>("basicInfo");
-  const moduleOrder = ref<ModuleItem[]>([...DEFAULT_MODULE_ORDER]);
+  const moduleOrder = ref<ModuleItem[]>(DEFAULT_MODULE_ORDER.map((module) => ({ ...module })));
+  /** 记录模块最后已知的排序位置，用于“清空后重新添加”时保持原有顺序 */
+  const moduleSortHints = ref<Record<string, number>>({});
   const isExpanded = ref(false);
 
   const currentTemplateType = computed(() => {
@@ -197,11 +203,15 @@ export const useResumeStore = defineStore("resume", () => {
   };
 
   const createResume = async () => {
+    moduleSortHints.value = {};
     const res = await createResumeAPI();
     resumeData.value = res.data;
   };
 
   const saveResume = async () => {
+    if (!resumeData.value._id) {
+      throw new Error("简历尚未创建，请先创建或打开一份简历");
+    }
     const res = await updateResumeAPI(resumeData.value._id, resumeData.value);
     resumeData.value = res.data;
   };
@@ -212,7 +222,11 @@ export const useResumeStore = defineStore("resume", () => {
 
   const syncModuleOrderWithResumeData = () => {
     moduleOrder.value.forEach((module) => {
-      module.globalSort = getGlobalSortFromResumeData(resumeData.value, module.moduleKey);
+      module.globalSort = getGlobalSortFromResumeData(
+        resumeData.value,
+        module.moduleKey,
+        moduleSortHints.value,
+      );
     });
 
     const basicInfoModule = moduleOrder.value.find((m) => m.moduleKey === "basicInfo");
@@ -228,8 +242,14 @@ export const useResumeStore = defineStore("resume", () => {
     ];
   };
 
+  let resumeLoadToken = 0;
   const getResumeDetail = async (id: string) => {
+    // 先清空数据，避免加载失败/慢加载时残留上一份简历
+    const currentToken = ++resumeLoadToken;
+    resumeData.value = createEmptyResumeData();
+    moduleSortHints.value = {};
     const res = await getResumeDetailAPI(id);
+    if (currentToken !== resumeLoadToken) return;
     resumeData.value = res.data;
     initializeModuleOrder();
   };
@@ -334,6 +354,12 @@ export const useResumeStore = defineStore("resume", () => {
     if (!list || list.length === 0) return;
     if (index < 0 || index >= list.length) return;
     list.splice(index, 1);
+    if (Array.isArray(list) && list.length === 0) {
+      const module = moduleOrder.value.find((m) => m.moduleKey === key);
+      if (module) {
+        moduleSortHints.value[key as string] = module.globalSort;
+      }
+    }
   };
 
   const updateItem = (key: keyof ResumeData, index: number, data: any) => {
@@ -355,11 +381,12 @@ export const useResumeStore = defineStore("resume", () => {
     const newItem = {
       ...initialData,
       localSort: newLocalSort,
+      globalSort:
+        list[0]?.globalSort ??
+        moduleSortHints.value[key as string] ??
+        MODULE_DEFAULT_SORT[key as string] ??
+        MAX_GLOBAL_SORT,
     };
-
-    if (list.length > 0 && list[0]?.globalSort !== undefined) {
-      newItem.globalSort = list[0].globalSort;
-    }
 
     list.push(newItem);
   };
@@ -476,21 +503,51 @@ export const useResumeStore = defineStore("resume", () => {
   const changeGlobalSort = (moduleKeyA: string, moduleKeyB: string) => {
     const moduleA = (resumeData.value as any)[moduleKeyA];
     const moduleB = (resumeData.value as any)[moduleKeyB];
+    if (moduleA == null || moduleB == null) return;
 
-    const tempGlobalSortA = Array.isArray(moduleA)
-      ? (moduleA[0]?.globalSort ?? 0)
-      : (moduleA?.globalSort ?? 0);
-    const tempGlobalSortB = Array.isArray(moduleB)
-      ? (moduleB[0]?.globalSort ?? 0)
-      : (moduleB?.globalSort ?? 0);
-    if (Array.isArray(moduleA)) {
+    // 空模块没有条目可写 globalSort，统一落到 moduleSortHints，避免把 0 写进另一个模块
+    if (
+      Array.isArray(moduleA) &&
+      Array.isArray(moduleB) &&
+      moduleA.length === 0 &&
+      moduleB.length === 0
+    ) {
+      return;
+    }
+
+    const getEffectiveSort = (moduleKey: string, module: any): number => {
+      if (Array.isArray(module)) {
+        return (
+          module[0]?.globalSort ??
+          moduleSortHints.value[moduleKey] ??
+          MODULE_DEFAULT_SORT[moduleKey] ??
+          0
+        );
+      }
+      return (
+        module?.globalSort ??
+        moduleSortHints.value[moduleKey] ??
+        MODULE_DEFAULT_SORT[moduleKey] ??
+        0
+      );
+    };
+
+    const tempGlobalSortA = getEffectiveSort(moduleKeyA, moduleA);
+    const tempGlobalSortB = getEffectiveSort(moduleKeyB, moduleB);
+
+    if (Array.isArray(moduleA) && moduleA.length === 0) {
+      moduleSortHints.value[moduleKeyA] = tempGlobalSortB;
+    } else if (Array.isArray(moduleA)) {
       moduleA.forEach((item) => {
         item.globalSort = tempGlobalSortB;
       });
     } else {
       moduleA.globalSort = tempGlobalSortB;
     }
-    if (Array.isArray(moduleB)) {
+
+    if (Array.isArray(moduleB) && moduleB.length === 0) {
+      moduleSortHints.value[moduleKeyB] = tempGlobalSortA;
+    } else if (Array.isArray(moduleB)) {
       moduleB.forEach((item) => {
         item.globalSort = tempGlobalSortA;
       });

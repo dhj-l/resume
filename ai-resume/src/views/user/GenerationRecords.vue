@@ -98,8 +98,9 @@ const handlePageChange = () => {
   fetchRecords();
 };
 
-const handleView = (id: string) => {
-  router.push({ path: "/editor", query: { id } });
+const handleView = (record: GenerationRecord) => {
+  // 优先使用后端回传的简历 ID；未回传时退回记录 ID（保持原行为）
+  router.push({ path: "/editor", query: { id: record.resumeId || record._id } });
 };
 
 onMounted(() => {

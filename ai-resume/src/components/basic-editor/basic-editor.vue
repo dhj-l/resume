@@ -24,7 +24,7 @@ const editorRef = shallowRef();
 
 // 内容 HTML
 const valueHtml = defineModel({
-  default: "<p>hello</p>",
+  default: "",
 });
 
 const toolbarConfig: Partial<IToolbarConfig> = {

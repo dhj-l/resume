@@ -15,7 +15,7 @@ const update = (val: string) => {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div v-if="data" class="space-y-4">
     <div
       class="group relative bg-white p-3 rounded-lg border border-gray-200 hover:border-blue-500 transition-colors"
     >

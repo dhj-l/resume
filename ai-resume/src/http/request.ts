@@ -1,6 +1,13 @@
 import { message } from "ant-design-vue";
 import axios from "axios";
 
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    /** 请求失败时不弹出全局错误提示（由调用方自行处理） */
+    silent?: boolean;
+  }
+}
+
 export const http = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 30000,
@@ -37,7 +44,9 @@ http.interceptors.response.use(
     if (code >= 200 && code < 300) {
       return response.data;
     } else {
-      message.error(msg || "请求失败");
+      if (!response.config.silent) {
+        message.error(msg || "请求失败");
+      }
       return Promise.reject(new Error(msg || "请求失败"));
     }
   },
@@ -53,10 +62,14 @@ http.interceptors.response.use(
         message.error("登录已过期，请重新登录");
         router.push({ path: "/auth/login" });
       } else {
-        message.error(data?.message || "网络请求错误");
+        if (!error.config?.silent) {
+          message.error(data?.message || "网络请求错误");
+        }
       }
     } else {
-      message.error("网络连接异常，请检查网络设置");
+      if (!error.config?.silent) {
+        message.error("网络连接异常，请检查网络设置");
+      }
     }
     return Promise.reject(error);
   },

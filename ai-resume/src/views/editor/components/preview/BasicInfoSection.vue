@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { BasicInfo } from "@/stores/type";
+import { getFullImageUrl } from "@/utils/image";
 
 import { getBasicInfoStyles } from "./BasicInfoSection";
 import type { templateType } from "./type";
@@ -52,7 +53,7 @@ const contentArray = computed(() => {
   ];
 });
 const fullAvatar = computed(() => {
-  return import.meta.env.VITE_DEFAULT_AVATAR + props.data.avatar;
+  return getFullImageUrl(props.data.avatar);
 });
 </script>
 
@@ -63,7 +64,7 @@ const fullAvatar = computed(() => {
   -->
   <div v-if="data" :class="styles.container" @click="handleClick">
     <div :class="styles.contentWrapper">
-      <img :src="fullAvatar" alt="avatar" :class="styles.avatar" />
+      <img v-if="data.avatar" :src="fullAvatar" alt="avatar" :class="styles.avatar" />
       <div :class="styles.infoWrapper">
         <h1 :class="styles.name">
           {{ data.name }}

@@ -130,7 +130,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 import { message } from "ant-design-vue";
 import type { FormInstance } from "ant-design-vue";
@@ -296,6 +296,28 @@ const handleSubmit = () => {
     supplementary: formData.value.supplementary,
   });
 };
+
+// 每次打开弹窗时重置步骤与表单，避免残留上一次的输入
+watch(
+  () => props.open,
+  (open) => {
+    if (!open) return;
+    currentStep.value = 0;
+    formData.value = {
+      jd: "",
+      userInfo: {
+        name: "",
+        age: undefined,
+        education: undefined,
+        school: "",
+        major: "",
+        targetRole: "",
+        yearsOfExperience: undefined,
+      },
+      supplementary: "",
+    };
+  },
+);
 </script>
 
 <style scoped>

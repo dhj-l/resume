@@ -5,10 +5,18 @@ import { Slider } from "ant-design-vue";
 import { storeToRefs } from "pinia";
 
 import { useResumeStore } from "@/stores/resumeStore";
+import type { GlobalStyle } from "@/stores/type";
 
 const resumeStore = useResumeStore();
 const { resumeData } = storeToRefs(resumeStore);
 const { setGlobalStyle } = resumeStore;
+
+const DEFAULT_GLOBAL_STYLE: GlobalStyle = {
+  fontSize: "14px",
+  moduleMargin: "24px",
+  pageMargin: "32px",
+  lineHeight: "1.5",
+};
 
 // Helper to parse value from string (e.g., "14px" -> 14, "1.5" -> 1.5)
 const parseValue = (val: string) => {
@@ -16,10 +24,11 @@ const parseValue = (val: string) => {
 };
 
 // Local state for sliders
-const fontSize = ref(parseValue(resumeData.value.globalStyle.fontSize));
-const moduleMargin = ref(parseValue(resumeData.value.globalStyle.moduleMargin));
-const pageMargin = ref(parseValue(resumeData.value.globalStyle.pageMargin));
-const lineHeight = ref(parseValue(resumeData.value.globalStyle.lineHeight));
+const currentStyle = resumeData.value.globalStyle ?? DEFAULT_GLOBAL_STYLE;
+const fontSize = ref(parseValue(currentStyle.fontSize));
+const moduleMargin = ref(parseValue(currentStyle.moduleMargin));
+const pageMargin = ref(parseValue(currentStyle.pageMargin));
+const lineHeight = ref(parseValue(currentStyle.lineHeight));
 
 // Watchers to update store
 watch(fontSize, (val) => {
@@ -42,17 +51,18 @@ watch(lineHeight, (val) => {
 watch(
   () => resumeData.value.globalStyle,
   (newStyle) => {
-    if (parseValue(newStyle.fontSize) !== fontSize.value) {
-      fontSize.value = parseValue(newStyle.fontSize);
+    const style = newStyle ?? DEFAULT_GLOBAL_STYLE;
+    if (parseValue(style.fontSize) !== fontSize.value) {
+      fontSize.value = parseValue(style.fontSize);
     }
-    if (parseValue(newStyle.moduleMargin) !== moduleMargin.value) {
-      moduleMargin.value = parseValue(newStyle.moduleMargin);
+    if (parseValue(style.moduleMargin) !== moduleMargin.value) {
+      moduleMargin.value = parseValue(style.moduleMargin);
     }
-    if (parseValue(newStyle.pageMargin) !== pageMargin.value) {
-      pageMargin.value = parseValue(newStyle.pageMargin);
+    if (parseValue(style.pageMargin) !== pageMargin.value) {
+      pageMargin.value = parseValue(style.pageMargin);
     }
-    if (parseValue(newStyle.lineHeight) !== lineHeight.value) {
-      lineHeight.value = parseValue(newStyle.lineHeight);
+    if (parseValue(style.lineHeight) !== lineHeight.value) {
+      lineHeight.value = parseValue(style.lineHeight);
     }
   },
   { deep: true },

@@ -152,6 +152,8 @@ const handleDelete = (id: string, title: string) => {
         await deleteResumeAPI(id);
         await fetchResumes({ showLoading: false });
         message.success("删除成功");
+      } catch {
+        // 错误提示已由请求拦截器统一处理
       } finally {
         actionLoadingId.value = "";
         actionType.value = "";

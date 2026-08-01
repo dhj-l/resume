@@ -40,7 +40,7 @@ const resumeTitle = computed(() => {
 
 const pdfName = computed(() => {
   const { basicInfo, jobIntention } = resumeData.value;
-  return basicInfo.name + "-" + jobIntention?.jobIntention;
+  return [basicInfo?.name, jobIntention?.jobIntention].filter(Boolean).join("-") || "简历";
 });
 const props = withDefaults(defineProps<Props>(), {
   resumeTitle: "未命名简历",
@@ -57,6 +57,7 @@ const currentTemplateLabel = computed(() => {
 });
 const router = useRouter();
 const exportLoading = ref(false);
+const isSaving = ref(false);
 const publishModalRef = ref();
 
 const isEditingTitle = ref(false);
@@ -77,8 +78,11 @@ const handleToggleAiDrawer = () => {
 
 const handleSave = async () => {
   const result = await autoSave(true);
-  if (result === false) return;
-  message.success("草稿保存成功");
+  if (result) {
+    message.success("草稿保存成功");
+  } else {
+    message.error("保存失败，请稍后重试");
+  }
 };
 
 /**
@@ -86,27 +90,40 @@ const handleSave = async () => {
  * @param isUpdateCover 是否更新封面
  */
 const autoSave = async (isUpdateCover: boolean = false) => {
-  //如果是更新封面，或者没有封面，才需要更新封面
-  if (isUpdateCover || !resumeData.value.cover) {
-    const element = getElement(".resume-preview-wrapper");
-    if (!element) return false;
+  if (isSaving.value) return true;
+  // 简历尚未创建/加载成功时不允许保存
+  if (!resumeData.value._id) return false;
 
-    const elementHeight = (element as HTMLElement).offsetHeight;
-    const COVER_HEIGHT_THRESHOLD = 1200;
+  isSaving.value = true;
+  try {
+    //如果是更新封面，或者没有封面，才需要更新封面
+    if (isUpdateCover || !resumeData.value.cover) {
+      const element = getElement(".resume-preview-wrapper");
+      if (!element) return false;
 
-    const coverFile = await getDomCover(
-      element as HTMLElement,
-      elementHeight > COVER_HEIGHT_THRESHOLD ? COVER_HEIGHT_THRESHOLD : undefined,
-    );
+      const elementHeight = (element as HTMLElement).offsetHeight;
+      const COVER_HEIGHT_THRESHOLD = 1200;
 
-    const url = await uploadImage(coverFile);
-    if (url) {
-      setResumeDataString("cover", url);
-    } else {
-      message.error("封面上传失败");
+      const coverFile = await getDomCover(
+        element as HTMLElement,
+        elementHeight > COVER_HEIGHT_THRESHOLD ? COVER_HEIGHT_THRESHOLD : undefined,
+      );
+
+      const url = await uploadImage(coverFile);
+      if (url) {
+        setResumeDataString("cover", url);
+      } else if (isUpdateCover) {
+        message.error("封面上传失败");
+      }
     }
+    await saveResume();
+    return true;
+  } catch (error) {
+    console.error("Auto save failed:", error);
+    return false;
+  } finally {
+    isSaving.value = false;
   }
-  await saveResume();
 };
 
 const handleExport = async () => {

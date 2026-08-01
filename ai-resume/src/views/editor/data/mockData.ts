@@ -1,5 +1,46 @@
 import type { ResumeData } from "@/stores/type";
 
+/**
+ * 创建一份空白简历，用于编辑器初始状态或加载失败后的兜底，
+ * 避免直接使用 mock 数据导致误保存/误分析。
+ */
+export const createEmptyResumeData = (): ResumeData => ({
+  _id: "",
+  userId: "",
+  type: "default",
+  title: "",
+  globalStyle: {
+    fontSize: "14px",
+    moduleMargin: "24px",
+    pageMargin: "32px",
+    lineHeight: "1.5",
+  },
+  basicInfo: {
+    name: "",
+    gender: "",
+    phone: "",
+    age: "",
+    email: "",
+    avatar: "",
+    politicalStatus: "",
+    workYear: "",
+  },
+  jobIntention: {
+    jobIntention: "",
+    intentionCity: "",
+    expectationSalary: "",
+    entryTime: "",
+  },
+  educationBackground: [],
+  workExperience: [],
+  campusExperience: [],
+  skills: { content: "", globalSort: 7 },
+  certificates: { content: "", globalSort: 8 },
+  projectExperience: [],
+  internshipExperience: [],
+  selfEvaluation: { content: "", globalSort: 9 },
+});
+
 export const mockResumeData: ResumeData = {
   _id: "1",
   userId: "user_123",

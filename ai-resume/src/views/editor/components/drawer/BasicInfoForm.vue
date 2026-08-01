@@ -6,6 +6,7 @@ import { Form, FormItem, Input, Row, Col, Upload, Select } from "ant-design-vue"
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { BasicInfo } from "@/stores/type";
+import { getFullImageUrl } from "@/utils/image";
 import { uploadImage } from "@/utils/upload";
 
 const props = defineProps<{
@@ -15,7 +16,8 @@ const props = defineProps<{
 const { setBasicInfo } = useResumeStore();
 
 const drawerContentRef = inject<Ref<HTMLDivElement>>("drawerContentRef");
-const getPopupContainer = (trigger: HTMLElement) => (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
+const getPopupContainer = (trigger: HTMLElement) =>
+  (drawerContentRef?.value ?? trigger.parentNode) as HTMLElement;
 
 // 处理表单变化
 const update = (key: keyof BasicInfo, value: any) => {
@@ -40,7 +42,7 @@ const workYearOptions = [
   { label: "10年以上", value: "10年以上" },
 ];
 const fullAvatar = computed(() => {
-  return import.meta.env.VITE_DEFAULT_AVATAR + props.data.avatar;
+  return getFullImageUrl(props.data.avatar);
 });
 const uploadHandle = async (file: File) => {
   const url = await uploadImage(file);
@@ -49,7 +51,7 @@ const uploadHandle = async (file: File) => {
 </script>
 
 <template>
-  <Form layout="vertical">
+  <Form v-if="data" layout="vertical">
     <Row :gutter="24">
       <!-- 左侧表单区域 -->
       <Col :span="18">
@@ -92,7 +94,7 @@ const uploadHandle = async (file: File) => {
               <Input
                 :value="data.age"
                 placeholder="请输入年龄"
-                @update:value="(val) => update('age', Number(val))"
+                @update:value="(val) => update('age', val)"
               />
             </FormItem>
           </Col>
