@@ -13,7 +13,7 @@ export default defineConfig({
   },
 
   use: {
-    baseURL: "http://localhost:5173",
+    baseURL: process.env.BASE_URL || "http://localhost:5173",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -30,7 +30,7 @@ export default defineConfig({
   // 启动 Vite dev server 后再运行测试
   webServer: {
     command: "pnpm dev",
-    url: "http://localhost:5173",
+    url: process.env.BASE_URL || "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
     cwd: ".",
     timeout: 30_000,
