@@ -14,7 +14,10 @@ const route = useRoute();
 watch(
   () => route.query.id,
   (newVal) => {
-    if (newVal) {
+    // 仅在编辑器路由内监听：离开编辑页（如跳转 /analysis-detail）时，
+    // 该组件仍处于 out-in 过渡的挂载期，query.id 已变成其他页面的 id，
+    // 若不限定路由，会把分析记录 ID 误当成简历 ID 请求，触发 404 提示。
+    if (route.name === "Editor" && newVal) {
       getResumeDetail(newVal as string);
     }
   },

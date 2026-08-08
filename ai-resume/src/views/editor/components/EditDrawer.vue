@@ -6,6 +6,10 @@ import { storeToRefs } from "pinia";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData } from "@/stores/type";
+import {
+  EDIT_DRAWER_COLLAPSED_HEIGHT,
+  EDIT_DRAWER_EXPANDED_HEIGHT,
+} from "@/views/editor/constants";
 
 import ModuleTabs from "./drawer/ModuleTabs.vue";
 
@@ -14,7 +18,7 @@ defineProps<{
 }>();
 const { isExpanded } = storeToRefs(useResumeStore());
 const { setIsExpanded } = useResumeStore();
-const drawerHeight = ref("40vh");
+const drawerHeight = ref(EDIT_DRAWER_EXPANDED_HEIGHT);
 const drawerContentRef = ref<HTMLDivElement>();
 provide("drawerContentRef", drawerContentRef);
 
@@ -30,7 +34,7 @@ const handleDragStart = () => {
 <template>
   <div
     class="fixed bottom-0 left-0 right-0 bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.08)] transition-all duration-300 z-40 flex flex-col"
-    :style="{ height: isExpanded ? drawerHeight : '48px' }"
+    :style="{ height: isExpanded ? drawerHeight : `${EDIT_DRAWER_COLLAPSED_HEIGHT}px` }"
   >
     <!-- 拖拽手柄/标题栏 -->
     <div

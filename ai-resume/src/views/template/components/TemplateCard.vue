@@ -1,30 +1,26 @@
 <template>
   <div
-    class="group relative bg-white rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.08)] hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer border border-[#f0f0f0] flex flex-col h-full"
+    class="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:shadow-lg hover:shadow-primary-100/60"
     @click="$emit('click', template._id)"
   >
-    <!-- Template Preview Image (70%) -->
-    <div class="relative w-full aspect-[210/297] overflow-hidden bg-gray-100 p-2">
-      <!-- Placeholder or Image -->
+    <!-- Template preview image -->
+    <div class="relative aspect-[210/297] overflow-hidden bg-slate-50 p-3">
       <img
         v-if="template.previewImage"
         :src="getFullImageUrl(template.previewImage)"
         :alt="template.name"
-        class="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105 shadow-sm rounded-sm"
+        class="h-full w-full rounded-md object-contain shadow-sm transition-transform duration-300 group-hover:scale-[1.02]"
       />
-      <div
-        v-else
-        class="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400 group-hover:scale-105 transition-transform duration-300"
-      >
-        <span class="text-4xl">📄</span>
+      <div v-else class="flex h-full w-full items-center justify-center rounded-md bg-slate-100">
+        <FileText class="h-10 w-10 text-slate-300" />
       </div>
 
-      <!-- Overlay -->
+      <!-- Hover overlay -->
       <div
-        class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[1px]"
+        class="absolute inset-0 flex items-center justify-center bg-slate-900/45 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100"
       >
         <button
-          class="bg-[#1677ff] text-white px-4 py-1.5 text-sm rounded-full font-medium hover:bg-blue-600 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-lg"
+          class="translate-y-2 rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 shadow-lg transition-all duration-300 hover:bg-primary-600 hover:text-white group-hover:translate-y-0"
           @click.stop="$emit('click', template._id)"
         >
           使用此模板
@@ -32,40 +28,38 @@
       </div>
     </div>
 
-    <!-- Info Area (30%) -->
-    <div class="p-4 bg-white flex flex-col flex-1 justify-between gap-3">
+    <!-- Info area -->
+    <div class="flex flex-1 flex-col gap-3 p-5">
       <h3
-        class="text-[15px] font-[600] text-[#1a1a1a] leading-tight truncate"
+        class="truncate text-[15px] font-semibold leading-snug text-slate-900"
         :title="template.name"
       >
         {{ template.name }}
       </h3>
 
-      <div class="flex flex-col gap-2">
-        <!-- Category -->
-        <div class="flex items-center gap-1.5 text-[#8c8c8c] text-[13px]">
-          <TagOutlined />
-          <span class="truncate">{{ template.category }}</span>
-        </div>
+      <div class="flex items-center gap-1.5 text-[13px] text-slate-500">
+        <Tags class="h-3.5 w-3.5" />
+        <span class="truncate">{{ template.category }}</span>
+      </div>
 
-        <!-- Stats row -->
-        <div class="flex items-center justify-between text-[#8c8c8c] text-[13px]">
-          <div class="flex items-center gap-1.5" title="使用人数">
-            <TeamOutlined />
-            <span>{{ formatNumber(template.usedCount) }}</span>
-          </div>
-          <div class="flex items-center gap-1.5" title="创建时间">
-            <CalendarOutlined />
-            <span>{{ formatDate(template.createdAt) }}</span>
-          </div>
-        </div>
+      <div
+        class="mt-auto flex items-center justify-between border-t border-slate-100 pt-3 text-[13px] text-slate-500"
+      >
+        <span class="inline-flex items-center gap-1.5" title="使用人数">
+          <Users class="h-3.5 w-3.5" />
+          {{ formatNumber(template.usedCount) }}
+        </span>
+        <span class="inline-flex items-center gap-1.5" title="创建时间">
+          <CalendarDays class="h-3.5 w-3.5" />
+          {{ formatDate(template.createdAt) }}
+        </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { TagOutlined, TeamOutlined, CalendarOutlined } from "@ant-design/icons-vue";
+import { CalendarDays, FileText, Tags, Users } from "lucide-vue-next";
 
 import type { Template } from "@/api/templates/type";
 import { formatDate } from "@/utils/day";
@@ -83,7 +77,3 @@ const formatNumber = (num: number): string => {
   return new Intl.NumberFormat("zh-CN").format(num);
 };
 </script>
-
-<style scoped>
-/* Ensure aspect ratio works nicely */
-</style>

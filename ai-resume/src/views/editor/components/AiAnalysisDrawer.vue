@@ -12,6 +12,7 @@ import { analyzeResumeAPI, getLatestAnalysisAPI } from "@/api/resume-ai/resume-a
 import type { AnalysisResultData } from "@/api/resume-ai/type";
 import ResumeAnalysisReport from "@/components/resume-analysis/ResumeAnalysisReport.vue";
 import { useResumeStore } from "@/stores/resumeStore";
+import { AI_DRAWER_BOTTOM_OFFSET, EDIT_DRAWER_EXPANDED_HEIGHT } from "@/views/editor/constants";
 
 const props = defineProps<{
   visible: boolean;
@@ -21,12 +22,22 @@ const emit = defineEmits<{
   close: [];
 }>();
 
-const { resumeData } = storeToRefs(useResumeStore());
+const { resumeData, isExpanded } = storeToRefs(useResumeStore());
 const router = useRouter();
 
 const drawerRef = ref<HTMLElement>();
 const { width } = useElementSize(drawerRef);
 const isDesktop = computed(() => width.value >= 768);
+
+/**
+ * 底部内容编辑抽屉展开时，右侧 AI 抽屉同步向上让位，
+ * 确保抽屉底部（查看详情/重新分析按钮）始终可见可点击。
+ */
+const drawerBottom = computed(() =>
+  isExpanded.value
+    ? `calc(${EDIT_DRAWER_EXPANDED_HEIGHT} + ${AI_DRAWER_BOTTOM_OFFSET}px)`
+    : `${AI_DRAWER_BOTTOM_OFFSET}px`,
+);
 
 const jobDescription = ref("");
 const loading = ref(false);
@@ -109,7 +120,8 @@ const handleViewDetail = () => {
 <template>
   <div
     ref="drawerRef"
-    class="fixed top-16 right-0 bottom-[52px] w-[400px] bg-white border-l border-gray-200 shadow-[-4px_0_16px_rgba(0,0,0,0.08)] z-30 flex flex-col transition-transform duration-300 ease-in-out"
+    class="fixed top-16 right-0 w-[400px] bg-white border-l border-gray-200 shadow-[-4px_0_16px_rgba(0,0,0,0.08)] z-30 flex flex-col transition-all duration-300 ease-in-out"
+    :style="{ bottom: drawerBottom }"
     :class="visible ? 'translate-x-0' : 'translate-x-full'"
   >
     <!-- Header -->

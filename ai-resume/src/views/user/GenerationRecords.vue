@@ -64,7 +64,7 @@
 import { ref, onMounted } from "vue";
 
 import { FileOutlined } from "@ant-design/icons-vue";
-import { Empty } from "ant-design-vue";
+import { Empty, message } from "ant-design-vue";
 import { useRouter } from "vue-router";
 
 import { getGenerationRecordsAPI } from "@/api/resume-ai/resume-ai";
@@ -99,8 +99,12 @@ const handlePageChange = () => {
 };
 
 const handleView = (record: GenerationRecord) => {
-  // 优先使用后端回传的简历 ID；未回传时退回记录 ID（保持原行为）
-  router.push({ path: "/editor", query: { id: record.resumeId || record._id } });
+  // 后端回传的 resumeId 才是可打开的简历 ID（记录自身 _id 不是简历 ID）
+  if (!record.resumeId) {
+    message.warning("该生成记录暂无关联简历，无法打开");
+    return;
+  }
+  router.push({ path: "/editor", query: { id: record.resumeId } });
 };
 
 onMounted(() => {
