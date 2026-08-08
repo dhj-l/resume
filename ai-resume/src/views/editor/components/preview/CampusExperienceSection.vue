@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { CampusExperience } from "@/stores/type";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import { getCampusExperienceStyles } from "./CampusExperienceSection";
 import type { templateType } from "./type";
@@ -14,10 +15,12 @@ const props = defineProps<{
 }>();
 
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getCampusExperienceStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("campusExperience");
   setIsExpanded(true);
 };

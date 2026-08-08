@@ -79,17 +79,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, unref } from "vue";
 
-import { storeToRefs } from "pinia";
-
-import { useResumeStore } from "@/stores/resumeStore";
 import type { ModuleItem, ResumeData } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
 import { usePageMarkers } from "@/views/editor/hooks/usePageMarkers";
+import { useResumeView } from "@/views/editor/hooks/useResumeView";
 
+const resumeData = ref(inject<ResumeData>("resumeData")!);
 const {
   moduleOrder,
   currentTemplateType,
@@ -97,9 +96,7 @@ const {
   globalFontSize,
   globalLineHeight,
   globalModuleMargin,
-} = storeToRefs(useResumeStore());
-
-const resumeData = ref(inject<ResumeData>("resumeData")!);
+} = useResumeView(resumeData);
 
 const componentMap: Record<string, any> = {
   basicInfo: BasicInfoSection,
@@ -109,7 +106,7 @@ const componentMap: Record<string, any> = {
 const { activeModules } = useActiveModules(moduleOrder, resumeData);
 
 const getComponent = (item: ModuleItem) => {
-  return item.component || componentMap[item.moduleKey];
+  return item.component ? unref(item.component) : componentMap[item.moduleKey];
 };
 
 const basicInfoModule = computed(() =>

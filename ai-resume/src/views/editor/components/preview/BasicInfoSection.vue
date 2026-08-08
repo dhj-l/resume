@@ -4,6 +4,7 @@ import { computed } from "vue";
 import { useResumeStore } from "@/stores/resumeStore";
 import type { BasicInfo } from "@/stores/type";
 import { getFullImageUrl } from "@/utils/image";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import { getBasicInfoStyles } from "./BasicInfoSection";
 import type { templateType } from "./type";
@@ -16,10 +17,12 @@ const props = defineProps<{
   templateType: templateType;
 }>();
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getBasicInfoStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("basicInfo");
   setIsExpanded(true);
 };

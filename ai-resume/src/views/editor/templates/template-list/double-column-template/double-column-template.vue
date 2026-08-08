@@ -27,7 +27,7 @@
             class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
           >
             <component
-              :is="item.component"
+              :is="getComponent(item)"
               v-if="item.isShow && item.component"
               :data="resumeData?.[item.moduleKey]"
               :label="item.label"
@@ -64,7 +64,7 @@
             }"
           >
             <component
-              :is="item.component"
+              :is="getComponent(item)"
               v-if="item.isShow && item.component"
               :data="resumeData?.[item.moduleKey]"
               :label="item.label"
@@ -95,17 +95,16 @@
 </template>
 
 <script setup lang="ts">
-import { inject, computed, ref } from "vue";
+import { inject, computed, ref, unref } from "vue";
 
-import { storeToRefs } from "pinia";
-
-import { useResumeStore } from "@/stores/resumeStore";
-import type { ResumeData } from "@/stores/type";
+import type { ModuleItem, ResumeData } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
 import { usePageMarkers } from "@/views/editor/hooks/usePageMarkers";
+import { useResumeView } from "@/views/editor/hooks/useResumeView";
 
+const resumeData = ref(inject<ResumeData>("resumeData")!);
 const {
   moduleOrder,
   currentTemplateType,
@@ -113,8 +112,7 @@ const {
   globalFontSize,
   globalLineHeight,
   globalModuleMargin,
-} = storeToRefs(useResumeStore());
-const resumeData = ref(inject<ResumeData>("resumeData")!);
+} = useResumeView(resumeData);
 
 const leftModuleKeys = ["skills", "certificates", "selfEvaluation"];
 const rightModuleKeys = [
@@ -129,6 +127,10 @@ const basicInfoModule = computed(() => moduleOrder.value.find((m) => m.moduleKey
 const jobIntentionModule = computed(() =>
   moduleOrder.value.find((m) => m.moduleKey === "jobIntention"),
 );
+
+const getComponent = (item: ModuleItem) => {
+  return item.component ? unref(item.component) : null;
+};
 
 const { activeModules } = useActiveModules(moduleOrder, resumeData);
 

@@ -245,9 +245,21 @@ const runAiGenerate = async (payload: AiResumeParams, options: RunAiGenerateOpti
       // 持久化 payload，供刷新后检测生成中断
       sessionStorage.setItem(
         `ai-generate:${resumeId}`,
-        JSON.stringify({ payload, startedAt: Date.now() }),
+        JSON.stringify({
+          payload,
+          startedAt: Date.now(),
+          totalModules: aiGenerateStore.totalModules,
+        }),
       );
-      pushToEditor(resumeId);
+      if (payload.parseType === "select") {
+        // 选择已有简历：进入对比页，原版 vs AI 版实时对比，完成后再选择版本
+        router.push({
+          path: "/compare",
+          query: { originalId: payload.resumeId, draftId: resumeId },
+        });
+      } else {
+        pushToEditor(resumeId);
+      }
     });
 
     // startGeneration 在 complete / error 后返回

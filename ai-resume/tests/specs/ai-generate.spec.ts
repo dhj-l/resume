@@ -48,6 +48,22 @@ async function submitManualGenerate(page: Page, options?: { uncheckModules?: str
   await page.getByRole("button", { name: "开始生成" }).click();
 }
 
+/**
+ * 走"选择已有简历"路径提交 AI 生成：
+ * 填 JD -> 选择 resume001 -> 模块选择（默认全选）-> 确定
+ */
+async function submitSelectGenerate(page: Page) {
+  await page.getByRole("button", { name: "AI 帮我写" }).click();
+  await page.getByText("选择已有简历", { exact: true }).click();
+
+  await page
+    .getByPlaceholder(/请粘贴或输入目标岗位的职位描述/)
+    .fill("前端工程师，精通 Vue3 和 TypeScript");
+  const modal = page.locator(".select-resume-modal");
+  await modal.getByText("张三 - 前端开发工程师", { exact: true }).click();
+  await page.getByRole("button", { name: /确\s*定/ }).click();
+}
+
 test.describe("模板详情 - AI 生成简历", () => {
   test.beforeEach(async ({ page }) => {
     await injectAuthToPage(page);
@@ -68,9 +84,8 @@ test.describe("模板详情 - AI 生成简历", () => {
 
     // init 后立即进入编辑页
     await page.waitForURL("**/editor?id=resume_new", { timeout: 10000 });
-    // 生成中横幅与进度实时更新
-    await expect(page.getByText(/AI 生成中：1\/11/)).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/AI 生成中：2\/11/)).toBeVisible({ timeout: 10000 });
+    // 生成中横幅（完成帧前保持最后进度足够时间，避免瞬态帧被挂载延迟漏掉）
+    await expect(page.getByText(/AI 生成中：11\/11/)).toBeVisible({ timeout: 10000 });
     // 预览区标注当前生成的模块（模块名随进度实时变化）
     await expect(page.getByText(/AI 正在生成：/)).toBeVisible({
       timeout: 10000,
@@ -83,7 +98,7 @@ test.describe("模板详情 - AI 生成简历", () => {
     await expect(page.getByRole("button", { name: "保存草稿" })).toBeDisabled();
     // 完成后横幅切换并解锁
     await expect(page.getByText("AI 生成完成，可以开始编辑了")).toBeVisible({
-      timeout: 10000,
+      timeout: 15000,
     });
     await expect(page.getByRole("button", { name: "保存草稿" })).toBeEnabled();
   });
@@ -140,16 +155,94 @@ test.describe("模板详情 - AI 生成简历", () => {
 
     // init 后进入编辑页，进度总数按所选模块数动态展示
     await page.waitForURL("**/editor?id=resume_new", { timeout: 10000 });
-    await expect(page.getByText(/AI 生成中：1\/3/)).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(page.getByText(/AI 生成中：2\/3/)).toBeVisible({ timeout: 10000 });
+    // 完成前最后状态保持足够时间，断言动态总数 3
+    await expect(page.getByText(/AI 生成中：3\/3/)).toBeVisible({ timeout: 10000 });
     // 只渲染所选模块的数据（工作经历公司名）
     await expect(page.getByText("某公司", { exact: true }).first()).toBeVisible({
       timeout: 10000,
     });
     await expect(page.getByText("AI 生成完成，可以开始编辑了")).toBeVisible({
+      timeout: 15000,
+    });
+  });
+
+  test("select 成功流：进入对比页实时渲染，完成后可选 AI 版进入编辑器", async ({ page }) => {
+    await mockGenerateSse(page, "success");
+    await page.goto("/templates/tpl001default");
+
+    await submitSelectGenerate(page);
+
+    // init 后进入对比页，而不是直接进编辑器
+    await page.waitForURL("**/compare?originalId=resume001&draftId=resume_new", {
       timeout: 10000,
     });
+    await expect(page.getByText("原版简历", { exact: true })).toBeVisible();
+    await expect(page.getByText("AI 生成版", { exact: true })).toBeVisible();
+
+    // 进度与实时渲染
+    await expect(page.getByText(/AI 生成中：11\/11/)).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("负责 AI 核心业务开发", { exact: true })).toBeVisible({
+      timeout: 10000,
+    });
+    // 原版保持原内容
+    await expect(page.getByText("负责核心业务开发", { exact: true })).toBeVisible();
+
+    // 生成完成前版本按钮禁用，完成后可用
+    const aiButton = page.getByRole("button", { name: "使用 AI 版" });
+    await expect(aiButton).toBeDisabled();
+    await expect(page.getByText("AI 生成完成，可以开始编辑了")).toBeVisible({
+      timeout: 15000,
+    });
+    await expect(aiButton).toBeEnabled();
+
+    // 选择 AI 版 -> 进入草稿编辑器
+    await aiButton.click();
+    await page.waitForURL("**/editor?id=resume_new", { timeout: 10000 });
+  });
+
+  test("select 选原版：确认后删除 AI 草稿并进入原版编辑器", async ({ page }) => {
+    await mockGenerateSse(page, "success");
+    await page.goto("/templates/tpl001default");
+
+    await submitSelectGenerate(page);
+
+    await page.waitForURL("**/compare?originalId=resume001&draftId=resume_new", {
+      timeout: 10000,
+    });
+    // 生成完成后“使用原版”按钮可用（完成帧约 10.6s 后到达）
+    const originalButton = page.getByRole("button", { name: "使用原版" });
+    await expect(originalButton).toBeEnabled({ timeout: 15000 });
+
+    const deleteRequest = page.waitForRequest(
+      (req) => req.method() === "DELETE" && req.url().includes("/resume/resume_new"),
+    );
+    await originalButton.click();
+    await page.locator(".ant-modal-confirm").getByRole("button", { name: "确认使用原版" }).click();
+    await deleteRequest;
+    await page.waitForURL("**/editor?id=resume001", { timeout: 10000 });
+  });
+
+  test("select 失败流：AI 版显示失败，可选择原版删除草稿", async ({ page }) => {
+    await mockGenerateSse(page, "error");
+    await page.goto("/templates/tpl001default");
+
+    await submitSelectGenerate(page);
+
+    await page.waitForURL("**/compare?originalId=resume001&draftId=resume_new", {
+      timeout: 10000,
+    });
+    await expect(page.getByText("AI 生成失败：内容解析异常")).toBeVisible({
+      timeout: 10000,
+    });
+
+    const originalButton = page.getByRole("button", { name: "使用原版" });
+    await expect(originalButton).toBeEnabled();
+    const deleteRequest = page.waitForRequest(
+      (req) => req.method() === "DELETE" && req.url().includes("/resume/resume_new"),
+    );
+    await originalButton.click();
+    await page.locator(".ant-modal-confirm").getByRole("button", { name: "确认使用原版" }).click();
+    await deleteRequest;
+    await page.waitForURL("**/editor?id=resume001", { timeout: 10000 });
   });
 });

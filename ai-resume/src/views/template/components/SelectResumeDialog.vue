@@ -160,8 +160,18 @@ const fetchResumes = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const res = await getUserResumesAPI();
-    resumes.value = res?.data?.list || [];
+    // 对话框需要展示用户全部简历：后端单页上限 100，按 total 分页拉全量
+    const PAGE_SIZE = 100;
+    const first = await getUserResumesAPI({ page: 1, pageSize: PAGE_SIZE });
+    const firstList = first?.data?.list || [];
+    const total = first?.data?.total ?? firstList.length;
+    const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const rest = await Promise.all(
+      Array.from({ length: pageCount - 1 }, (_, index) =>
+        getUserResumesAPI({ page: index + 2, pageSize: PAGE_SIZE }),
+      ),
+    );
+    resumes.value = [...firstList, ...rest.flatMap((item) => item?.data?.list || [])];
   } catch {
     error.value = "加载简历列表失败，请重试";
   } finally {

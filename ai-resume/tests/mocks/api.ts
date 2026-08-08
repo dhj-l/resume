@@ -140,12 +140,14 @@ export async function setupApiMocks(page: Page) {
 
   // 简历详情 / 更新 / 删除 (匹配 /api/v1/resume/:id)
   await page.route(/\/api\/v1\/resume\/[^\/]+$/, async (route) => {
+    const id = route.request().url().split("/").pop();
     if (route.request().method() === "GET") {
       await route.fulfill({
         json: apiJson({
           ...mockResumes[0],
-          title: "前端开发工程师简历详情",
-          aiStatus: "generating",
+          _id: id,
+          title: "张三 - 前端开发工程师",
+          aiStatus: id === "resume_new" ? "generating" : "",
           type: "default",
           globalStyle: {},
           basicInfo: {
@@ -178,14 +180,16 @@ export async function setupApiMocks(page: Page) {
     } else if (route.request().method() === "PATCH") {
       await route.fulfill({ json: apiJson({ ...mockResumes[0] }) });
     } else if (route.request().method() === "DELETE") {
-      await route.fulfill({ json: apiJson({ _id: "resume001", title: "张三 - 前端开发工程师" }) });
+      await route.fulfill({
+        json: apiJson({ _id: id, title: "张三 - 前端开发工程师" }),
+      });
     } else {
       await route.fulfill({ json: apiJson({}) });
     }
   });
 
-  // 简历列表 / 创建（仅精确匹配 /api/v1/resume）
-  await page.route("**/api/v1/resume", async (route) => {
+  // 简历列表 / 创建（仅精确匹配 /api/v1/resume，兼容分页 query 参数）
+  await page.route(/\/api\/v1\/resume(\?.*)?$/, async (route) => {
     const url = route.request().url();
     if (url.match(/\/api\/v1\/resume(\?.*)?$/)) {
       if (route.request().method() === "GET") {
@@ -285,7 +289,7 @@ export async function mockGenerateSse(page: Page, scenario: "success" | "error")
           globalStyle: {},
           skills: { content: "<ul><li>熟练掌握 Vue3</li></ul>" },
           certificates: { content: "" },
-          selfEvaluation: { content: "热爱技术" },
+          selfEvaluation: { content: "AI 优化的自我评价" },
           educationBackground: [],
           workExperience: [
             {
@@ -293,7 +297,7 @@ export async function mockGenerateSse(page: Page, scenario: "success" | "error")
               position: "前端开发工程师",
               workTime: "2020-07",
               dismissalTime: "至今",
-              workDescription: "<p>负责核心业务开发</p>",
+              workDescription: "<p>负责 AI 核心业务开发</p>",
               globalSort: 1,
               localSort: 1,
             },
@@ -363,9 +367,15 @@ export async function mockGenerateSse(page: Page, scenario: "success" | "error")
         const stream = new ReadableStream({
           async start(controller) {
             for (const frame of frames) {
+              // 完成帧前保持“生成中 x/x”状态足够时间，便于 E2E 断言进度
+              if (frame.type === "complete") {
+                await new Promise((resolve) => setTimeout(resolve, 4000));
+              }
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(frame)}\n\n`));
-              // 帧间延迟，让 UI 有机会渲染进度
-              await new Promise((resolve) => setTimeout(resolve, 600));
+              if (frame.type !== "complete") {
+                // 帧间延迟，让 UI 有机会渲染进度
+                await new Promise((resolve) => setTimeout(resolve, 600));
+              }
             }
             controller.close();
           },

@@ -28,7 +28,7 @@ export const useAiGenerateStore = defineStore("aiGenerate", () => {
   /** 非响应式标记：判断当前会话是否仍由本页面持有（刷新后为 false） */
   let active = false;
 
-  const clearSessionStorage = () => {
+  const clearSession = () => {
     if (resumeId.value) {
       sessionStorage.removeItem(`ai-generate:${resumeId.value}`);
     }
@@ -77,13 +77,13 @@ export const useAiGenerateStore = defineStore("aiGenerate", () => {
         totalModules.value = msg.totalModules;
         currentModule.value = msg.totalModules;
         active = false;
-        clearSessionStorage();
+        clearSession();
       },
       onError: (err) => {
         status.value = "failed";
         error.value = err.message ?? "AI 生成失败";
         active = false;
-        clearSessionStorage();
+        clearSession();
       },
       timeout: 600000,
     });
@@ -99,6 +99,7 @@ export const useAiGenerateStore = defineStore("aiGenerate", () => {
     error,
     startGeneration,
     reset,
+    clearSession,
     isActive: () => active,
   };
 });

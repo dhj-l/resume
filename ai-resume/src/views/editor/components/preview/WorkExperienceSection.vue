@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { WorkExperience } from "@/stores/type";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import type { templateType } from "./type";
 import { getWorkExperienceStyles } from "./WorkExperienceSection";
@@ -14,10 +15,12 @@ const props = defineProps<{
 }>();
 
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getWorkExperienceStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("workExperience");
   setIsExpanded(true);
 };

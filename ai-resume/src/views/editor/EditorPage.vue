@@ -64,7 +64,8 @@ watch(
       mergeAiModule(key, data);
     }
   },
-  { deep: true },
+  // immediate：页面挂载晚于部分/全部模块帧时，先合并已生成的数据
+  { deep: true, immediate: true },
 );
 
 // 刷新恢复：store 无活跃会话 + 简历仍标记 generating + sessionStorage 有会话记录

@@ -38,7 +38,7 @@ import type {
   SortableModule,
 } from "./type";
 
-const DEFAULT_MODULE_ORDER: ModuleItem[] = [
+export const DEFAULT_MODULE_ORDER: ModuleItem[] = [
   {
     moduleKey: "basicInfo",
     label: "基本信息",
@@ -120,17 +120,17 @@ const DEFAULT_MODULE_ORDER: ModuleItem[] = [
     globalSort: 9,
   },
 ];
-const MAX_GLOBAL_SORT = Number.MAX_SAFE_INTEGER;
-const MODULE_DEFAULT_SORT: Record<string, number> = Object.fromEntries(
+export const MAX_GLOBAL_SORT = Number.MAX_SAFE_INTEGER;
+export const MODULE_DEFAULT_SORT: Record<string, number> = Object.fromEntries(
   DEFAULT_MODULE_ORDER.map((module) => [module.moduleKey, module.globalSort]),
 );
-const FIXED_MODULES = ["basicInfo", "jobIntention"] as const;
+export const FIXED_MODULES = ["basicInfo", "jobIntention"] as const;
 
-const isFixedModule = (moduleKey: string): boolean => {
+export const isFixedModule = (moduleKey: string): boolean => {
   return FIXED_MODULES.includes(moduleKey as any);
 };
 
-const getGlobalSortFromResumeData = (
+export const getGlobalSortFromResumeData = (
   resumeData: ResumeData,
   moduleKey: string,
   sortHints: Record<string, number>,

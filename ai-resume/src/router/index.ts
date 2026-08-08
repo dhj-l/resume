@@ -60,6 +60,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: "简历编辑", requiresAuth: true, animation: "scale-in" },
   },
   {
+    path: "/compare",
+    name: "AiResumeCompare",
+    component: () => import("@/views/editor/AiResumeComparePage.vue"),
+    meta: { title: "AI 生成对比", requiresAuth: true, animation: "scale-in" },
+  },
+  {
     path: "/auth/gitee/callback",
     name: "GiteeCallback",
     component: () => import("@/views/auth/GiteeCallbackPage.vue"),

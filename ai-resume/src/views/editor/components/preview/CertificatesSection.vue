@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { SortableModule } from "@/stores/type";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import { getCertificatesStyles } from "./CertificatesSection";
 import type { templateType } from "./type";
@@ -13,10 +14,12 @@ const props = defineProps<{
   templateType: templateType;
 }>();
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getCertificatesStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("certificates");
   setIsExpanded(true);
 };

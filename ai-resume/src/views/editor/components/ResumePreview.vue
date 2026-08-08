@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch } from "vue";
+import { computed, provide, watch } from "vue";
 
 import { LoadingOutlined } from "@ant-design/icons-vue";
 import { storeToRefs } from "pinia";
@@ -7,13 +7,41 @@ import { useRoute } from "vue-router";
 
 import { useAiGenerateStore } from "@/stores/aiGenerateStore";
 import { useResumeStore } from "@/stores/resumeStore";
+import type { ResumeData } from "@/stores/type";
+import { PREVIEW_ONLY_KEY } from "@/views/editor/hooks/usePreviewOnly";
+import { useResumeView } from "@/views/editor/hooks/useResumeView";
 import { templateList } from "@/views/editor/templates/index";
 
-const { resumeData, globalFontSize, globalLineHeight } = storeToRefs(useResumeStore());
+const props = withDefaults(
+  defineProps<{
+    /** 传入独立数据源（对比页双预览）；缺省使用全局简历 store */
+    data?: ResumeData;
+    /** 预览态：点击模块不触发编辑器选中/展开 */
+    previewOnly?: boolean;
+    /** 是否显示 AI 生成中悬浮标注（编辑器内为 true） */
+    showGeneratingBadge?: boolean;
+    /** 自适应面板宽度（对比页双预览使用）；缺省保持 A4 210mm 固定宽度 */
+    fluid?: boolean;
+  }>(),
+  {
+    previewOnly: false,
+    showGeneratingBadge: true,
+    fluid: false,
+  },
+);
+
+const { resumeData: storeResumeData } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
 const aiGenerate = useAiGenerateStore();
 
 const route = useRoute();
+
+const previewData = computed<ResumeData>(() => props.data ?? storeResumeData.value);
+provide("resumeData", previewData);
+provide(PREVIEW_ONLY_KEY, props.previewOnly);
+
+const { globalFontSize, globalLineHeight } = useResumeView(previewData);
+
 watch(
   () => route.query.id,
   (newVal) => {
@@ -36,7 +64,7 @@ watch(
   <div class="flex flex-col items-center gap-3">
     <!-- AI 生成中：当前生成模块标注 -->
     <div
-      v-if="aiGenerate.status === 'generating'"
+      v-if="showGeneratingBadge && aiGenerate.status === 'generating'"
       class="sticky top-4 z-20 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-sm text-white shadow-lg"
     >
       <LoadingOutlined spin class="text-base" />
@@ -48,7 +76,8 @@ watch(
     </div>
 
     <div
-      class="resume-preview-wrapper w-[210mm]"
+      class="resume-preview-wrapper"
+      :class="fluid ? 'w-full' : 'w-[210mm]'"
       :style="{
         lineHeight: globalLineHeight,
         '--resume-fs': globalFontSize,
@@ -56,7 +85,7 @@ watch(
       }"
     >
       <template v-for="item in templateList" :key="item.value">
-        <component :is="item.component" v-if="item.value === resumeData.type" />
+        <component :is="item.component" v-if="item.value === previewData.type" />
       </template>
     </div>
   </div>
