@@ -32,6 +32,6 @@ const handleClick = () => {
     <h3 :class="styles.title">
       {{ label || "技能特长" }}
     </h3>
-    <div v-if="data?.content" :class="styles.listWrapper" v-safe-html="data.content"></div>
+    <div v-if="data?.content" v-safe-html="data.content" :class="styles.listWrapper"></div>
   </div>
 </template>

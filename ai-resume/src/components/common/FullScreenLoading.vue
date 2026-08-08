@@ -26,8 +26,20 @@
           <h3
             class="mt-6 text-gray-800 text-lg font-medium tracking-wide text-center leading-relaxed"
           >
-            {{ text }}
+            <template v-if="progress">
+              正在生成：{{ progress.label }}（{{ progress.current }}/{{ progress.total }}）
+            </template>
+            <template v-else>{{ text }}</template>
           </h3>
+
+          <!-- Progress Bar -->
+          <a-progress
+            v-if="progress"
+            :percent="progressPercent"
+            status="active"
+            class="mt-4 w-full"
+            :show-info="false"
+          />
 
           <!-- Subtext -->
           <p class="mt-2 text-gray-500 text-sm font-light text-center">请勿关闭页面或刷新</p>
@@ -38,23 +50,36 @@
 </template>
 
 <script setup lang="ts">
-import { watch, onUnmounted } from "vue";
+import { computed, watch, onUnmounted } from "vue";
+
+interface ProgressInfo {
+  current: number;
+  total: number;
+  label: string;
+}
 
 interface Props {
   loading: boolean;
   text?: string;
   timeout?: number; // milliseconds
+  progress?: ProgressInfo | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   text: "AI正在为您生成简历，过程可能需要1到2分钟，请稍等。",
   timeout: 180000, // 180 seconds default
+  progress: null,
 });
 
 const emit = defineEmits<{
   (e: "update:loading", value: boolean): void;
   (e: "timeout"): void;
 }>();
+
+const progressPercent = computed(() => {
+  if (!props.progress || !props.progress.total) return 0;
+  return Math.round((props.progress.current / props.progress.total) * 100);
+});
 
 let timer: number | null = null;
 

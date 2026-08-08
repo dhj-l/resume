@@ -46,7 +46,7 @@ const handleClick = () => {
             </span>
           </div>
 
-          <p :class="styles.description" v-safe-html="project.content"></p>
+          <p v-safe-html="project.content" :class="styles.description"></p>
         </div>
       </template>
       <div v-else :class="styles.empty">暂无项目经历信息</div>

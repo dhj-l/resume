@@ -132,3 +132,67 @@ export interface AnalysisDetailResult {
   updatedAt: string;
   analysisResult: AnalysisResult["analysisResult"];
 }
+
+// ==================== SSE 实时生成 ====================
+
+/** AI 生成 SSE 消息的模块中文标签映射（11 个模块） */
+export const SSE_MODULE_LABEL_MAP: Record<string, string> = {
+  basicInfo: "基础信息",
+  jobIntention: "求职意向",
+  globalStyle: "全局样式",
+  skills: "技能",
+  certificates: "证书",
+  selfEvaluation: "自我评价",
+  educationBackground: "教育经历",
+  workExperience: "工作经历",
+  projectExperience: "项目经历",
+  campusExperience: "校园经历",
+  internshipExperience: "实习经历",
+};
+
+/** 获取模块中文标签，未知模块回退为原始 moduleName */
+export const getSseModuleLabel = (moduleName: string): string => {
+  return SSE_MODULE_LABEL_MAP[moduleName] ?? moduleName;
+};
+
+/** 进度帧：单个模块生成进度 */
+export interface SseProgressMessage {
+  type: "progress";
+  moduleName: string;
+  status: "processing" | "completed" | "retrying";
+  message?: string;
+  totalModules: number;
+  currentModule: number;
+  retryCount?: number;
+}
+
+/** 完成帧：整体生成完成，携带 resumeId 用于跳转 */
+export interface SseCompleteMessage {
+  type: "complete";
+  status: "completed";
+  message?: string;
+  totalModules: number;
+  currentModule: number;
+  resumeId: string;
+}
+
+/** 错误帧：生成失败 */
+export interface SseErrorMessage {
+  type: "error";
+  status: "failed";
+  message: string;
+  totalModules: number;
+  currentModule: number;
+}
+
+/** 心跳帧：仅保活，业务侧忽略 */
+export interface SseHeartbeatMessage {
+  type: "heartbeat";
+}
+
+/** SSE 消息判别联合 */
+export type SseMessage =
+  | SseProgressMessage
+  | SseCompleteMessage
+  | SseErrorMessage
+  | SseHeartbeatMessage;

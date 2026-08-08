@@ -153,7 +153,7 @@
       :submitting="isImportingResume"
       @submit="handleImportResumeSubmit"
     />
-    <FullScreenLoading v-model:loading="isGlobalLoading" />
+    <FullScreenLoading v-model:loading="isGlobalLoading" :progress="aiProgress" :timeout="600000" />
   </div>
 </template>
 
@@ -164,7 +164,10 @@ import { message } from "ant-design-vue";
 import { Calendar, Users, Edit3, Sparkles, Upload } from "lucide-vue-next";
 import { useRoute, useRouter } from "vue-router";
 
-import { generateAiResumeAPI, createResumeAPI, importResumeAPI } from "@/api/resume/resume";
+import { createResumeAPI, importResumeAPI } from "@/api/resume/resume";
+import type { AiResumeParams } from "@/api/resume/type";
+import { generateAiResumeSSE } from "@/api/resume-ai/sse";
+import { getSseModuleLabel } from "@/api/resume-ai/type";
 import { getTemplateByIdAPI } from "@/api/templates/templates";
 import type { TemplateDetails } from "@/api/templates/type";
 import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
@@ -219,6 +222,50 @@ const pushToEditor = (resumeId: string) => {
   });
 };
 
+const aiProgress = ref<{ current: number; total: number; label: string } | null>(null);
+
+interface RunAiGenerateOptions {
+  successText?: string;
+  onComplete?: () => void;
+  onFinally?: () => void;
+}
+
+/**
+ * 统一处理 AI 生成：打开/关闭全屏遮罩、调用 SSE、更新进度，
+ * complete 后提示成功并跳转编辑页，error/超时/断线时提示并关闭遮罩。
+ */
+const runAiGenerate = async (payload: AiResumeParams, options: RunAiGenerateOptions = {}) => {
+  const { successText = "AI 简历生成成功", onComplete, onFinally } = options;
+
+  isGlobalLoading.value = true;
+  aiProgress.value = null;
+
+  try {
+    await generateAiResumeSSE(payload, {
+      onProgress: (msg) => {
+        aiProgress.value = {
+          current: msg.currentModule,
+          total: msg.totalModules,
+          label: getSseModuleLabel(msg.moduleName),
+        };
+      },
+      onComplete: (msg) => {
+        message.success(successText);
+        onComplete?.();
+        pushToEditor(msg.resumeId);
+      },
+      onError: (error) => {
+        message.error(error.message);
+      },
+      timeout: 600000,
+    });
+  } finally {
+    aiProgress.value = null;
+    isGlobalLoading.value = false;
+    onFinally?.();
+  }
+};
+
 const handleUseTemplate = async () => {
   if (!template.value || isCreating.value) return;
 
@@ -257,79 +304,70 @@ const handleModeSelect = (mode: "manual" | "select" | "upload") => {
 const handleAiSubmit = async (data: any) => {
   if (!template.value || isGlobalLoading.value) return;
 
-  try {
-    isAiCreating.value = true;
-    isGlobalLoading.value = true;
-    const { data: resData } = await generateAiResumeAPI({
+  isAiCreating.value = true;
+  await runAiGenerate(
+    {
       parseType: "manual",
       jobDescription: data.jd,
       detailInfo: { ...data.userInfo, supplementary: data.supplementary },
       templateType: template.value.resume.type,
-    });
-
-    if (resData && resData._id) {
-      message.success("AI 简历生成成功");
-      pushToEditor(resData._id);
-      aiDialogOpen.value = false;
-    }
-  } catch {
-    // 错误提示已由请求拦截器统一处理
-  } finally {
-    isAiCreating.value = false;
-    isGlobalLoading.value = false;
-  }
+    },
+    {
+      successText: "AI 简历生成成功",
+      onComplete: () => {
+        aiDialogOpen.value = false;
+      },
+      onFinally: () => {
+        isAiCreating.value = false;
+      },
+    },
+  );
 };
 
 const handleSelectResumeSubmit = async (payload: { jd: string; resumeId: string }) => {
   if (!template.value || isGlobalLoading.value) return;
-  isImporting.value = true;
-  isGlobalLoading.value = true;
 
-  try {
-    const { data: resData } = await generateAiResumeAPI({
+  isImporting.value = true;
+  await runAiGenerate(
+    {
       parseType: "select",
       jobDescription: payload.jd,
       resumeId: payload.resumeId,
       templateType: template.value.resume.type,
-    });
-
-    if (resData && resData._id) {
-      message.success("基于已有简历生成成功");
-      pushToEditor(resData._id);
-      selectResumeOpen.value = false;
-    }
-  } catch {
-    // 错误提示已由请求拦截器统一处理
-  } finally {
-    isImporting.value = false;
-    isGlobalLoading.value = false;
-  }
+    },
+    {
+      successText: "基于已有简历生成成功",
+      onComplete: () => {
+        selectResumeOpen.value = false;
+      },
+      onFinally: () => {
+        isImporting.value = false;
+      },
+    },
+  );
 };
 
 const handleUploadResumeSubmit = async (payload: { resumeText: string; jdText: string }) => {
   if (!template.value || isGlobalLoading.value) return;
-  isImporting.value = true;
-  isGlobalLoading.value = true;
 
-  try {
-    const { data: resData } = await generateAiResumeAPI({
+  isImporting.value = true;
+  await runAiGenerate(
+    {
       parseType: "upload",
       jobDescription: payload.jdText,
       resumeContent: payload.resumeText,
       templateType: template.value.resume.type,
-    });
-
-    if (resData && resData._id) {
-      message.success("生成成功");
-      pushToEditor(resData._id);
-      uploadResumeOpen.value = false;
-    }
-  } catch {
-    // 错误提示已由请求拦截器统一处理
-  } finally {
-    isImporting.value = false;
-    isGlobalLoading.value = false;
-  }
+    },
+    {
+      successText: "生成成功",
+      onComplete: () => {
+        uploadResumeOpen.value = false;
+      },
+      onFinally: () => {
+        isImporting.value = false;
+      },
+    },
+  );
 };
 
 const handleCreateNew = () => {

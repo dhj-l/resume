@@ -1,5 +1,6 @@
-import DOMPurify from "dompurify";
 import type { Directive } from "vue";
+
+import DOMPurify from "dompurify";
 
 export const safeHtml: Directive<HTMLElement, string> = {
   mounted(el, binding) {

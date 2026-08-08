@@ -158,6 +158,7 @@ export async function setupApiMocks(page: Page) {
   });
 
   // ==================== Resume-AI 模块 (mock minimal) ====================
+  // generatesse 由 mockGenerateSse 通过覆盖 window.fetch 实现流式分帧推送
 
   await page.route("**/api/v1/resume-ai/**", async (route) => {
     await route.fulfill({ json: apiJson({}) });
@@ -194,4 +195,98 @@ export async function injectAuthToPage(page: Page) {
   );
   // 重新加载以让 Pinia 读取 localStorage
   await page.reload();
+}
+
+/**
+ * 注册 generatesse 的 SSE mock（流式分帧推送）。
+ *
+ * 通过 page.addInitScript 覆盖 window.fetch，对 generatesse 请求返回
+ * ReadableStream 分帧响应（帧间有延迟，便于 UI 实时渲染进度）。
+ * 选择 fetch 覆盖而非 page.route，是因为 route.fulfill 只能一次性返回整个 body，
+ * 无法实现真正的流式分帧，会导致 complete 帧与 progress 帧同步到达、遮罩立即关闭，
+ * 进度文本来不及渲染。
+ *
+ * - success: progress(basicInfo 1/11) -> progress(workExperience 2/11) -> complete(resumeId="resume_new")
+ * - error:   progress(basicInfo 1/11) -> error("AI 生成失败：内容解析异常")
+ *
+ * 需在 setupApiMocks 之后调用；其他 axios/XHR 请求仍走 page.route mock。
+ */
+export async function mockGenerateSse(page: Page, scenario: "success" | "error") {
+  await page.addInitScript(
+    ({ scenario }: { scenario: "success" | "error" }) => {
+      const originalFetch = window.fetch;
+      window.fetch = async (input: any, init?: any) => {
+        const url =
+          typeof input === "string"
+            ? input
+            : input instanceof URL
+              ? input.href
+              : (input as Request)?.url || "";
+
+        if (!url.includes("/resume-ai/generatesse")) {
+          return originalFetch(input as RequestInfo, init as RequestInit);
+        }
+
+        const frames =
+          scenario === "success"
+            ? [
+                {
+                  type: "progress",
+                  moduleName: "basicInfo",
+                  status: "processing",
+                  totalModules: 11,
+                  currentModule: 1,
+                },
+                {
+                  type: "progress",
+                  moduleName: "workExperience",
+                  status: "processing",
+                  totalModules: 11,
+                  currentModule: 2,
+                },
+                {
+                  type: "complete",
+                  status: "completed",
+                  totalModules: 11,
+                  currentModule: 11,
+                  resumeId: "resume_new",
+                },
+              ]
+            : [
+                {
+                  type: "progress",
+                  moduleName: "basicInfo",
+                  status: "processing",
+                  totalModules: 11,
+                  currentModule: 1,
+                },
+                {
+                  type: "error",
+                  status: "failed",
+                  message: "AI 生成失败：内容解析异常",
+                  totalModules: 11,
+                  currentModule: 1,
+                },
+              ];
+
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+          async start(controller) {
+            for (const frame of frames) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(frame)}\n\n`));
+              // 帧间延迟，让 UI 有机会渲染进度
+              await new Promise((resolve) => setTimeout(resolve, 200));
+            }
+            controller.close();
+          },
+        });
+
+        return new Response(stream, {
+          status: 200,
+          headers: { "Content-Type": "text/event-stream" },
+        });
+      };
+    },
+    { scenario },
+  );
 }

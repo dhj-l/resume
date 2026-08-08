@@ -51,8 +51,7 @@ export const getCertificatesStyles = (type: templateType): CertificatesStyles =>
           "text-xs tracking-[0.2em] uppercase font-semibold text-[#8a8780] mb-5 flex items-center gap-3",
         container: `${commonStyles.container}`,
         list: "space-y-2.5 text-[#555]",
-        listItem:
-          "flex items-center gap-3 pl-4 py-1.5 text-sm",
+        listItem: "flex items-center gap-3 pl-4 py-1.5 text-sm",
       };
     case "minimal":
       return {

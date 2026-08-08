@@ -8,7 +8,11 @@
       }"
     >
       <!-- Hero Header: 渐变背景 + 基本信息 + 求职意向 -->
-      <div v-if="basicInfoModule" class="bg-primary-600 text-white" :style="{ padding: globalPageMargin, fontSize: globalFontSize }">
+      <div
+        v-if="basicInfoModule"
+        class="bg-primary-600 text-white"
+        :style="{ padding: globalPageMargin, fontSize: globalFontSize }"
+      >
         <div class="flex items-start gap-6">
           <!-- BasicInfo via section component -->
           <component
@@ -33,7 +37,14 @@
         <template v-for="item in contentModules" :key="item.moduleKey">
           <div
             :class="{
-              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
+                ![
+                  'workExperience',
+                  'educationBackground',
+                  'projectExperience',
+                  'campusExperience',
+                  'internshipExperience',
+                ].includes(item.moduleKey),
             }"
             :style="{ marginBottom: globalModuleMargin }"
           >

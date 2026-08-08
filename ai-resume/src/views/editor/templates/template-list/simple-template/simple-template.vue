@@ -40,7 +40,14 @@
         v-for="item in activeModules"
         :key="item.moduleKey"
         :class="{
-          'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+          'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
+            ![
+              'workExperience',
+              'educationBackground',
+              'projectExperience',
+              'campusExperience',
+              'internshipExperience',
+            ].includes(item.moduleKey),
         }"
         :style="{ marginBottom: globalModuleMargin }"
       >
