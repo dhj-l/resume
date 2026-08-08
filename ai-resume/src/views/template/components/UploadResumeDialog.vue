@@ -106,6 +106,11 @@
           {{ jdError }}
         </div>
       </div>
+
+      <!-- Section 3: Module Selection -->
+      <div class="space-y-2">
+        <ModuleSelectPanel v-model="selectedModules" />
+      </div>
     </div>
   </a-modal>
 </template>
@@ -118,6 +123,9 @@ import { message } from "ant-design-vue";
 import type { UploadProps } from "ant-design-vue";
 
 import { parseResumeAPI } from "@/api/resume/resume";
+import { SSE_MODULE_KEYS } from "@/api/resume-ai/type";
+
+import ModuleSelectPanel from "./ModuleSelectPanel.vue";
 
 /**
  * Props Definition
@@ -137,7 +145,7 @@ const props = withDefaults(defineProps<Props>(), {
  */
 const emit = defineEmits<{
   (e: "update:open", value: boolean): void;
-  (e: "submit", payload: { resumeText: string; jdText: string }): void;
+  (e: "submit", payload: { resumeText: string; jdText: string; modules: string[] }): void;
 }>();
 
 /**
@@ -145,6 +153,7 @@ const emit = defineEmits<{
  */
 const loading = ref(false);
 const jdError = ref("");
+const selectedModules = ref<string[]>([...SSE_MODULE_KEYS]);
 
 // 使用 ref 管理组件内部状态，不再依赖父组件的 props 回流
 // 这样可以确保数据流单向，且组件内部状态自洽
@@ -222,10 +231,15 @@ const handleConfirm = () => {
     jdError.value = "岗位描述不能为空";
     return;
   }
+  if (selectedModules.value.length === 0) {
+    message.warning("请至少选择一个模块");
+    return;
+  }
 
   emit("submit", {
     resumeText: localResumeText.value,
     jdText: localJdText.value,
+    modules: [...selectedModules.value],
   });
   // Note: We don't automatically close here, expecting parent to handle or close on success
   // But typically a dialog closes on OK.
@@ -242,6 +256,7 @@ watch(
       jdError.value = "";
       localResumeText.value = "";
       localJdText.value = "";
+      selectedModules.value = [...SSE_MODULE_KEYS];
     }
   },
 );

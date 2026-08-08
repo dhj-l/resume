@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { provide, ref } from "vue";
+import { inject, provide, ref, type Ref } from "vue";
 
 import { UpOutlined, DownOutlined } from "@ant-design/icons-vue";
 import { storeToRefs } from "pinia";
@@ -20,6 +20,7 @@ const { isExpanded } = storeToRefs(useResumeStore());
 const { setIsExpanded } = useResumeStore();
 const drawerHeight = ref(EDIT_DRAWER_EXPANDED_HEIGHT);
 const drawerContentRef = ref<HTMLDivElement>();
+const aiGenerating = inject<Ref<boolean>>("aiGenerating", ref(false));
 provide("drawerContentRef", drawerContentRef);
 
 const toggleDrawer = () => {
@@ -55,8 +56,19 @@ const handleDragStart = () => {
     </div>
 
     <!-- 内容区域 -->
-    <div v-if="isExpanded" ref="drawerContentRef" class="flex-1 overflow-hidden flex flex-col">
+    <div
+      v-if="isExpanded"
+      ref="drawerContentRef"
+      class="relative flex-1 overflow-hidden flex flex-col"
+    >
       <ModuleTabs :resume-data="resumeData" />
+      <!-- AI 生成中锁定编辑 -->
+      <div
+        v-if="aiGenerating"
+        class="absolute inset-0 z-10 bg-white/70 backdrop-blur-[1px] flex items-center justify-center"
+      >
+        <span class="text-sm text-slate-500">AI 生成中，暂时无法编辑</span>
+      </div>
     </div>
   </div>
 </template>

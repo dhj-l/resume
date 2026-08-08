@@ -7,6 +7,8 @@
 
 import type { Page, Route } from "@playwright/test";
 
+import { SSE_MODULE_KEYS } from "../../src/api/resume-ai/type";
+
 import {
   mockCreatedResume,
   mockGiteeAuthUrl,
@@ -89,7 +91,9 @@ export async function setupApiMocks(page: Page) {
 
   // GitHub OAuth URL
   await page.route("**/api/v1/auth/github", async (route) => {
-    await route.fulfill({ json: apiJson({ authUrl: "https://github.com/login/oauth/authorize", state: "mock" }) });
+    await route.fulfill({
+      json: apiJson({ authUrl: "https://github.com/login/oauth/authorize", state: "mock" }),
+    });
   });
 
   // ==================== Templates 模块 ====================
@@ -125,13 +129,52 @@ export async function setupApiMocks(page: Page) {
 
   // 简历复制 (最具体：/api/v1/resume/:id/copy)
   await page.route("**/api/v1/resume/*/copy", async (route) => {
-    await route.fulfill({ json: apiJson({ ...mockResumes[0], _id: "resume_copy001", title: "张三 - 前端开发工程师(副本)" }) });
+    await route.fulfill({
+      json: apiJson({
+        ...mockResumes[0],
+        _id: "resume_copy001",
+        title: "张三 - 前端开发工程师(副本)",
+      }),
+    });
   });
 
   // 简历详情 / 更新 / 删除 (匹配 /api/v1/resume/:id)
   await page.route(/\/api\/v1\/resume\/[^\/]+$/, async (route) => {
     if (route.request().method() === "GET") {
-      await route.fulfill({ json: apiJson({ ...mockResumes[0], title: "前端开发工程师简历详情" }) });
+      await route.fulfill({
+        json: apiJson({
+          ...mockResumes[0],
+          title: "前端开发工程师简历详情",
+          aiStatus: "generating",
+          type: "default",
+          globalStyle: {},
+          basicInfo: {
+            name: "张三",
+            gender: "男",
+            phone: "13800138000",
+            email: "zhangsan@example.com",
+          },
+          jobIntention: {},
+          educationBackground: [],
+          workExperience: [
+            {
+              companyName: "某公司",
+              position: "前端开发工程师",
+              workTime: "2020-07",
+              dismissalTime: "至今",
+              workDescription: "<p>负责核心业务开发</p>",
+              globalSort: 1,
+              localSort: 1,
+            },
+          ],
+          projectExperience: [],
+          campusExperience: [],
+          internshipExperience: [],
+          skills: { content: "<ul><li>熟练掌握 Vue3</li></ul>" },
+          certificates: { content: "" },
+          selfEvaluation: { content: "热爱技术" },
+        }),
+      });
     } else if (route.request().method() === "PATCH") {
       await route.fulfill({ json: apiJson({ ...mockResumes[0] }) });
     } else if (route.request().method() === "DELETE") {
@@ -175,24 +218,21 @@ export async function setupApiMocks(page: Page) {
 export async function injectAuthToPage(page: Page) {
   const testEmail = process.env.TEST_USER_EMAIL || "test@example.com";
   await page.goto("/");
-  await page.evaluate(
-    (email) => {
-      localStorage.setItem(
-        "auth",
-        JSON.stringify({
-          token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-token",
-          userInfo: {
-            _id: "user001",
-            username: "testuser",
-            email,
-            createdAt: "2025-01-01T00:00:00Z",
-            updatedAt: "2025-06-01T08:00:00Z",
-          },
-        }),
-      );
-    },
-    testEmail,
-  );
+  await page.evaluate((email) => {
+    localStorage.setItem(
+      "auth",
+      JSON.stringify({
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.mock-token",
+        userInfo: {
+          _id: "user001",
+          username: "testuser",
+          email,
+          createdAt: "2025-01-01T00:00:00Z",
+          updatedAt: "2025-06-01T08:00:00Z",
+        },
+      }),
+    );
+  }, testEmail);
   // 重新加载以让 Pinia 读取 localStorage
   await page.reload();
 }
@@ -206,14 +246,14 @@ export async function injectAuthToPage(page: Page) {
  * 无法实现真正的流式分帧，会导致 complete 帧与 progress 帧同步到达、遮罩立即关闭，
  * 进度文本来不及渲染。
  *
- * - success: progress(basicInfo 1/11) -> progress(workExperience 2/11) -> complete(resumeId="resume_new")
- * - error:   progress(basicInfo 1/11) -> error("AI 生成失败：内容解析异常")
+ * - init(resumeId="resume_new") -> 按请求体 modules 逐模块推送 completed 帧（含 data）-> complete
+ * - error:   init -> 第一个模块 completed（含 data）-> error("内容解析异常")
  *
  * 需在 setupApiMocks 之后调用；其他 axios/XHR 请求仍走 page.route mock。
  */
 export async function mockGenerateSse(page: Page, scenario: "success" | "error") {
   await page.addInitScript(
-    ({ scenario }: { scenario: "success" | "error" }) => {
+    ({ scenario, allModules }: { scenario: "success" | "error"; allModules: string[] }) => {
       const originalFetch = window.fetch;
       window.fetch = async (input: any, init?: any) => {
         const url =
@@ -227,45 +267,95 @@ export async function mockGenerateSse(page: Page, scenario: "success" | "error")
           return originalFetch(input as RequestInfo, init as RequestInit);
         }
 
+        const payload = init?.body ? JSON.parse(String(init.body)) : {};
+        const modules =
+          Array.isArray(payload.modules) && payload.modules.length > 0
+            ? payload.modules
+            : allModules;
+        const total = modules.length;
+
+        const moduleMockData: Record<string, any> = {
+          basicInfo: {
+            name: "张三",
+            gender: "男",
+            phone: "13800138000",
+            email: "zhangsan@example.com",
+          },
+          jobIntention: {},
+          globalStyle: {},
+          skills: { content: "<ul><li>熟练掌握 Vue3</li></ul>" },
+          certificates: { content: "" },
+          selfEvaluation: { content: "热爱技术" },
+          educationBackground: [],
+          workExperience: [
+            {
+              companyName: "某公司",
+              position: "前端开发工程师",
+              workTime: "2020-07",
+              dismissalTime: "至今",
+              workDescription: "<p>负责核心业务开发</p>",
+              globalSort: 1,
+              localSort: 1,
+            },
+          ],
+          projectExperience: [],
+          campusExperience: [],
+          internshipExperience: [],
+        };
+
         const frames =
           scenario === "success"
             ? [
                 {
-                  type: "progress",
-                  moduleName: "basicInfo",
-                  status: "processing",
-                  totalModules: 11,
-                  currentModule: 1,
+                  type: "init",
+                  moduleName: "system",
+                  status: "started",
+                  totalModules: total,
+                  currentModule: 0,
+                  resumeId: "resume_new",
                 },
-                {
+                ...modules.map((moduleName: string, index: number) => ({
                   type: "progress",
-                  moduleName: "workExperience",
-                  status: "processing",
-                  totalModules: 11,
-                  currentModule: 2,
-                },
+                  moduleName,
+                  status: "completed",
+                  totalModules: total,
+                  currentModule: index + 1,
+                  resumeId: "resume_new",
+                  data: moduleMockData[moduleName] ?? {},
+                })),
                 {
                   type: "complete",
                   status: "completed",
-                  totalModules: 11,
-                  currentModule: 11,
+                  totalModules: total,
+                  currentModule: total,
                   resumeId: "resume_new",
                 },
               ]
             : [
                 {
+                  type: "init",
+                  moduleName: "system",
+                  status: "started",
+                  totalModules: total,
+                  currentModule: 0,
+                  resumeId: "resume_new",
+                },
+                {
                   type: "progress",
-                  moduleName: "basicInfo",
-                  status: "processing",
-                  totalModules: 11,
+                  moduleName: modules[0],
+                  status: "completed",
+                  totalModules: total,
                   currentModule: 1,
+                  resumeId: "resume_new",
+                  data: moduleMockData[modules[0]] ?? {},
                 },
                 {
                   type: "error",
                   status: "failed",
-                  message: "AI 生成失败：内容解析异常",
-                  totalModules: 11,
+                  message: "内容解析异常",
+                  totalModules: total,
                   currentModule: 1,
+                  resumeId: "resume_new",
                 },
               ];
 
@@ -275,7 +365,7 @@ export async function mockGenerateSse(page: Page, scenario: "success" | "error")
             for (const frame of frames) {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(frame)}\n\n`));
               // 帧间延迟，让 UI 有机会渲染进度
-              await new Promise((resolve) => setTimeout(resolve, 200));
+              await new Promise((resolve) => setTimeout(resolve, 600));
             }
             controller.close();
           },
@@ -287,6 +377,6 @@ export async function mockGenerateSse(page: Page, scenario: "success" | "error")
         });
       };
     },
-    { scenario },
+    { scenario, allModules: SSE_MODULE_KEYS },
   );
 }

@@ -1,23 +1,97 @@
 <script setup lang="ts">
-import { onMounted, provide, ref } from "vue";
+import { computed, onMounted, provide, ref, watch } from "vue";
 
 import { Layout, message } from "ant-design-vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 
+import { useAiGenerateStore } from "@/stores/aiGenerateStore";
 import { useResumeStore } from "@/stores/resumeStore";
 
 import AiAnalysisDrawer from "./components/AiAnalysisDrawer.vue";
+import AiGenerateBanner, { type AiBannerStatus } from "./components/AiGenerateBanner.vue";
 import EditDrawer from "./components/EditDrawer.vue";
 import EditorHeader from "./components/EditorHeader.vue";
 import ResumePreview from "./components/ResumePreview.vue";
 
 const { resumeData } = storeToRefs(useResumeStore());
-const { setResumeDataString } = useResumeStore();
+const { setResumeDataString, mergeAiModule } = useResumeStore();
+const aiGenerate = useAiGenerateStore();
 const route = useRoute();
 const router = useRouter();
 
 const showAiDrawer = ref(false);
+const interruptedBanner = ref(false);
+const dismissedBanner = ref(false);
+
+const currentResumeId = computed(() => route.query.id as string | undefined);
+
+/** 生成中锁定：当前编辑的正是生成中的草稿 */
+const isAiGenerating = computed(
+  () =>
+    aiGenerate.status === "generating" &&
+    !!currentResumeId.value &&
+    aiGenerate.resumeId === currentResumeId.value,
+);
+
+const aiBannerStatus = computed<AiBannerStatus | "none">(() => {
+  if (interruptedBanner.value) return "interrupted";
+  if (isAiGenerating.value) return "generating";
+  if (
+    aiGenerate.status === "completed" &&
+    aiGenerate.resumeId === currentResumeId.value &&
+    !dismissedBanner.value
+  ) {
+    return "completed";
+  }
+  if (
+    aiGenerate.status === "failed" &&
+    aiGenerate.resumeId === currentResumeId.value &&
+    !dismissedBanner.value
+  ) {
+    return "failed";
+  }
+  return "none";
+});
+
+provide("aiGenerating", isAiGenerating);
+
+// 新模块生成完成 -> 合并进当前简历，预览实时更新
+watch(
+  () => aiGenerate.completedModules,
+  (modules) => {
+    for (const [key, data] of Object.entries(modules)) {
+      mergeAiModule(key, data);
+    }
+  },
+  { deep: true },
+);
+
+// 刷新恢复：store 无活跃会话 + 简历仍标记 generating + sessionStorage 有会话记录
+watch(
+  () => resumeData.value.aiStatus,
+  (aiStatus) => {
+    if (
+      aiStatus === "generating" &&
+      currentResumeId.value &&
+      !aiGenerate.isActive() &&
+      sessionStorage.getItem(`ai-generate:${currentResumeId.value}`)
+    ) {
+      interruptedBanner.value = true;
+    }
+  },
+);
+
+const handleInterruptedConfirm = () => {
+  if (currentResumeId.value) {
+    sessionStorage.removeItem(`ai-generate:${currentResumeId.value}`);
+  }
+  interruptedBanner.value = false;
+};
+
+const handleBannerDismiss = () => {
+  dismissedBanner.value = true;
+};
 
 const toggleAiDrawer = () => {
   showAiDrawer.value = !showAiDrawer.value;
@@ -43,8 +117,22 @@ onMounted(() => {
     <!-- 顶部导航 -->
     <EditorHeader
       :resume-title="resumeData.title"
+      :ai-generating="isAiGenerating"
       @update:resume-title="handleTitleUpdate"
       @toggle-ai-drawer="toggleAiDrawer"
+    />
+
+    <!-- AI 生成状态横幅 -->
+    <AiGenerateBanner
+      v-if="aiBannerStatus !== 'none'"
+      class="mt-16"
+      :status="aiBannerStatus"
+      :current="aiGenerate.currentModule"
+      :total="aiGenerate.totalModules"
+      :label="aiGenerate.moduleLabel"
+      :error="aiGenerate.error"
+      @dismiss="handleBannerDismiss"
+      @confirm-interrupt="handleInterruptedConfirm"
     />
 
     <!-- 中间内容区 -->

@@ -8,10 +8,17 @@
 
 import type { AiResumeParams } from "@/api/resume/type";
 
-import type { SseCompleteMessage, SseErrorMessage, SseMessage, SseProgressMessage } from "./type";
+import type {
+  SseCompleteMessage,
+  SseErrorMessage,
+  SseInitMessage,
+  SseMessage,
+  SseProgressMessage,
+} from "./type";
 
 /** SSE 回调集合 */
 export interface SseCallbacks {
+  onInit?: (msg: SseInitMessage) => void;
   onProgress?: (msg: SseProgressMessage) => void;
   onComplete?: (msg: SseCompleteMessage) => void;
   onError?: (error: SseErrorMessage | Error) => void;
@@ -70,7 +77,7 @@ export const generateAiResumeSSE = async (
   payload: AiResumeParams,
   options: GenerateAiResumeSseOptions = {},
 ): Promise<void> => {
-  const { onProgress, onComplete, onError, timeout = DEFAULT_TIMEOUT, signal } = options;
+  const { onInit, onProgress, onComplete, onError, timeout = DEFAULT_TIMEOUT, signal } = options;
 
   const token = getAuthToken();
   if (!token) {
@@ -145,7 +152,9 @@ export const generateAiResumeSSE = async (
         separatorIndex = buffer.indexOf("\n\n");
         if (!message) continue;
 
-        if (message.type === "progress") {
+        if (message.type === "init") {
+          onInit?.(message);
+        } else if (message.type === "progress") {
           onProgress?.(message);
         } else if (message.type === "complete") {
           onComplete?.(message);

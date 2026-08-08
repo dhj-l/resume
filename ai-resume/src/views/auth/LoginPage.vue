@@ -88,7 +88,7 @@
       class="!h-12 !rounded-lg !border !border-gray-300 !text-gray-700 hover:!border-gray-900 hover:!text-gray-900 !flex !items-center !justify-center !gap-2.5 !transition-all !duration-300 mt-3"
       @click="handleOAuthLogin('github')"
     >
-      <GitHubIcon class="w-5 h-5" />
+      <GithubOutlined class="text-lg" />
       GitHub 登录
     </a-button>
 
@@ -112,13 +112,12 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 
-import { MailOutlined, LockOutlined } from "@ant-design/icons-vue";
+import { GithubOutlined, LockOutlined, MailOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { useRouter } from "vue-router";
 
 import { getGiteeAuthUrlAPI, getGitHubAuthUrlAPI } from "@/api/auth/auth";
 import GiteeIcon from "@/components/icons/GiteeIcon.vue";
-import GitHubIcon from "@/components/icons/GitHubIcon.vue";
 import { useAuthStore } from "@/stores/auth";
 
 const router = useRouter();

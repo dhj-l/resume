@@ -32,6 +32,8 @@ const { resumeData } = storeToRefs(useResumeStore());
 const { setCurrentTemplate, saveResume, setResumeDataString } = useResumeStore();
 interface Props {
   resumeTitle?: string;
+  /** AI 生成中：锁定编辑类操作 */
+  aiGenerating?: boolean;
 }
 
 const resumeTitle = computed(() => {
@@ -90,6 +92,8 @@ const handleSave = async () => {
  * @param isUpdateCover 是否更新封面
  */
 const autoSave = async (isUpdateCover: boolean = false) => {
+  // AI 生成中禁止自动保存，避免默认值覆盖草稿中已生成的模块
+  if (props.aiGenerating) return false;
   if (isSaving.value) return true;
   // 简历尚未创建/加载成功时不允许保存
   if (!resumeData.value._id) return false;
@@ -188,6 +192,7 @@ const validateTitle = (title: string): string => {
 };
 
 const startEditingTitle = () => {
+  if (props.aiGenerating) return;
   editingTitleValue.value = resumeTitle.value;
   isEditingTitle.value = true;
 };
@@ -231,6 +236,7 @@ interface HeaderButtonConfig {
   icon?: Component;
   type?: ButtonType;
   loading?: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }
 
@@ -256,12 +262,14 @@ const rightButtons = computed<HeaderButtonConfig[]>(() => [
     key: "save",
     label: "保存草稿",
     icon: toRaw(SaveOutlined),
+    disabled: props.aiGenerating,
     onClick: handleSave,
   },
   {
     key: "publish",
     label: "发布为模板",
     icon: toRaw(UploadOutlined),
+    disabled: props.aiGenerating,
     onClick: handleOpenPublishModal,
   },
   {
@@ -270,6 +278,7 @@ const rightButtons = computed<HeaderButtonConfig[]>(() => [
     icon: toRaw(FilePdfOutlined),
     type: "primary",
     loading: exportLoading.value,
+    disabled: props.aiGenerating,
     onClick: handleExport,
   },
 ]);
@@ -374,6 +383,7 @@ onUnmounted(() => {
         :key="btn.key"
         :type="btn.type"
         :loading="btn.loading"
+        :disabled="btn.disabled"
         class="flex items-center"
         @click="btn.onClick"
       >

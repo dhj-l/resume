@@ -94,6 +94,11 @@
           </div>
         </div>
       </div>
+
+      <!-- Module Selection Section -->
+      <div>
+        <ModuleSelectPanel v-model="selectedModules" />
+      </div>
     </div>
 
     <!-- Footer Actions -->
@@ -121,7 +126,10 @@ import { message } from "ant-design-vue";
 
 import { getUserResumesAPI } from "@/api/resume/resume";
 import type { UserResumeListItem } from "@/api/resume/type";
+import { SSE_MODULE_KEYS } from "@/api/resume-ai/type";
 import { formatDate } from "@/utils/day";
+
+import ModuleSelectPanel from "./ModuleSelectPanel.vue";
 
 const props = defineProps<{
   open: boolean;
@@ -130,13 +138,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:open", value: boolean): void;
-  (e: "submit", payload: { jd: string; resumeId: string }): void;
+  (e: "submit", payload: { jd: string; resumeId: string; modules: string[] }): void;
   (e: "create-new"): void;
 }>();
 
 // State
 const jobDescription = ref("");
 const selectedResumeId = ref<string | null>(null);
+const selectedModules = ref<string[]>([...SSE_MODULE_KEYS]);
 const resumes = ref<UserResumeListItem[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -173,10 +182,15 @@ const handleConfirm = () => {
     message.warning("请选择一份简历");
     return;
   }
+  if (selectedModules.value.length === 0) {
+    message.warning("请至少选择一个模块");
+    return;
+  }
 
   emit("submit", {
     jd: jobDescription.value,
     resumeId: selectedResumeId.value,
+    modules: [...selectedModules.value],
   });
 
   // Optional: Reset state or close dialog?
@@ -191,6 +205,7 @@ watch(
       // 打开时重置状态并拉取最新简历列表
       selectedResumeId.value = null;
       jobDescription.value = "";
+      selectedModules.value = [...SSE_MODULE_KEYS];
       error.value = null;
       fetchResumes();
     }

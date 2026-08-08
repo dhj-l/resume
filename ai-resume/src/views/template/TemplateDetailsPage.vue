@@ -166,11 +166,10 @@ import { useRoute, useRouter } from "vue-router";
 
 import { createResumeAPI, importResumeAPI } from "@/api/resume/resume";
 import type { AiResumeParams } from "@/api/resume/type";
-import { generateAiResumeSSE } from "@/api/resume-ai/sse";
-import { getSseModuleLabel } from "@/api/resume-ai/type";
 import { getTemplateByIdAPI } from "@/api/templates/templates";
 import type { TemplateDetails } from "@/api/templates/type";
 import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
+import { useAiGenerateStore } from "@/stores/aiGenerateStore";
 import { formatDate } from "@/utils/day";
 import { getFullImageUrl } from "@/utils/image";
 
@@ -188,6 +187,7 @@ const isAiCreating = ref(false);
 const isImporting = ref(false);
 const isImportingResume = ref(false);
 const isGlobalLoading = ref(false);
+const aiGenerateStore = useAiGenerateStore();
 
 const createModeOpen = ref(false);
 const aiDialogOpen = ref(false);
@@ -231,8 +231,8 @@ interface RunAiGenerateOptions {
 }
 
 /**
- * 统一处理 AI 生成：打开/关闭全屏遮罩、调用 SSE、更新进度，
- * complete 后提示成功并跳转编辑页，error/超时/断线时提示并关闭遮罩。
+ * 统一处理 AI 生成：收到 init（草稿已创建）后立即跳转编辑页，
+ * 生成在后台继续并由 aiGenerateStore 维护，编辑页实时渲染。
  */
 const runAiGenerate = async (payload: AiResumeParams, options: RunAiGenerateOptions = {}) => {
   const { successText = "AI 简历生成成功", onComplete, onFinally } = options;
@@ -241,24 +241,22 @@ const runAiGenerate = async (payload: AiResumeParams, options: RunAiGenerateOpti
   aiProgress.value = null;
 
   try {
-    await generateAiResumeSSE(payload, {
-      onProgress: (msg) => {
-        aiProgress.value = {
-          current: msg.currentModule,
-          total: msg.totalModules,
-          label: getSseModuleLabel(msg.moduleName),
-        };
-      },
-      onComplete: (msg) => {
-        message.success(successText);
-        onComplete?.();
-        pushToEditor(msg.resumeId);
-      },
-      onError: (error) => {
-        message.error(error.message);
-      },
-      timeout: 600000,
+    await aiGenerateStore.startGeneration(payload, (resumeId) => {
+      // 持久化 payload，供刷新后检测生成中断
+      sessionStorage.setItem(
+        `ai-generate:${resumeId}`,
+        JSON.stringify({ payload, startedAt: Date.now() }),
+      );
+      pushToEditor(resumeId);
     });
+
+    // startGeneration 在 complete / error 后返回
+    if (aiGenerateStore.status === "completed") {
+      message.success(successText);
+      onComplete?.();
+    } else if (aiGenerateStore.status === "failed") {
+      message.error(aiGenerateStore.error || "AI 生成失败");
+    }
   } finally {
     aiProgress.value = null;
     isGlobalLoading.value = false;
@@ -311,6 +309,7 @@ const handleAiSubmit = async (data: any) => {
       jobDescription: data.jd,
       detailInfo: { ...data.userInfo, supplementary: data.supplementary },
       templateType: template.value.resume.type,
+      modules: data.modules,
     },
     {
       successText: "AI 简历生成成功",
@@ -324,7 +323,11 @@ const handleAiSubmit = async (data: any) => {
   );
 };
 
-const handleSelectResumeSubmit = async (payload: { jd: string; resumeId: string }) => {
+const handleSelectResumeSubmit = async (payload: {
+  jd: string;
+  resumeId: string;
+  modules: string[];
+}) => {
   if (!template.value || isGlobalLoading.value) return;
 
   isImporting.value = true;
@@ -334,6 +337,7 @@ const handleSelectResumeSubmit = async (payload: { jd: string; resumeId: string 
       jobDescription: payload.jd,
       resumeId: payload.resumeId,
       templateType: template.value.resume.type,
+      modules: payload.modules,
     },
     {
       successText: "基于已有简历生成成功",
@@ -347,7 +351,11 @@ const handleSelectResumeSubmit = async (payload: { jd: string; resumeId: string 
   );
 };
 
-const handleUploadResumeSubmit = async (payload: { resumeText: string; jdText: string }) => {
+const handleUploadResumeSubmit = async (payload: {
+  resumeText: string;
+  jdText: string;
+  modules: string[];
+}) => {
   if (!template.value || isGlobalLoading.value) return;
 
   isImporting.value = true;
@@ -357,6 +365,7 @@ const handleUploadResumeSubmit = async (payload: { resumeText: string; jdText: s
       jobDescription: payload.jdText,
       resumeContent: payload.resumeText,
       templateType: template.value.resume.type,
+      modules: payload.modules,
     },
     {
       successText: "生成成功",

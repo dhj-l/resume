@@ -150,6 +150,9 @@ export const SSE_MODULE_LABEL_MAP: Record<string, string> = {
   internshipExperience: "实习经历",
 };
 
+/** 全部模块 key（顺序固定，与后端 MODULE_EXECUTION_ORDER 一致） */
+export const SSE_MODULE_KEYS: string[] = Object.keys(SSE_MODULE_LABEL_MAP);
+
 /** 获取模块中文标签，未知模块回退为原始 moduleName */
 export const getSseModuleLabel = (moduleName: string): string => {
   return SSE_MODULE_LABEL_MAP[moduleName] ?? moduleName;
@@ -164,6 +167,20 @@ export interface SseProgressMessage {
   totalModules: number;
   currentModule: number;
   retryCount?: number;
+  /** 模块生成的数据（仅 completed 帧携带，key 与简历字段一致） */
+  data?: any;
+  resumeId?: string;
+}
+
+/** 初始化帧：草稿已创建，携带 resumeId，前端据此立即进入编辑页 */
+export interface SseInitMessage {
+  type: "init";
+  moduleName: string;
+  status: "started";
+  message?: string;
+  totalModules: number;
+  currentModule: number;
+  resumeId: string;
 }
 
 /** 完成帧：整体生成完成，携带 resumeId 用于跳转 */
@@ -183,6 +200,7 @@ export interface SseErrorMessage {
   message: string;
   totalModules: number;
   currentModule: number;
+  resumeId?: string;
 }
 
 /** 心跳帧：仅保活，业务侧忽略 */
@@ -192,6 +210,7 @@ export interface SseHeartbeatMessage {
 
 /** SSE 消息判别联合 */
 export type SseMessage =
+  | SseInitMessage
   | SseProgressMessage
   | SseCompleteMessage
   | SseErrorMessage

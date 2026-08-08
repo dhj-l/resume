@@ -41,7 +41,11 @@
           </div>
         </div>
 
-        <a-tag v-if="resume.isTemplate" color="blue">模板</a-tag>
+        <div class="flex items-center gap-1">
+          <a-tag v-if="resume.aiStatus === 'generating'" color="processing"> 生成中 </a-tag>
+          <a-tag v-else-if="resume.aiStatus === 'failed'" color="error"> 生成失败 </a-tag>
+          <a-tag v-if="resume.isTemplate" color="blue">模板</a-tag>
+        </div>
       </div>
 
       <div class="flex items-center justify-end gap-2">

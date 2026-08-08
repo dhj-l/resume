@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { watch } from "vue";
 
+import { LoadingOutlined } from "@ant-design/icons-vue";
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 
+import { useAiGenerateStore } from "@/stores/aiGenerateStore";
 import { useResumeStore } from "@/stores/resumeStore";
 import { templateList } from "@/views/editor/templates/index";
 
 const { resumeData, globalFontSize, globalLineHeight } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
+const aiGenerate = useAiGenerateStore();
 
 const route = useRoute();
 watch(
@@ -30,17 +33,32 @@ watch(
   这里只展示模板，不涉及复杂的逻辑。
 -->
 <template>
-  <div
-    class="resume-preview-wrapper w-[210mm]"
-    :style="{
-      lineHeight: globalLineHeight,
-      '--resume-fs': globalFontSize,
-      '--resume-lh': globalLineHeight,
-    }"
-  >
-    <template v-for="item in templateList" :key="item.value">
-      <component :is="item.component" v-if="item.value === resumeData.type" />
-    </template>
+  <div class="flex flex-col items-center gap-3">
+    <!-- AI 生成中：当前生成模块标注 -->
+    <div
+      v-if="aiGenerate.status === 'generating'"
+      class="sticky top-4 z-20 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-sm text-white shadow-lg"
+    >
+      <LoadingOutlined spin class="text-base" />
+      <span>
+        AI 正在生成：{{ aiGenerate.moduleLabel || "初始化中" }}（{{ aiGenerate.currentModule }}/{{
+          aiGenerate.totalModules
+        }}）
+      </span>
+    </div>
+
+    <div
+      class="resume-preview-wrapper w-[210mm]"
+      :style="{
+        lineHeight: globalLineHeight,
+        '--resume-fs': globalFontSize,
+        '--resume-lh': globalLineHeight,
+      }"
+    >
+      <template v-for="item in templateList" :key="item.value">
+        <component :is="item.component" v-if="item.value === resumeData.type" />
+      </template>
+    </div>
   </div>
 </template>
 

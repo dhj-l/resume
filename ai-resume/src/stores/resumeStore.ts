@@ -202,6 +202,12 @@ export const useResumeStore = defineStore("resume", () => {
     }
   };
 
+  /** AI 生成过程中合并单个模块数据到当前简历（触发预览响应式更新） */
+  const mergeAiModule = (moduleName: string, data: any) => {
+    if (!data || typeof data !== "object") return;
+    (resumeData.value as any)[moduleName] = data;
+  };
+
   const createResume = async () => {
     moduleSortHints.value = {};
     const res = await createResumeAPI();
@@ -587,6 +593,7 @@ export const useResumeStore = defineStore("resume", () => {
     setIsExpanded,
     setCurrentTemplate,
     setResumeDataString,
+    mergeAiModule,
     createResume,
     saveResume,
     getResumeDetail,

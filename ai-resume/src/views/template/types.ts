@@ -20,4 +20,6 @@ export interface AiCreateFormData {
   jd: string;
   userInfo: AiCreateUserInfo;
   supplementary: string;
+  /** 本次要生成的模块 key 列表 */
+  modules: string[];
 }
