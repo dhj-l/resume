@@ -60,6 +60,8 @@ provide("aiGenerating", isAiGenerating);
 watch(
   () => aiGenerate.completedModules,
   (modules) => {
+    // 仅当当前编辑的简历正是生成中的草稿时才合并，避免后台 SSE 把其他简历的模块写进来
+    if (aiGenerate.resumeId !== currentResumeId.value) return;
     for (const [key, data] of Object.entries(modules)) {
       mergeAiModule(key, data);
     }
@@ -98,8 +100,6 @@ const toggleAiDrawer = () => {
   showAiDrawer.value = !showAiDrawer.value;
 };
 
-provide("resumeData", resumeData);
-
 const handleTitleUpdate = (newTitle: string) => {
   setResumeDataString("title", newTitle);
 };
@@ -136,8 +136,11 @@ onMounted(() => {
       @confirm-interrupt="handleInterruptedConfirm"
     />
 
-    <!-- 中间内容区 -->
-    <Layout.Content class="flex-1 overflow-y-auto mt-16 relative custom-scrollbar">
+    <!-- 中间内容区：横幅显示时由横幅占用头栏下方空间，内容区不再叠加 mt-16 -->
+    <Layout.Content
+      class="flex-1 overflow-y-auto relative custom-scrollbar"
+      :class="aiBannerStatus === 'none' ? 'mt-16' : ''"
+    >
       <div
         class="min-h-full py-8 pl-4 flex justify-center pb-[35vh] transition-[padding-right] duration-300 ease-in-out"
         :class="showAiDrawer ? 'pr-[420px]' : 'pr-4'"

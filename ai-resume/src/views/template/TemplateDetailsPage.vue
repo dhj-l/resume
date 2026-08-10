@@ -236,12 +236,14 @@ interface RunAiGenerateOptions {
  */
 const runAiGenerate = async (payload: AiResumeParams, options: RunAiGenerateOptions = {}) => {
   const { successText = "AI 简历生成成功", onComplete, onFinally } = options;
+  // startGeneration 返回本次调用是否仍是最近一代；被新调用取代时为 false
+  let isCurrent = true;
 
   isGlobalLoading.value = true;
   aiProgress.value = null;
 
   try {
-    await aiGenerateStore.startGeneration(payload, (resumeId) => {
+    isCurrent = await aiGenerateStore.startGeneration(payload, (resumeId) => {
       // 持久化 payload，供刷新后检测生成中断
       sessionStorage.setItem(
         `ai-generate:${resumeId}`,
@@ -262,7 +264,9 @@ const runAiGenerate = async (payload: AiResumeParams, options: RunAiGenerateOpti
       }
     });
 
-    // startGeneration 在 complete / error 后返回
+    // startGeneration 在 complete / error 后返回；已被新调用取代则不再处理本次收尾
+    if (!isCurrent) return;
+
     if (aiGenerateStore.status === "completed") {
       message.success(successText);
       onComplete?.();
@@ -270,9 +274,12 @@ const runAiGenerate = async (payload: AiResumeParams, options: RunAiGenerateOpti
       message.error(aiGenerateStore.error || "AI 生成失败");
     }
   } finally {
-    aiProgress.value = null;
-    isGlobalLoading.value = false;
-    onFinally?.();
+    // 仅当前代次负责收尾，避免旧调用清掉新调用的 isGlobalLoading
+    if (isCurrent) {
+      aiProgress.value = null;
+      isGlobalLoading.value = false;
+      onFinally?.();
+    }
   }
 };
 

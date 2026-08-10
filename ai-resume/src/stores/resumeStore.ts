@@ -156,6 +156,27 @@ export const getGlobalSortFromResumeData = (
   return fallbackSort;
 };
 
+/**
+ * 合并 AI 生成的单个模块数据到现有模块，保留 AI 未携带的排序字段
+ * - 对象模块（skills/globalStyle 等）：浅合并，保留原 globalSort 等字段
+ * - 数组模块（workExperience 等）：沿用原模块的全局排序位置，按序重置 localSort
+ */
+export const mergeAiModuleData = (current: any, data: any, fallbackSort?: number): any => {
+  if (!data || typeof data !== "object") return current;
+
+  if (Array.isArray(data)) {
+    const moduleGlobalSort =
+      Array.isArray(current) && current.length > 0 ? current[0]?.globalSort : fallbackSort;
+    return data.map((item: any, index: number) => ({
+      ...item,
+      globalSort: item.globalSort ?? moduleGlobalSort,
+      localSort: item.localSort ?? index,
+    }));
+  }
+
+  return { ...current, ...data };
+};
+
 export const useResumeStore = defineStore("resume", () => {
   const resumeData = ref<ResumeData>(createEmptyResumeData());
   const currentModule = ref<string>("basicInfo");
@@ -205,7 +226,9 @@ export const useResumeStore = defineStore("resume", () => {
   /** AI 生成过程中合并单个模块数据到当前简历（触发预览响应式更新） */
   const mergeAiModule = (moduleName: string, data: any) => {
     if (!data || typeof data !== "object") return;
-    (resumeData.value as any)[moduleName] = data;
+    const current = (resumeData.value as any)[moduleName];
+    const fallbackSort = moduleSortHints.value[moduleName] ?? MODULE_DEFAULT_SORT[moduleName];
+    (resumeData.value as any)[moduleName] = mergeAiModuleData(current, data, fallbackSort);
   };
 
   const createResume = async () => {

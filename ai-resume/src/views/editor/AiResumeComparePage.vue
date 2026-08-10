@@ -98,6 +98,7 @@ import { deleteResumeAPI, getResumeDetailAPI } from "@/api/resume/resume";
 import { SSE_MODULE_KEYS, SSE_MODULE_LABEL_MAP } from "@/api/resume-ai/type";
 import type { AiResumeParams } from "@/api/resume/type";
 import { useAiGenerateStore } from "@/stores/aiGenerateStore";
+import { mergeAiModuleData, MODULE_DEFAULT_SORT } from "@/stores/resumeStore";
 import type { ResumeData } from "@/stores/type";
 import AiGenerateBanner from "@/views/editor/components/AiGenerateBanner.vue";
 import ResumePreview from "@/views/editor/components/ResumePreview.vue";
@@ -218,7 +219,12 @@ const moduleOptions = Object.entries(SSE_MODULE_LABEL_MAP);
 const applyCompletedModules = () => {
   if (!aiData.value) return;
   for (const [key, data] of Object.entries(completedModules.value)) {
-    (aiData.value as unknown as Record<string, unknown>)[key] = data;
+    const current = (aiData.value as unknown as Record<string, unknown>)[key];
+    (aiData.value as unknown as Record<string, unknown>)[key] = mergeAiModuleData(
+      current,
+      data,
+      MODULE_DEFAULT_SORT[key],
+    );
   }
 };
 
