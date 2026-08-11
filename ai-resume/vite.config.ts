@@ -33,9 +33,11 @@ export default defineConfig({
           "vue-vendor": ["vue", "vue-router", "pinia", "pinia-plugin-persistedstate"],
           "antd-vendor": ["ant-design-vue", "@ant-design/icons-vue"],
           "echarts-vendor": ["echarts", "vue-echarts"],
+          "lottie-vendor": ["vue3-lottie", "lottie-web"],
           "editor-vendor": ["@wangeditor/editor", "@wangeditor/editor-for-vue"],
           "utils-vendor": [
             "axios",
+            "canvas-confetti",
             "dayjs",
             "html2canvas",
             "gsap",

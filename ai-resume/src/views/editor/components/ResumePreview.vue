@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed, provide, watch } from "vue";
 
-import { LoadingOutlined } from "@ant-design/icons-vue";
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 
+import AiGeneratingOverlay from "@/components/common/AiGeneratingOverlay.vue";
 import { useAiGenerateStore } from "@/stores/aiGenerateStore";
 import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData } from "@/stores/type";
@@ -62,18 +62,14 @@ watch(
 -->
 <template>
   <div class="flex flex-col items-center gap-3">
-    <!-- AI 生成中：当前生成模块标注 -->
-    <div
+    <!-- AI 生成中：动画卡片（不遮挡预览） -->
+    <AiGeneratingOverlay
       v-if="showGeneratingBadge && aiGenerate.status === 'generating'"
-      class="sticky top-4 z-20 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-sm text-white shadow-lg"
-    >
-      <LoadingOutlined spin class="text-base" />
-      <span>
-        AI 正在生成：{{ aiGenerate.moduleLabel || "初始化中" }}（{{ aiGenerate.currentModule }}/{{
-          aiGenerate.totalModules
-        }}）
-      </span>
-    </div>
+      :status="aiGenerate.status"
+      :current="aiGenerate.currentModule"
+      :total="aiGenerate.totalModules"
+      :label="aiGenerate.moduleLabel"
+    />
 
     <div
       class="resume-preview-wrapper"

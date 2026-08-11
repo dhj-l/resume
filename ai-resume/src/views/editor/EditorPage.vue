@@ -7,6 +7,7 @@ import { useRoute, useRouter } from "vue-router";
 
 import { useAiGenerateStore } from "@/stores/aiGenerateStore";
 import { useResumeStore } from "@/stores/resumeStore";
+import { playCelebration } from "@/utils/confetti";
 
 import AiAnalysisDrawer from "./components/AiAnalysisDrawer.vue";
 import AiGenerateBanner, { type AiBannerStatus } from "./components/AiGenerateBanner.vue";
@@ -81,6 +82,20 @@ watch(
       sessionStorage.getItem(`ai-generate:${currentResumeId.value}`)
     ) {
       interruptedBanner.value = true;
+    }
+  },
+);
+
+// 生成完成庆祝彩带（仅当前编辑的正是生成中的草稿时）
+watch(
+  () => aiGenerate.status,
+  (newStatus, oldStatus) => {
+    if (
+      oldStatus === "generating" &&
+      newStatus === "completed" &&
+      aiGenerate.resumeId === currentResumeId.value
+    ) {
+      playCelebration();
     }
   },
 );

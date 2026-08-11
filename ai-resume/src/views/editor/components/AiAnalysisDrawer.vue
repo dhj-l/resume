@@ -10,8 +10,10 @@ import { useRouter } from "vue-router";
 
 import { analyzeResumeAPI, getLatestAnalysisAPI } from "@/api/resume-ai/resume-ai";
 import type { AnalysisResultData } from "@/api/resume-ai/type";
+import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
 import ResumeAnalysisReport from "@/components/resume-analysis/ResumeAnalysisReport.vue";
 import { useResumeStore } from "@/stores/resumeStore";
+import { AI_ANALYZING_TIPS } from "@/utils/aiTips";
 import { AI_DRAWER_BOTTOM_OFFSET, EDIT_DRAWER_EXPANDED_HEIGHT } from "@/views/editor/constants";
 
 const props = defineProps<{
@@ -197,5 +199,13 @@ const handleViewDetail = () => {
         </Button>
       </template>
     </div>
+
+    <!-- 分析中全屏遮罩动画（不可手动关闭，分析结束自动关闭） -->
+    <FullScreenLoading
+      v-model:loading="loading"
+      text="AI 正在分析简历，请稍候..."
+      :tips="AI_ANALYZING_TIPS"
+      :timeout="600000"
+    />
   </div>
 </template>

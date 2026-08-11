@@ -73,6 +73,15 @@
             <a-tag v-else color="success">已完成</a-tag>
           </div>
           <div class="p-6 lg:p-8 bg-slate-50">
+            <AiGeneratingOverlay
+              v-if="isGenerating"
+              status="generating"
+              class="mb-5"
+              :current="current"
+              :total="total"
+              :label="label"
+              :sticky="false"
+            />
             <ResumePreview
               v-if="aiData"
               :data="aiData"
@@ -95,11 +104,13 @@ import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
 
 import { deleteResumeAPI, getResumeDetailAPI } from "@/api/resume/resume";
-import { SSE_MODULE_KEYS, SSE_MODULE_LABEL_MAP } from "@/api/resume-ai/type";
 import type { AiResumeParams } from "@/api/resume/type";
+import { SSE_MODULE_KEYS, SSE_MODULE_LABEL_MAP } from "@/api/resume-ai/type";
+import AiGeneratingOverlay from "@/components/common/AiGeneratingOverlay.vue";
 import { useAiGenerateStore } from "@/stores/aiGenerateStore";
 import { mergeAiModuleData, MODULE_DEFAULT_SORT } from "@/stores/resumeStore";
 import type { ResumeData } from "@/stores/type";
+import { playCelebration } from "@/utils/confetti";
 import AiGenerateBanner from "@/views/editor/components/AiGenerateBanner.vue";
 import ResumePreview from "@/views/editor/components/ResumePreview.vue";
 
@@ -332,9 +343,12 @@ const useOriginalVersion = () => {
 // 新模块生成完成 -> 增量合并到 AI 版预览
 watch(completedModules, applyCompletedModules, { deep: true });
 
-watch(generationStatus, (status) => {
+watch(generationStatus, (status, prev) => {
   if (status !== "generating") {
     stopPolling();
+  }
+  if (prev === "generating" && status === "completed") {
+    playCelebration();
   }
 });
 

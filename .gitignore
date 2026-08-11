@@ -28,9 +28,13 @@ dist-ssr
 
 .agents
 .agent
+.claude
 .vercel
 
 # Playwright
 playwright-report/
 test-results/
-.workbuddy/*
+.workbuddy/
+
+# pnpm local package store (regenerable cache, never commit)
+.pnpm-store

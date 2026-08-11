@@ -153,7 +153,12 @@
       :submitting="isImportingResume"
       @submit="handleImportResumeSubmit"
     />
-    <FullScreenLoading v-model:loading="isGlobalLoading" :progress="aiProgress" :timeout="600000" />
+    <FullScreenLoading
+      v-model:loading="isGlobalLoading"
+      :progress="aiProgress"
+      :tips="AI_GENERATING_TIPS"
+      :timeout="600000"
+    />
   </div>
 </template>
 
@@ -170,6 +175,7 @@ import { getTemplateByIdAPI } from "@/api/templates/templates";
 import type { TemplateDetails } from "@/api/templates/type";
 import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
 import { useAiGenerateStore } from "@/stores/aiGenerateStore";
+import { AI_GENERATING_TIPS } from "@/utils/aiTips";
 import { formatDate } from "@/utils/day";
 import { getFullImageUrl } from "@/utils/image";
 
