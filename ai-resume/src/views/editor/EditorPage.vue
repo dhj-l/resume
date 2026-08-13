@@ -22,8 +22,8 @@ const aiGenerate = useAiGenerateStore();
 const route = useRoute();
 const router = useRouter();
 
-const showAiDrawer = ref(false);
-const showQuestionsDrawer = ref(false);
+/** 当前打开的右侧 AI 抽屉（分析/押题互斥，同时只能展示一个） */
+const activeDrawer = ref<"analysis" | "questions" | null>(null);
 const interruptedBanner = ref(false);
 const dismissedBanner = ref(false);
 
@@ -114,11 +114,11 @@ const handleBannerDismiss = () => {
 };
 
 const toggleAiDrawer = () => {
-  showAiDrawer.value = !showAiDrawer.value;
+  activeDrawer.value = activeDrawer.value === "analysis" ? null : "analysis";
 };
 
 const toggleQuestionsDrawer = () => {
-  showQuestionsDrawer.value = !showQuestionsDrawer.value;
+  activeDrawer.value = activeDrawer.value === "questions" ? null : "questions";
 };
 
 const handleTitleUpdate = (newTitle: string) => {
@@ -165,7 +165,7 @@ onMounted(() => {
     >
       <div
         class="min-h-full py-8 pl-4 flex justify-center pb-[35vh] transition-[padding-right] duration-300 ease-in-out"
-        :class="showAiDrawer || showQuestionsDrawer ? 'pr-[420px]' : 'pr-4'"
+        :class="activeDrawer ? 'pr-[420px]' : 'pr-4'"
       >
         <!-- 简历预览区域 -->
         <ResumePreview />
@@ -173,10 +173,10 @@ onMounted(() => {
     </Layout.Content>
 
     <!-- AI 分析抽屉 -->
-    <AiAnalysisDrawer :visible="showAiDrawer" @close="showAiDrawer = false" />
+    <AiAnalysisDrawer :visible="activeDrawer === 'analysis'" @close="activeDrawer = null" />
 
     <!-- AI 押题抽屉 -->
-    <AiQuestionsDrawer :visible="showQuestionsDrawer" @close="showQuestionsDrawer = false" />
+    <AiQuestionsDrawer :visible="activeDrawer === 'questions'" @close="activeDrawer = null" />
 
     <!-- 底部编辑抽屉 -->
     <EditDrawer :resume-data="resumeData" />
