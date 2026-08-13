@@ -24,6 +24,11 @@ test.describe("AI 押题详情页", () => {
       page.getByText("张三 · 前端开发工程师 · 3年", { exact: true }),
     ).toBeVisible();
 
+    // 内容宽度应与屏幕宽度接近（全宽布局）
+    const contentBox = await page.locator("div.bg-white.rounded-lg.p-6").boundingBox();
+    const viewport = page.viewportSize();
+    expect(contentBox?.width ?? 0).toBeGreaterThanOrEqual((viewport?.width ?? 0) - 80);
+
     // 记录级汇总卡片
     await expect(page.getByText("综合押题说明", { exact: true })).toBeVisible();
     await expect(page.getByText("重点准备方向", { exact: true })).toBeVisible();

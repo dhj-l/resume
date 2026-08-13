@@ -65,7 +65,7 @@ onMounted(() => {
     </div>
 
     <!-- Content -->
-    <div class="max-w-3xl mx-auto py-4 px-4">
+    <div class="w-full py-4 px-4 md:px-8">
       <Spin :spinning="loading">
         <template v-if="detail && !loading">
           <div class="bg-white rounded-lg p-6 shadow-sm space-y-6">
