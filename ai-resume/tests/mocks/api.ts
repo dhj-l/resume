@@ -13,6 +13,7 @@ import {
   mockCreatedResume,
   mockGiteeAuthUrl,
   mockLoginResponse,
+  mockQuestionDetail,
   mockResumes,
   mockTemplates,
   mockUserProfile,
@@ -209,6 +210,11 @@ export async function setupApiMocks(page: Page) {
 
   await page.route("**/api/v1/resume-ai/**", async (route) => {
     await route.fulfill({ json: apiJson({}) });
+  });
+
+  // 押题详情（使用正则以兼容 ?id= 查询串；需在通用 resume-ai 路由之后注册）
+  await page.route(/\/api\/v1\/resume-ai\/question-detail/, async (route) => {
+    await route.fulfill({ json: apiJson(mockQuestionDetail) });
   });
 
   // ==================== Upload 模块 ====================

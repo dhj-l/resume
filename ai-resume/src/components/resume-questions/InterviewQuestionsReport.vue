@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 
 import { DownOutlined, UpOutlined } from "@ant-design/icons-vue";
 
@@ -10,11 +10,19 @@ interface Props {
   isDesktop?: boolean;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   isDesktop: true,
 });
 
 const expandedIndexes = ref<number[]>([]);
+
+const items = computed(() =>
+  props.questions.map((item) => ({
+    ...item,
+    visibleKeywords: item.keywords?.slice(0, 3) ?? [],
+    extraKeywordCount: Math.max(0, (item.keywords?.length ?? 0) - 3),
+  })),
+);
 
 const difficultyClassMap: Record<string, string> = {
   基础: "bg-green-50 text-green-600 border-green-200",
@@ -45,7 +53,7 @@ const toggleExpand = (index: number) => {
 
     <div class="space-y-3">
       <div
-        v-for="(item, index) in questions"
+        v-for="(item, index) in items"
         :key="index"
         class="bg-white rounded-xl border border-gray-200 overflow-hidden"
       >
@@ -78,16 +86,41 @@ const toggleExpand = (index: number) => {
                 {{ item.difficulty }}
               </span>
             </span>
+            <span v-if="item.visibleKeywords.length" class="flex flex-wrap gap-1 mt-2">
+              <span
+                v-for="keyword in item.visibleKeywords"
+                :key="keyword"
+                class="text-xs px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600"
+              >
+                {{ keyword }}
+              </span>
+              <span v-if="item.extraKeywordCount > 0" class="text-xs text-gray-400">
+                +{{ item.extraKeywordCount }}
+              </span>
+            </span>
           </span>
           <DownOutlined v-if="!isExpanded(index)" class="text-gray-300 text-xs mt-2 shrink-0" />
           <UpOutlined v-else class="text-gray-300 text-xs mt-2 shrink-0" />
         </button>
 
-        <div v-show="isExpanded(index)" class="border-t border-gray-100 px-4 py-3 bg-gray-50/60">
-          <p class="text-xs text-gray-400 mb-1">参考解答</p>
-          <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
-            {{ item.answer }}
-          </p>
+        <div
+          v-show="isExpanded(index)"
+          class="border-t border-gray-100 px-4 py-3 bg-gray-50/60 space-y-3"
+        >
+          <div v-if="item.evaluationPoint">
+            <p class="text-xs text-gray-400 mb-1">考察点</p>
+            <p class="text-sm text-gray-600 leading-relaxed">{{ item.evaluationPoint }}</p>
+          </div>
+          <div>
+            <p class="text-xs text-gray-400 mb-1">参考解答</p>
+            <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap">
+              {{ item.answer }}
+            </p>
+          </div>
+          <div v-if="item.followUp">
+            <p class="text-xs text-gray-400 mb-1">可能的追问</p>
+            <p class="text-sm text-amber-600 leading-relaxed">{{ item.followUp }}</p>
+          </div>
         </div>
       </div>
     </div>

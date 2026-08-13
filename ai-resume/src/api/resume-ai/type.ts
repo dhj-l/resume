@@ -146,11 +146,23 @@ export interface InterviewQuestionItem {
   answer: string;
   category?: string;
   difficulty?: string;
+  keywords?: string[];
+  followUp?: string;
+  evaluationPoint?: string;
+}
+
+export interface QuestionFocusArea {
+  area: string;
+  reason: string;
 }
 
 export interface PredictQuestionsResult {
   recordId: string;
   result: InterviewQuestionItem[];
+  overview?: string;
+  focusAreas?: QuestionFocusArea[];
+  hotTopics?: string[];
+  interviewTips?: string[];
 }
 
 export interface QuestionRecordDetail {
@@ -160,6 +172,11 @@ export interface QuestionRecordDetail {
   questionCount: number;
   targetPosition?: string;
   workYears?: string;
+  candidateName?: string;
+  overview?: string;
+  focusAreas?: QuestionFocusArea[];
+  hotTopics?: string[];
+  interviewTips?: string[];
   status: "generating" | "completed" | "failed";
   result?: InterviewQuestionItem[];
   failReason?: string;
