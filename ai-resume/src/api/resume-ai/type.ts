@@ -133,6 +133,49 @@ export interface AnalysisDetailResult {
   analysisResult: AnalysisResult["analysisResult"];
 }
 
+// ==================== AI 面试押题 ====================
+
+export interface PredictQuestionsParams {
+  resumeId: string;
+  jobDescription: string;
+  questionCount: number;
+}
+
+export interface InterviewQuestionItem {
+  question: string;
+  answer: string;
+  category?: string;
+  difficulty?: string;
+}
+
+export interface PredictQuestionsResult {
+  recordId: string;
+  result: InterviewQuestionItem[];
+}
+
+export interface QuestionRecordDetail {
+  _id: string;
+  resumeId: string;
+  jobDescription: string;
+  questionCount: number;
+  targetPosition?: string;
+  workYears?: string;
+  status: "generating" | "completed" | "failed";
+  result?: InterviewQuestionItem[];
+  failReason?: string;
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface QuestionRecordResponse {
+  total: number;
+  list: QuestionRecordDetail[];
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
 // ==================== SSE 实时生成 ====================
 
 /** AI 生成 SSE 消息的模块中文标签映射（11 个模块） */

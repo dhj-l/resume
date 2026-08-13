@@ -51,6 +51,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   "update:resumeTitle": [value: string];
   "toggle-ai-drawer": [];
+  "toggle-questions-drawer": [];
 }>();
 
 const currentTemplateLabel = computed(() => {
@@ -76,6 +77,10 @@ const handleBack = () => {
 
 const handleToggleAiDrawer = () => {
   emit("toggle-ai-drawer");
+};
+
+const handleToggleQuestionsDrawer = () => {
+  emit("toggle-questions-drawer");
 };
 
 const handleSave = async () => {
@@ -254,6 +259,12 @@ const middleButtons: HeaderButtonConfig[] = [
     label: "AI分析",
     icon: toRaw(Sparkles),
     onClick: handleToggleAiDrawer,
+  },
+  {
+    key: "ai-questions",
+    label: "AI押题",
+    icon: toRaw(Sparkles),
+    onClick: handleToggleQuestionsDrawer,
   },
 ];
 

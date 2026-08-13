@@ -84,6 +84,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: "AI 分析详情", requiresAuth: true, animation: "scale-in" },
   },
   {
+    path: "/question-detail",
+    name: "QuestionDetail",
+    component: () => import("@/views/editor/QuestionDetailPage.vue"),
+    meta: { title: "AI 押题详情", requiresAuth: true, animation: "scale-in" },
+  },
+  {
     path: "/auth",
     component: () => import("@/layouts/AuthLayout.vue"),
     meta: { defaultChildAnimation: "fade-slide-left" },

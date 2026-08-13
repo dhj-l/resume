@@ -9,6 +9,10 @@ import type {
   AnalysisDetailResult,
   AnalysisResult,
   GenerationRecordResponse,
+  PredictQuestionsParams,
+  PredictQuestionsResult,
+  QuestionRecordDetail,
+  QuestionRecordResponse,
 } from "./type";
 
 export const getGenerationRecordsAPI = (
@@ -38,6 +42,34 @@ export const getAnalysisDetailAPI = (id: string) => {
 
 export const getLatestAnalysisAPI = (resumeId: string, config?: AxiosRequestConfig) => {
   return http.get<AnalysisDetailResult>("/resume-ai/latest-analysis", {
+    params: { resumeId },
+    ...config,
+  });
+};
+
+export const predictQuestionsAPI = (data: PredictQuestionsParams) => {
+  return http.post<PredictQuestionsResult>("/resume-ai/predict-questions", data);
+};
+
+export const getQuestionRecordsAPI = (
+  query: {
+    page?: number;
+    pageSize?: number;
+  } = {},
+) => {
+  return http.get<QuestionRecordResponse>("/resume-ai/question-records", {
+    params: query,
+  });
+};
+
+export const getQuestionDetailAPI = (id: string) => {
+  return http.get<QuestionRecordDetail>("/resume-ai/question-detail", {
+    params: { id },
+  });
+};
+
+export const getLatestQuestionsAPI = (resumeId: string, config?: AxiosRequestConfig) => {
+  return http.get<QuestionRecordDetail>("/resume-ai/latest-questions", {
     params: { resumeId },
     ...config,
   });

@@ -11,6 +11,7 @@ import { playCelebration } from "@/utils/confetti";
 
 import AiAnalysisDrawer from "./components/AiAnalysisDrawer.vue";
 import AiGenerateBanner, { type AiBannerStatus } from "./components/AiGenerateBanner.vue";
+import AiQuestionsDrawer from "./components/AiQuestionsDrawer.vue";
 import EditDrawer from "./components/EditDrawer.vue";
 import EditorHeader from "./components/EditorHeader.vue";
 import ResumePreview from "./components/ResumePreview.vue";
@@ -22,6 +23,7 @@ const route = useRoute();
 const router = useRouter();
 
 const showAiDrawer = ref(false);
+const showQuestionsDrawer = ref(false);
 const interruptedBanner = ref(false);
 const dismissedBanner = ref(false);
 
@@ -115,6 +117,10 @@ const toggleAiDrawer = () => {
   showAiDrawer.value = !showAiDrawer.value;
 };
 
+const toggleQuestionsDrawer = () => {
+  showQuestionsDrawer.value = !showQuestionsDrawer.value;
+};
+
 const handleTitleUpdate = (newTitle: string) => {
   setResumeDataString("title", newTitle);
 };
@@ -136,6 +142,7 @@ onMounted(() => {
       :ai-generating="isAiGenerating"
       @update:resume-title="handleTitleUpdate"
       @toggle-ai-drawer="toggleAiDrawer"
+      @toggle-questions-drawer="toggleQuestionsDrawer"
     />
 
     <!-- AI 生成状态横幅 -->
@@ -158,7 +165,7 @@ onMounted(() => {
     >
       <div
         class="min-h-full py-8 pl-4 flex justify-center pb-[35vh] transition-[padding-right] duration-300 ease-in-out"
-        :class="showAiDrawer ? 'pr-[420px]' : 'pr-4'"
+        :class="showAiDrawer || showQuestionsDrawer ? 'pr-[420px]' : 'pr-4'"
       >
         <!-- 简历预览区域 -->
         <ResumePreview />
@@ -167,6 +174,9 @@ onMounted(() => {
 
     <!-- AI 分析抽屉 -->
     <AiAnalysisDrawer :visible="showAiDrawer" @close="showAiDrawer = false" />
+
+    <!-- AI 押题抽屉 -->
+    <AiQuestionsDrawer :visible="showQuestionsDrawer" @close="showQuestionsDrawer = false" />
 
     <!-- 底部编辑抽屉 -->
     <EditDrawer :resume-data="resumeData" />
