@@ -17,6 +17,14 @@ export const AI_ANALYZING_TIPS = [
   "正在整理分析报告...",
 ];
 
+/** 导出 PDF 过程中的轮播提示语 */
+export const PDF_EXPORT_TIPS = [
+  "正在生成 PDF 文档...",
+  "正在渲染简历页面...",
+  "正在合成高清排版...",
+  "正在准备下载文件...",
+];
+
 /** AI 面试押题过程中的轮播提示语 */
 export const AI_QUESTIONS_TIPS = [
   "正在解析简历与岗位 JD...",

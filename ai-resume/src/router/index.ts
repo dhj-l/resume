@@ -51,6 +51,18 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/user/GenerationRecords.vue"),
         meta: { title: "生成记录", requiresAuth: true, animation: "fade-slide-up" },
       },
+      {
+        name: "AnalysisRecords",
+        path: "/user/analysis-records",
+        component: () => import("@/views/user/AnalysisRecords.vue"),
+        meta: { title: "分析记录", requiresAuth: true, animation: "fade-slide-up" },
+      },
+      {
+        name: "QuestionRecords",
+        path: "/user/question-records",
+        component: () => import("@/views/user/QuestionRecords.vue"),
+        meta: { title: "押题记录", requiresAuth: true, animation: "fade-slide-up" },
+      },
     ],
   },
   {

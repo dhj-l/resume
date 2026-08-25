@@ -17,7 +17,9 @@ import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
 import { downloadResumeAPI } from "@/api/resume/resume";
+import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
 import { useResumeStore } from "@/stores/resumeStore";
+import { PDF_EXPORT_TIPS } from "@/utils/aiTips";
 import { extractEffectiveCssForElement, getDomCover, getDomHtml, getElement } from "@/utils/dom";
 import { downloadPdf } from "@/utils/download";
 import { uploadImage } from "@/utils/upload";
@@ -423,6 +425,14 @@ onUnmounted(() => {
 
     <!-- Publish Template Modal -->
     <PublishTemplateModal ref="publishModalRef" :resume-title="props.resumeTitle" />
+
+    <!-- 导出 PDF 全屏遮罩动画 -->
+    <FullScreenLoading
+      v-model:loading="exportLoading"
+      text="正在导出 PDF，请稍候..."
+      :tips="PDF_EXPORT_TIPS"
+      :timeout="120000"
+    />
   </header>
 </template>
 

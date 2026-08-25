@@ -21,9 +21,20 @@ export interface GenerationRecord {
   updatedAt: string;
 }
 
+/** 记录列表通用查询参数（分页 + 状态筛选 + 关键词搜索） */
+export interface RecordQueryParams {
+  page?: number;
+  pageSize?: number;
+  status?: string;
+  keyword?: string;
+}
+
 export interface GenerationRecordResponse {
   total: number;
   list: GenerationRecord[];
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }
 
 export interface AiPolishParams {
@@ -131,6 +142,14 @@ export interface AnalysisDetailResult {
   createdAt: string;
   updatedAt: string;
   analysisResult: AnalysisResult["analysisResult"];
+}
+
+export interface AnalysisRecordResponse {
+  total: number;
+  list: AnalysisDetailResult[];
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }
 
 // ==================== AI 面试押题 ====================

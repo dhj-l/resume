@@ -15,7 +15,7 @@
       </router-link>
 
       <!-- Center: Navigation -->
-      <div class="hidden md:flex items-center gap-8">
+      <div class="hidden md:flex items-center gap-6">
         <a
           v-for="item in navItems"
           :key="item.name"
@@ -105,6 +105,8 @@ const navItems = [
   { name: "模板", path: "/templates" },
   { name: "我的简历", path: "/user/resumes", requiresAuth: true },
   { name: "生成记录", path: "/user/generations", requiresAuth: true },
+  { name: "分析记录", path: "/user/analysis-records", requiresAuth: true },
+  { name: "押题记录", path: "/user/question-records", requiresAuth: true },
 ];
 
 const handleScroll = () => {

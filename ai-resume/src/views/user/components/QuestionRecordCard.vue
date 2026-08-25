@@ -6,24 +6,29 @@
       <div>
         <div class="flex items-start justify-between gap-3 mb-3">
           <div class="flex items-center gap-2 min-w-0">
-            <FileTextOutlined class="text-[#8c8c8c] shrink-0" />
+            <QuestionCircleOutlined class="text-[#8c8c8c] shrink-0" />
             <h3
               class="text-[15px] font-[600] text-[#1a1a1a] leading-tight truncate"
-              :title="jobTitle"
+              :title="metaText"
             >
-              {{ jobTitle }}
+              {{ record.targetPosition || "面试押题" }}
             </h3>
           </div>
           <a-tag :color="statusColor" class="shrink-0">{{ statusLabel }}</a-tag>
         </div>
 
+        <p v-if="metaText" class="text-[13px] text-[#8c8c8c] mb-2 truncate">{{ metaText }}</p>
+
         <div class="flex flex-wrap gap-2 mb-3">
-          <a-tag>{{ templateTypeLabel }}</a-tag>
-          <a-tag>{{ parseTypeLabel }}</a-tag>
+          <a-tag>共 {{ record.questionCount }} 道</a-tag>
+          <a-tag>AI 押题</a-tag>
         </div>
 
-        <p v-if="jobDescription" class="text-[13px] text-[#8c8c8c] leading-relaxed line-clamp-3">
-          {{ jobDescription }}
+        <p
+          v-if="record.jobDescription"
+          class="text-[13px] text-[#8c8c8c] leading-relaxed line-clamp-3"
+        >
+          {{ record.jobDescription }}
         </p>
       </div>
 
@@ -33,6 +38,14 @@
           <span>{{ formattedTime }}</span>
         </div>
         <div class="flex items-center gap-1 shrink-0">
+          <a-button
+            size="small"
+            class="flex items-center whitespace-nowrap"
+            @click="emit('openResume', record)"
+          >
+            <template #icon><FileTextOutlined /></template>
+            打开简历
+          </a-button>
           <a-popconfirm
             title="确定删除该记录吗？"
             ok-text="删除"
@@ -54,11 +67,11 @@
           <a-button
             type="primary"
             size="small"
-            class="flex items-center"
-            @click="emit('view', record)"
+            class="flex items-center whitespace-nowrap"
+            @click="$emit('view', record)"
           >
             <template #icon><EyeOutlined /></template>
-            查看
+            查看详情
           </a-button>
         </div>
       </div>
@@ -74,37 +87,33 @@ import {
   DeleteOutlined,
   EyeOutlined,
   FileTextOutlined,
+  QuestionCircleOutlined,
 } from "@ant-design/icons-vue";
 
-import type { GenerationRecord } from "@/api/resume-ai/type";
+import type { QuestionRecordDetail } from "@/api/resume-ai/type";
 import { formatDate } from "@/utils/day";
-import { templateList } from "@/views/editor/templates";
 
 const props = defineProps<{
-  record: GenerationRecord;
+  record: QuestionRecordDetail;
   deleting?: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: "view", record: GenerationRecord): void;
-  (e: "delete", record: GenerationRecord): void;
+  (e: "view", record: QuestionRecordDetail): void;
+  (e: "openResume", record: QuestionRecordDetail): void;
+  (e: "delete", record: QuestionRecordDetail): void;
 }>();
 
-const jobTitle = computed(() => {
-  const firstLine = props.record.jobDescription?.split("\n")[0];
-  return firstLine || "未知职位";
-});
-
-const jobDescription = computed(() => {
-  const lines = props.record.jobDescription?.split("\n");
-  if (!lines || lines.length <= 1) return "";
-  return lines.slice(1).join("\n").trim();
-});
+const metaText = computed(() =>
+  [props.record.candidateName, props.record.targetPosition, props.record.workYears]
+    .filter(Boolean)
+    .join(" · "),
+);
 
 const statusColor = computed(() => {
   const map: Record<string, string> = {
     completed: "success",
-    creating: "processing",
+    generating: "processing",
     failed: "error",
   };
   return map[props.record.status] || "default";
@@ -113,28 +122,13 @@ const statusColor = computed(() => {
 const statusLabel = computed(() => {
   const map: Record<string, string> = {
     completed: "已完成",
-    creating: "生成中",
+    generating: "生成中",
     failed: "失败",
   };
   return map[props.record.status] || props.record.status;
 });
 
-const parseTypeLabel = computed(() => {
-  const map: Record<string, string> = {
-    upload: "上传简历",
-    select: "选择模板",
-    manual: "手动填写",
-  };
-  return map[props.record.parseType] || props.record.parseType;
-});
-
 const formattedTime = computed(() => {
   return props.record.createdAt ? formatDate(props.record.createdAt, "YYYY-MM-DD HH:mm") : "-";
-});
-const templateTypeLabel = computed(() => {
-  const label =
-    templateList.find((item) => item.value === props.record.templateType)?.label ||
-    props.record.templateType;
-  return label;
 });
 </script>
