@@ -104,6 +104,7 @@ const navItems = [
   { name: "首页", path: "/" },
   { name: "模板", path: "/templates" },
   { name: "我的简历", path: "/user/resumes", requiresAuth: true },
+  { name: "模拟面试", path: "/interview", requiresAuth: true },
   { name: "生成记录", path: "/user/generations", requiresAuth: true },
   { name: "分析记录", path: "/user/analysis-records", requiresAuth: true },
   { name: "押题记录", path: "/user/question-records", requiresAuth: true },

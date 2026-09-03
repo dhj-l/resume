@@ -21,8 +21,8 @@ test.describe("未登录用户 — 公开页面", () => {
     await page.goto("/");
     await page.waitForURL("**/home");
 
-    // 导航栏品牌名
-    await expect(page.locator("text=大学生简历")).toBeVisible({ timeout: 8000 });
+    // 导航栏品牌名（用 link role 精确匹配 Logo，避免同时命中页脚与版权行）
+    await expect(page.getByRole("link", { name: "大学生简历" })).toBeVisible({ timeout: 8000 });
     // 未登录时显示"登录 / 注册"
     await expect(page.locator("text=登录 / 注册")).toBeVisible();
     // "开始制作"按钮（使用 exact 避免匹配 Hero 中的"免费开始制作"）

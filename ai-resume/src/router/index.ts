@@ -102,6 +102,24 @@ const routes: RouteRecordRaw[] = [
     meta: { title: "AI 押题详情", requiresAuth: true, animation: "scale-in" },
   },
   {
+    path: "/interview",
+    name: "InterviewSetup",
+    component: () => import("@/views/interview/InterviewSetupPage.vue"),
+    meta: { title: "发起模拟面试", requiresAuth: true, animation: "fade" },
+  },
+  {
+    path: "/interview/chat",
+    name: "InterviewChat",
+    component: () => import("@/views/interview/InterviewChatPage.vue"),
+    meta: { title: "模拟面试", requiresAuth: true, animation: "none" },
+  },
+  {
+    path: "/interview/report",
+    name: "InterviewReport",
+    component: () => import("@/views/interview/InterviewReportPage.vue"),
+    meta: { title: "面试评价报告", requiresAuth: true, animation: "fade" },
+  },
+  {
     path: "/auth",
     component: () => import("@/layouts/AuthLayout.vue"),
     meta: { defaultChildAnimation: "fade-slide-left" },

@@ -13,7 +13,7 @@
           把写简历这件事，变简单
         </h2>
         <p class="mt-4 text-base text-slate-600 lg:text-lg">
-          六个实用功能，覆盖从创建到投递的每一步。
+          七个实用功能，覆盖从创建、优化到面试的每一环。
         </p>
       </div>
 
@@ -23,7 +23,11 @@
           v-for="feature in features"
           :key="feature.title"
           class="flex flex-col gap-8 rounded-2xl border border-slate-200 bg-white p-8 lg:flex-row lg:items-center"
-          :class="feature.wide ? 'lg:col-span-2' : ''"
+          :class="[
+            feature.wide ? 'lg:col-span-2' : '',
+            feature.to ? 'cursor-pointer transition-shadow hover:shadow-md' : '',
+          ]"
+          @click="feature.to && router.push(feature.to)"
         >
           <div class="flex-1">
             <div class="flex items-start justify-between gap-4">
@@ -184,10 +188,14 @@ import {
   FileDown,
   FileText,
   LayoutTemplate,
+  MessagesSquare,
   ScanSearch,
   Sparkles,
   X,
 } from "lucide-vue-next";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 type FeatureType = "free" | "ai";
 
@@ -198,6 +206,7 @@ interface Feature {
   type: FeatureType;
   wide?: boolean;
   visual?: "stack" | "match" | "import";
+  to?: string;
 }
 
 const features: Feature[] = [
@@ -242,6 +251,13 @@ const features: Feature[] = [
     description: "左边编辑右边预览，改完立刻看到最终效果，所见即所得。",
     icon: Eye,
     type: "free",
+  },
+  {
+    title: "AI 模拟面试",
+    description: "选择简历、粘贴岗位 JD，AI 面试官逐题追问，面试结束生成评价报告。",
+    icon: MessagesSquare,
+    type: "ai",
+    to: "/interview",
   },
 ];
 </script>
