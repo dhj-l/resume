@@ -21,6 +21,8 @@ import type { ExperienceLevel, Focus } from "@/api/interview/type";
 import { FOCUS_TARGET_ROUNDS_MAP } from "@/api/interview/type";
 import { getUserResumesAPI } from "@/api/resume/resume";
 import type { UserResumeListItem } from "@/api/resume/type";
+import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
+import { AI_INTERVIEW_TIPS } from "@/utils/aiTips";
 
 const JD_MIN_LENGTH = 150;
 const JD_MAX_LENGTH = 5000;
@@ -390,6 +392,14 @@ onMounted(async () => {
         </div>
       </div>
     </Spin>
+
+    <!-- 面试准备中全屏遮罩动画（生成结束自动关闭） -->
+    <FullScreenLoading
+      v-model:loading="submitting"
+      text="AI 面试官正在准备本场面试，请稍候..."
+      :tips="AI_INTERVIEW_TIPS"
+      :timeout="600000"
+    />
   </div>
 </template>
 

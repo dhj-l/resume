@@ -73,8 +73,13 @@ const fullAvatar = computed(() => {
           {{ data.name }}
         </h1>
         <div :class="styles.detailsWrapper">
-          <template v-for="item in contentArray" :key="item.label">
+          <template v-for="(item, index) in contentArray" :key="item.label">
             <div v-if="item.value" :class="styles.detailItem">
+              <component
+                :is="styles.detailIcons[index]"
+                v-if="styles.detailIcons?.[index]"
+                :class="styles.detailIconClass"
+              />
               <span>{{ item.label }}：{{ item.value }}</span>
             </div>
           </template>

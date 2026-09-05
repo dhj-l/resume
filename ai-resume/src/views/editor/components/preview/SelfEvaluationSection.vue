@@ -33,9 +33,10 @@ const handleClick = () => {
   -->
   <div v-if="data?.content" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
+      <component :is="styles.titleIcon" v-if="styles.titleIcon" :class="styles.titleIconClass" />
       {{ label || "自我评价" }}
     </h3>
-    <p v-if="data?.content" v-safe-html="data.content" :class="styles.content"></p>
+    <div v-if="data?.content" v-safe-html="data.content" :class="styles.content"></div>
     <div v-else :class="styles.empty">暂无自我评价信息</div>
   </div>
 </template>

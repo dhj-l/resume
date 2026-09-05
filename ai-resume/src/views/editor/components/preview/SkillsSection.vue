@@ -33,6 +33,7 @@ const handleClick = () => {
   -->
   <div v-if="data?.content" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
+      <component :is="styles.titleIcon" v-if="styles.titleIcon" :class="styles.titleIconClass" />
       {{ label || "技能特长" }}
     </h3>
     <div v-if="data?.content" v-safe-html="data.content" :class="styles.listWrapper"></div>

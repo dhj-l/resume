@@ -35,7 +35,7 @@ export interface SubmitAnswerSseOptions extends InterviewSseCallbacks {
 const DEFAULT_TIMEOUT = 5 * 60 * 1000;
 
 /** 从 localStorage 读取 auth token，与 src/http/request.ts 保持一致 */
-const getAuthToken = (): string | null => {
+export const getAuthToken = (): string | null => {
   try {
     const authStoreStr = localStorage.getItem("auth");
     if (!authStoreStr) return null;
@@ -48,7 +48,7 @@ const getAuthToken = (): string | null => {
 };
 
 /** 解析单个 SSE 帧：合并多行 data: 字段并 JSON.parse */
-const parseSseFrame = (frame: string): InterviewSseMessage | null => {
+export const parseSseFrame = (frame: string): InterviewSseMessage | null => {
   const dataLines = frame
     .split("\n")
     .map((line) => line.trim())

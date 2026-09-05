@@ -43,8 +43,9 @@ const isVisible = computed(() => {
   -->
   <div v-if="isVisible" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
+      <component :is="styles.titleIcon" v-if="styles.titleIcon" :class="styles.titleIconClass" />
       {{ label || "荣誉证书" }}
     </h3>
-    <div v-safe-html="data?.content"></div>
+    <div v-safe-html="data?.content" :class="styles.list"></div>
   </div>
 </template>

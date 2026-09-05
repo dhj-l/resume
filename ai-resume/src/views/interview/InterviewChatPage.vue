@@ -31,6 +31,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useInterviewStore } from "@/stores/interviewStore";
 
 import InterviewSidebar from "./components/InterviewSidebar.vue";
+import VoiceRecordButton from "./components/VoiceRecordButton.vue";
 import { useTtsPlayer } from "./composables/useTtsPlayer";
 
 const ANSWER_MAX_LENGTH = 5000;
@@ -77,6 +78,8 @@ const messages = ref<InterviewMessage[]>([]);
 
 const answerText = ref("");
 const submitting = ref(false);
+/** 语音输入按钮（暴露 cancelAll 用于发送前丢弃在途识别） */
+const voiceBtnRef = ref<InstanceType<typeof VoiceRecordButton> | null>(null);
 /** AI 正在生成下一题 */
 const aiThinking = ref(false);
 /** 下一题打字机输出中 */
@@ -323,10 +326,24 @@ const refreshSessionMeta = async () => {
   }
 };
 
+/** 语音识别增量：按句追加进输入框 */
+const handleVoiceDelta = (text: string) => {
+  // 超长时截断，与输入框 maxlength 上限保持一致
+  answerText.value = (answerText.value + text).slice(0, ANSWER_MAX_LENGTH);
+};
+
+/** 语音识别失败提示 */
+const handleVoiceError = (error: Error) => {
+  message.error(error.message || "语音识别失败，请稍后重试");
+};
+
 /** 提交回答（SSE 流式） */
 const handleSend = async () => {
   const content = answerText.value.trim();
   if (!canSubmitAnswer.value) return;
+
+  // 发送即截断语音输入：丢弃排队/在途识别，避免增量继续写入下一条回答
+  voiceBtnRef.value?.cancelAll();
 
   // 先乐观渲染用户回答，失败时回滚
   const optimisticMsg: InterviewMessage = {
@@ -790,10 +807,16 @@ onBeforeUnmount(() => {
                 <span class="text-xs tabular-nums text-slate-300">
                   {{ answerText.length }}/{{ ANSWER_MAX_LENGTH }}
                 </span>
+                <VoiceRecordButton
+                  ref="voiceBtnRef"
+                  :disabled="finished || typing || submitting || aiThinking"
+                  @delta="handleVoiceDelta"
+                  @error="handleVoiceError"
+                />
                 <Button
                   type="primary"
                   shape="circle"
-                  class="send-btn"
+                  class="send-btn flex items-center justify-center"
                   :loading="submitting || aiThinking"
                   :disabled="!canSubmitAnswer"
                   @click="handleSend"

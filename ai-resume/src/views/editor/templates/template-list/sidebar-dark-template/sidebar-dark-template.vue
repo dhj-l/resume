@@ -1,6 +1,6 @@
 <template>
   <div class="relative mx-auto w-full max-w-[210mm]">
-    <!-- 连续内容区：双栏 -->
+    <!-- 连续内容区：左深色侧栏 + 右白色主栏 -->
     <div
       ref="containerRef"
       class="w-full bg-white shadow-lg flex box-border min-h-[297mm]"
@@ -9,43 +9,35 @@
         fontSize: globalFontSize,
       }"
     >
-      <!-- 左栏 32%：顶部靛蓝色块（基本信息）+ 浅灰内容区 -->
-      <div class="w-[32%] bg-slate-50 flex flex-col shrink-0 border-r border-gray-200">
-        <div
-          v-if="basicInfoModule"
-          class="bg-gradient-to-b from-indigo-600 to-indigo-700 text-white"
-          :style="{ padding: globalPageMargin }"
-        >
-          <BasicInfoSection
-            :data="resumeData!.basicInfo"
-            :label="basicInfoModule?.label"
-            :template-type="currentTemplateType"
-          />
-        </div>
-        <div
-          class="flex-1 flex flex-col min-w-0"
-          :style="{
-            padding: globalPageMargin,
-            gap: globalModuleMargin,
-          }"
-        >
-          <template v-for="item in leftModules" :key="item.moduleKey">
-            <div
-              class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-indigo-300"
-            >
-              <component
-                :is="getComponent(item)"
-                v-if="item.isShow && item.component"
-                :data="resumeData?.[item.moduleKey]"
-                :label="item.label"
-                :template-type="currentTemplateType"
-              />
-            </div>
-          </template>
-        </div>
+      <!-- 左侧栏 34% -->
+      <div
+        class="w-[34%] bg-[#1f2d3d] flex flex-col shrink-0"
+        :style="{
+          padding: globalPageMargin,
+          gap: globalModuleMargin,
+        }"
+      >
+        <BasicInfoSection
+          :data="resumeData!.basicInfo"
+          :label="basicInfoModule?.label"
+          :template-type="currentTemplateType"
+        />
+        <template v-for="item in sidebarModules" :key="item.moduleKey">
+          <div
+            class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-white/40"
+          >
+            <component
+              :is="getComponent(item)"
+              v-if="item.isShow && item.component"
+              :data="resumeData?.[item.moduleKey]"
+              :label="item.label"
+              :template-type="currentTemplateType"
+            />
+          </div>
+        </template>
       </div>
 
-      <!-- 右栏 68% -->
+      <!-- 右主栏 66% -->
       <div
         class="flex-1 flex flex-col min-w-0"
         :style="{
@@ -58,7 +50,7 @@
           :label="jobIntentionModule?.label"
           :template-type="currentTemplateType"
         />
-        <template v-for="item in rightModules" :key="item.moduleKey">
+        <template v-for="item in mainModules" :key="item.moduleKey">
           <div>
             <component
               :is="getComponent(item)"
@@ -92,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { inject, computed, ref, unref } from "vue";
+import { computed, inject, ref, unref } from "vue";
 
 import type { ModuleItem, ResumeData } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
@@ -111,8 +103,8 @@ const {
   globalModuleMargin,
 } = useResumeView(resumeData);
 
-const leftModuleKeys = ["skills", "certificates", "selfEvaluation"];
-const rightModuleKeys = [
+const sidebarModuleKeys = ["skills", "certificates", "selfEvaluation"];
+const mainModuleKeys = [
   "educationBackground",
   "workExperience",
   "projectExperience",
@@ -131,12 +123,12 @@ const getComponent = (item: ModuleItem) => {
 
 const { activeModules } = useActiveModules(moduleOrder, resumeData);
 
-const leftModules = computed(() => {
-  return activeModules.value.filter((item) => leftModuleKeys.includes(item.moduleKey));
+const sidebarModules = computed(() => {
+  return activeModules.value.filter((item) => sidebarModuleKeys.includes(item.moduleKey));
 });
 
-const rightModules = computed(() => {
-  return activeModules.value.filter((item) => rightModuleKeys.includes(item.moduleKey));
+const mainModules = computed(() => {
+  return activeModules.value.filter((item) => mainModuleKeys.includes(item.moduleKey));
 });
 
 // 分页标记线

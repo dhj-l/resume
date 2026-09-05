@@ -1,48 +1,51 @@
 <template>
   <div class="relative mx-auto w-full max-w-[210mm]">
-    <!-- 连续内容区 -->
     <div
       ref="contentRef"
-      class="w-full bg-white shadow-lg box-border min-h-[297mm]"
-      :style="{
-        padding: globalPageMargin,
-        lineHeight: globalLineHeight,
-        fontSize: globalFontSize,
-      }"
+      class="w-full bg-white shadow-lg box-border overflow-hidden min-h-[297mm]"
+      :style="{ lineHeight: globalLineHeight }"
     >
-      <!-- 头部：基本信息（左对齐 + 渐变分隔线） -->
-      <div v-if="basicInfoModule" :style="{ marginBottom: globalModuleMargin }">
-        <div
-          class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
-        >
+      <!-- Hero 头部：浅青渐变底 + 基本信息 + 求职意向 -->
+      <div
+        v-if="basicInfoModule"
+        class="bg-gradient-to-r from-teal-50 via-cyan-50 to-teal-50 border-b border-teal-100"
+        :style="{ padding: globalPageMargin, fontSize: globalFontSize }"
+      >
+        <div class="flex flex-col gap-4">
           <component
             :is="getComponent(basicInfoModule)"
             :data="resumeData.basicInfo"
             :label="basicInfoModule.label"
             :template-type="currentTemplateType"
           />
+          <component
+            :is="getComponent(jobIntentionModule)"
+            v-if="jobIntentionModule"
+            :data="resumeData.jobIntention"
+            :label="jobIntentionModule.label"
+            :template-type="currentTemplateType"
+          />
         </div>
-        <div
-          class="h-1 mt-5 bg-gradient-to-r from-primary-600 via-primary-400/70 to-transparent rounded-full"
-        ></div>
       </div>
 
-      <!-- 其余模块连续渲染 -->
-      <div
-        v-for="item in contentModules"
-        :key="item.moduleKey"
-        :class="{
-          'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
-            !listModules.includes(item.moduleKey),
-        }"
-        :style="{ marginBottom: globalModuleMargin }"
-      >
-        <component
-          :is="getComponent(item)"
-          :data="resumeData[item.moduleKey]"
-          :label="item.label"
-          :template-type="currentTemplateType"
-        />
+      <!-- 内容模块区 -->
+      <div :style="{ padding: globalPageMargin, fontSize: globalFontSize }">
+        <template v-for="item in contentModules" :key="item.moduleKey">
+          <div
+            :class="{
+              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
+                !listModules.includes(item.moduleKey),
+            }"
+            :style="{ marginBottom: globalModuleMargin }"
+          >
+            <component
+              :is="getComponent(item)"
+              :data="resumeData[item.moduleKey]"
+              :label="item.label"
+              :template-type="currentTemplateType"
+            />
+          </div>
+        </template>
       </div>
     </div>
 
@@ -66,9 +69,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, inject, unref } from "vue";
+import { computed, inject, ref, unref } from "vue";
 
-import type { ResumeData, ModuleItem } from "@/stores/type";
+import type { ModuleItem, ResumeData } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
@@ -107,9 +110,14 @@ const getComponent = (item: ModuleItem) => {
 const basicInfoModule = computed(() =>
   activeModules.value.find((m) => m.moduleKey === "basicInfo"),
 );
+const jobIntentionModule = computed(() =>
+  activeModules.value.find((m) => m.moduleKey === "jobIntention"),
+);
 
 const contentModules = computed(() => {
-  return activeModules.value.filter((item) => item.moduleKey !== "basicInfo");
+  return activeModules.value.filter(
+    (item) => item.moduleKey !== "basicInfo" && item.moduleKey !== "jobIntention",
+  );
 });
 
 // 分页标记线
@@ -117,4 +125,8 @@ const contentRef = ref<HTMLElement | null>(null);
 const { markers } = usePageMarkers(contentRef);
 </script>
 
-<style scoped></style>
+<style scoped>
+:deep(.resume-section) {
+  margin-bottom: 0 !important;
+}
+</style>

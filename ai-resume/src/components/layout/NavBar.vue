@@ -108,6 +108,7 @@ const navItems = [
   { name: "生成记录", path: "/user/generations", requiresAuth: true },
   { name: "分析记录", path: "/user/analysis-records", requiresAuth: true },
   { name: "押题记录", path: "/user/question-records", requiresAuth: true },
+  { name: "面试记录", path: "/interview/chat", requiresAuth: true },
 ];
 
 const handleScroll = () => {

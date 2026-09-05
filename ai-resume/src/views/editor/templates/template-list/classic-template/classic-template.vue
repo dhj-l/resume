@@ -10,30 +10,14 @@
         fontSize: globalFontSize,
       }"
     >
-      <!-- 头部：基本信息（左对齐 + 渐变分隔线） -->
-      <div v-if="basicInfoModule" :style="{ marginBottom: globalModuleMargin }">
-        <div
-          class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
-        >
-          <component
-            :is="getComponent(basicInfoModule)"
-            :data="resumeData.basicInfo"
-            :label="basicInfoModule.label"
-            :template-type="currentTemplateType"
-          />
-        </div>
-        <div
-          class="h-1 mt-5 bg-gradient-to-r from-primary-600 via-primary-400/70 to-transparent rounded-full"
-        ></div>
-      </div>
-
-      <!-- 其余模块连续渲染 -->
+      <!-- 所有模块连续渲染，基本信息作为居中抬头并以分隔线收尾 -->
       <div
-        v-for="item in contentModules"
+        v-for="item in activeModules"
         :key="item.moduleKey"
         :class="{
           'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
             !listModules.includes(item.moduleKey),
+          'border-b border-[#1f4e79]/25 pb-4': item.moduleKey === 'basicInfo',
         }"
         :style="{ marginBottom: globalModuleMargin }"
       >
@@ -66,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, inject, unref } from "vue";
+import { ref, inject, unref } from "vue";
 
 import type { ResumeData, ModuleItem } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
@@ -103,14 +87,6 @@ const { activeModules } = useActiveModules(moduleOrder, resumeData);
 const getComponent = (item: ModuleItem) => {
   return item.component ? unref(item.component) : componentMap[item.moduleKey];
 };
-
-const basicInfoModule = computed(() =>
-  activeModules.value.find((m) => m.moduleKey === "basicInfo"),
-);
-
-const contentModules = computed(() => {
-  return activeModules.value.filter((item) => item.moduleKey !== "basicInfo");
-});
 
 // 分页标记线
 const contentRef = ref<HTMLElement | null>(null);

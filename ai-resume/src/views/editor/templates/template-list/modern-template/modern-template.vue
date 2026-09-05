@@ -10,7 +10,7 @@
       <!-- Hero Header: 渐变背景 + 基本信息 + 求职意向 -->
       <div
         v-if="basicInfoModule"
-        class="bg-primary-600 text-white"
+        class="bg-gradient-to-br from-primary-700 via-primary-600 to-primary-500 text-white"
         :style="{ padding: globalPageMargin, fontSize: globalFontSize }"
       >
         <div class="flex items-start gap-6">

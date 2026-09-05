@@ -10,44 +10,13 @@
         fontSize: globalFontSize,
       }"
     >
-      <!-- 首页 header -->
-      <div class="mb-8">
-        <div class="flex items-center justify-between pb-4 border-b-[3px] border-[#6D28D9]">
-          <div class="flex items-end gap-4">
-            <h1 class="text-4xl font-bold text-[#6D28D9] leading-none tracking-tight">个人简历</h1>
-            <div class="flex flex-col text-gray-400">
-              <span class="text-xs">细心从每一个细节开始</span>
-              <span class="text-lg font-medium leading-none">Personal resume</span>
-            </div>
-          </div>
-          <div class="flex gap-3">
-            <div
-              class="w-8 h-8 rounded-full bg-[#6D28D9] text-white flex items-center justify-center"
-            >
-              <Box class="h-4 w-4" />
-            </div>
-            <div
-              class="w-8 h-8 rounded-full bg-[#6D28D9] text-white flex items-center justify-center"
-            >
-              <Mail class="h-4 w-4" />
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- 所有模块连续渲染 -->
       <div
         v-for="item in activeModules"
         :key="item.moduleKey"
         :class="{
           'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
-            ![
-              'workExperience',
-              'educationBackground',
-              'projectExperience',
-              'campusExperience',
-              'internshipExperience',
-            ].includes(item.moduleKey),
+            !listModules.includes(item.moduleKey),
         }"
         :style="{ marginBottom: globalModuleMargin }"
       >
@@ -82,8 +51,6 @@
 <script setup lang="ts">
 import { ref, inject, unref } from "vue";
 
-import { Box, Mail } from "lucide-vue-next";
-
 import type { ResumeData, ModuleItem } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
@@ -105,6 +72,14 @@ const componentMap: Record<string, any> = {
   basicInfo: BasicInfoSection,
   jobIntention: JobIntentionSection,
 };
+
+const listModules = [
+  "workExperience",
+  "educationBackground",
+  "projectExperience",
+  "campusExperience",
+  "internshipExperience",
+];
 
 const { activeModules } = useActiveModules(moduleOrder, resumeData);
 
