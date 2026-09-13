@@ -69,10 +69,13 @@ const handleClick = async () => {
   }
 };
 
-/** 清空识别队列并中止在途请求（发送回答时调用，之后可继续语音输入） */
-const cancelAll = () => queue.cancelAll();
+/** 发送回答时调用：主动关闭语音收集——停止录音（丢弃未识别尾句）并清空识别队列与在途请求 */
+const stopAll = () => {
+  stop({ discardTail: true });
+  queue.cancelAll();
+};
 
-defineExpose({ cancelAll });
+defineExpose({ stopAll });
 </script>
 
 <template>

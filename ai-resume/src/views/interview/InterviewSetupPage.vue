@@ -7,6 +7,8 @@ import {
   CheckCircleFilled,
   CodeOutlined,
   FolderOpenOutlined,
+  IdcardOutlined,
+  ReadOutlined,
 } from "@ant-design/icons-vue";
 import { Alert, Button, Input, Modal, Select, Spin, message } from "ant-design-vue";
 import { MessagesSquare } from "lucide-vue-next";
@@ -17,8 +19,8 @@ import {
   createSessionAPI,
   cancelSessionAPI,
 } from "@/api/interview/interview";
-import type { ExperienceLevel, Focus } from "@/api/interview/type";
-import { FOCUS_TARGET_ROUNDS_MAP } from "@/api/interview/type";
+import type { ExperienceLevel, InterviewMode, InterviewStage } from "@/api/interview/type";
+import { INTERVIEW_STAGE_LABEL_MAP } from "@/api/interview/type";
 import { getUserResumesAPI } from "@/api/resume/resume";
 import type { UserResumeListItem } from "@/api/resume/type";
 import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
@@ -45,43 +47,56 @@ const resumesLoading = ref(false);
 const form = reactive({
   resumeId: "",
   jobDescription: "",
+  mode: "campus" as InterviewMode,
+  stage: "first" as InterviewStage,
+  /** 仅社招模式使用（校招固定按应届生标准，服务端归一为 junior） */
   experienceLevel: "mid" as ExperienceLevel,
-  focus: "technical" as Focus,
 });
 
-const experienceLevelOptions = [
-  { value: "junior", label: "校招/应届生" },
+const modeOptions = [
+  {
+    value: "campus",
+    label: "校招模式",
+    desc: "基础全面偏原理，验证项目真实性，更看重潜力",
+    icon: ReadOutlined,
+  },
+  {
+    value: "experienced",
+    label: "社招模式",
+    desc: "项目深挖结合实践与量化，更看重深度与架构",
+    icon: IdcardOutlined,
+  },
+];
+
+/** 社招模式可选的经验层级（junior 仅供校招，服务端会拒绝） */
+const experiencedLevelOptions = [
   { value: "mid", label: "1-3 年经验" },
   { value: "senior", label: "3-5 年经验" },
   { value: "expert", label: "5 年以上经验" },
 ];
 
-const focusOptions = [
+const stageOptions = [
   {
-    value: "technical",
-    label: "技术面",
-    desc: "考察技术功底与深度",
-    rounds: 8,
+    value: "first",
+    label: "一面 · 基础技术面",
+    desc: "未来同组资深工程师：项目/实习深挖约 7 成 + 八股基础约 3 成",
     icon: CodeOutlined,
   },
   {
-    value: "project",
-    label: "项目深挖面",
-    desc: "深挖项目细节与亮点",
-    rounds: 6,
+    value: "second",
+    label: "二面 · 项目深入面",
+    desc: "直属 Leader：项目深挖约 7 成（选型/架构/难点/量化）+ 系统设计约 3 成",
     icon: FolderOpenOutlined,
   },
   {
-    value: "mixed",
-    label: "综合面",
-    desc: "技术与项目结合考察",
-    rounds: 10,
+    value: "third",
+    label: "三面 · 综合面",
+    desc: "总监/交叉面官：项目引申至架构与决策约 6 成 + 技术广度与开放性问题约 4 成",
     icon: AppstoreOutlined,
   },
 ];
 
 const jdLength = computed(() => form.jobDescription.trim().length);
-const targetRounds = computed(() => FOCUS_TARGET_ROUNDS_MAP[form.focus] ?? 8);
 
 const jdValidateStatus = computed(() => {
   if (!form.jobDescription) return "";
@@ -112,6 +127,14 @@ const fetchResumes = async () => {
     resumes.value = data.list.filter((item) => !item.isTemplate);
   } finally {
     resumesLoading.value = false;
+  }
+};
+
+/** 切换面试模式：校招固定按应届生考察，无需经验层级 */
+const handleSelectMode = (mode: InterviewMode) => {
+  form.mode = mode;
+  if (mode === "experienced" && form.experienceLevel === "junior") {
+    form.experienceLevel = "mid";
   }
 };
 
@@ -163,10 +186,10 @@ const handleSubmit = async () => {
     const { data } = await createSessionAPI({
       resumeId: form.resumeId,
       jobDescription: form.jobDescription.trim(),
-      levelConfig: {
-        experienceLevel: form.experienceLevel,
-        focus: form.focus,
-      },
+      levelConfig:
+        form.mode === "experienced"
+          ? { mode: form.mode, stage: form.stage, experienceLevel: form.experienceLevel }
+          : { mode: form.mode, stage: form.stage },
     });
     message.success("面试准备完成，开始作答");
     router.push({ path: "/interview/chat", query: { id: data._id } });
@@ -178,10 +201,10 @@ const handleSubmit = async () => {
 };
 
 onMounted(async () => {
-  // 从对话页欢迎状态跳转过来时，预选考察侧重
-  const focusQuery = route.query.focus as Focus;
-  if (focusQuery && focusQuery in FOCUS_TARGET_ROUNDS_MAP) {
-    form.focus = focusQuery;
+  // 从对话页欢迎状态跳转过来时，预选面试轮次
+  const stageQuery = route.query.stage as InterviewStage;
+  if (stageQuery && stageQuery in INTERVIEW_STAGE_LABEL_MAP) {
+    form.stage = stageQuery;
   }
   await Promise.all([checkCurrentSession(), fetchResumes()]);
   pageLoading.value = false;
@@ -205,7 +228,7 @@ onMounted(async () => {
           <div>
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">发起模拟面试</h1>
             <p class="text-sm text-slate-500 mt-0.5">
-              AI 面试官将根据你的简历与目标岗位进行多轮模拟面试
+              AI 面试官深挖简历项目，像真实大厂面试一样多轮追问
             </p>
           </div>
         </div>
@@ -217,7 +240,7 @@ onMounted(async () => {
           show-icon
           class="mb-4 rounded-xl"
           message="上次面试因超时已关闭"
-          description="30 分钟内无任何活动，上次面试已被自动关闭。你可以重新发起新的面试。"
+          description="45 分钟内无任何活动，上次面试已被自动关闭。你可以重新发起新的面试。"
         />
 
         <!-- 进行中会话恢复 -->
@@ -260,7 +283,9 @@ onMounted(async () => {
                 <p class="text-sm font-semibold text-slate-800">
                   面试简历 <span class="text-red-400">*</span>
                 </p>
-                <p class="text-xs text-slate-400">AI 将基于这份简历的内容进行提问与追问</p>
+                <p class="text-xs text-slate-400">
+                  AI 将以这份简历上的项目为主线进行深挖与追问，请确保内容真实
+                </p>
               </div>
             </div>
             <Select
@@ -311,63 +336,99 @@ onMounted(async () => {
             </p>
           </section>
 
-          <!-- 经验层级 -->
+          <!-- 面试模式（联动经验层级） -->
           <section>
             <div class="flex items-center gap-3 mb-3">
               <span class="step-num">3</span>
-              <p class="text-sm font-semibold text-slate-800">经验层级</p>
+              <p class="text-sm font-semibold text-slate-800">面试模式</p>
             </div>
-            <div class="flex flex-wrap gap-2">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
-                v-for="opt in experienceLevelOptions"
-                :key="opt.value"
-                type="button"
-                class="px-4 py-2 rounded-full text-sm border transition-all"
-                :class="
-                  form.experienceLevel === opt.value
-                    ? 'border-indigo-500 bg-indigo-50 text-indigo-600 font-medium shadow-sm shadow-indigo-100'
-                    : 'border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-500'
-                "
-                @click="form.experienceLevel = opt.value as ExperienceLevel"
-              >
-                {{ opt.label }}
-              </button>
-            </div>
-          </section>
-
-          <!-- 考察侧重 -->
-          <section>
-            <div class="flex items-center gap-3 mb-3">
-              <span class="step-num">4</span>
-              <p class="text-sm font-semibold text-slate-800">考察侧重</p>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <button
-                v-for="opt in focusOptions"
+                v-for="opt in modeOptions"
                 :key="opt.value"
                 type="button"
                 class="relative text-left rounded-xl border p-4 transition-all"
                 :class="
-                  form.focus === opt.value
+                  form.mode === opt.value
                     ? 'border-indigo-500 bg-indigo-50/70 shadow-md shadow-indigo-100'
                     : 'border-slate-200 hover:border-indigo-300 bg-white hover:-translate-y-0.5'
                 "
-                @click="form.focus = opt.value as Focus"
+                @click="handleSelectMode(opt.value as InterviewMode)"
               >
                 <CheckCircleFilled
-                  v-if="form.focus === opt.value"
+                  v-if="form.mode === opt.value"
                   class="absolute top-3 right-3 text-indigo-500"
                 />
                 <component
                   :is="opt.icon"
                   class="h-5 w-5"
-                  :class="form.focus === opt.value ? 'text-indigo-500' : 'text-slate-400'"
+                  :class="form.mode === opt.value ? 'text-indigo-500' : 'text-slate-400'"
                 />
                 <p class="mt-2 font-medium text-sm text-slate-800">{{ opt.label }}</p>
                 <p class="text-xs text-slate-400 mt-0.5">{{ opt.desc }}</p>
-                <p class="text-xs mt-1.5 font-medium" :class="'text-indigo-500'">
-                  共 {{ opt.rounds }} 轮
-                </p>
+              </button>
+            </div>
+
+            <!-- 经验层级（随模式联动） -->
+            <div class="mt-4">
+              <p class="text-xs text-slate-400 mb-2">经验层级</p>
+              <div v-if="form.mode === 'campus'" class="flex items-center gap-2">
+                <span
+                  class="px-4 py-2 rounded-full text-sm border border-indigo-200 bg-indigo-50/60 text-indigo-500 font-medium"
+                >
+                  校招/应届生
+                </span>
+                <span class="text-xs text-slate-400">校招模式固定按应届生标准考察</span>
+              </div>
+              <div v-else class="flex flex-wrap gap-2">
+                <button
+                  v-for="opt in experiencedLevelOptions"
+                  :key="opt.value"
+                  type="button"
+                  class="px-4 py-2 rounded-full text-sm border transition-all"
+                  :class="
+                    form.experienceLevel === opt.value
+                      ? 'border-indigo-500 bg-indigo-50 text-indigo-600 font-medium shadow-sm shadow-indigo-100'
+                      : 'border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-500'
+                  "
+                  @click="form.experienceLevel = opt.value as ExperienceLevel"
+                >
+                  {{ opt.label }}
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 面试轮次 -->
+          <section>
+            <div class="flex items-center gap-3 mb-3">
+              <span class="step-num">4</span>
+              <p class="text-sm font-semibold text-slate-800">面试轮次</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button
+                v-for="opt in stageOptions"
+                :key="opt.value"
+                type="button"
+                class="relative text-left rounded-xl border p-4 transition-all"
+                :class="
+                  form.stage === opt.value
+                    ? 'border-indigo-500 bg-indigo-50/70 shadow-md shadow-indigo-100'
+                    : 'border-slate-200 hover:border-indigo-300 bg-white hover:-translate-y-0.5'
+                "
+                @click="form.stage = opt.value as InterviewStage"
+              >
+                <CheckCircleFilled
+                  v-if="form.stage === opt.value"
+                  class="absolute top-3 right-3 text-indigo-500"
+                />
+                <component
+                  :is="opt.icon"
+                  class="h-5 w-5"
+                  :class="form.stage === opt.value ? 'text-indigo-500' : 'text-slate-400'"
+                />
+                <p class="mt-2 font-medium text-sm text-slate-800">{{ opt.label }}</p>
+                <p class="text-xs text-slate-400 mt-0.5 leading-relaxed">{{ opt.desc }}</p>
               </button>
             </div>
           </section>
@@ -384,10 +445,10 @@ onMounted(async () => {
             :disabled="!canSubmit"
             @click="handleSubmit"
           >
-            {{ submitting ? "正在准备面试…" : `开始模拟面试（${targetRounds} 轮）` }}
+            {{ submitting ? "正在准备面试…" : "开始模拟面试" }}
           </Button>
           <p class="text-xs text-slate-400 text-center mt-3">
-            创建面试需要 AI 生成考察大纲与首题，可能需要 1-2 分钟，请耐心等待
+            主体考察约 30-60 分钟，AI 面试官将根据你的回答把握节奏与深度，结束前还有反问环节
           </p>
         </div>
       </div>

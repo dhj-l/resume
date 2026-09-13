@@ -20,6 +20,10 @@ import type {
 /** SSE 回调集合 */
 export interface InterviewSseCallbacks {
   onInit?: (msg: InterviewSseInitMessage) => void;
+  /** 逐题反馈生成完成（主体考察阶段，先于下一题到达） */
+  onFeedback?: (data: Extract<InterviewSseMessage, { type: "feedback" }>["data"]) => void;
+  /** 反问收尾：面试官告别语（先于评价报告生成到达，流继续保持） */
+  onClosing?: (data: Extract<InterviewSseMessage, { type: "closing" }>["data"]) => void;
   onQuestion?: (data: InterviewSseQuestionMessage["data"]) => void;
   onFinished?: (data: InterviewSseFinishedMessage["data"]) => void;
   onError?: (error: Error) => void;
@@ -27,12 +31,12 @@ export interface InterviewSseCallbacks {
 
 /** SSE 调用选项 */
 export interface SubmitAnswerSseOptions extends InterviewSseCallbacks {
-  /** 超时时间（毫秒），默认 5 分钟 */
+  /** 超时时间（毫秒），默认 8 分钟 */
   timeout?: number;
 }
 
-/** 默认超时：5 分钟 */
-const DEFAULT_TIMEOUT = 5 * 60 * 1000;
+/** 默认超时：8 分钟（反问收尾需等待评价报告生成，后端单次生成上限 4 分钟 + 1 次重试） */
+const DEFAULT_TIMEOUT = 8 * 60 * 1000;
 
 /** 从 localStorage 读取 auth token，与 src/http/request.ts 保持一致 */
 export const getAuthToken = (): string | null => {
@@ -78,7 +82,15 @@ export const submitAnswerSSE = async (
   payload: { content: string; channel?: string },
   options: SubmitAnswerSseOptions = {},
 ): Promise<void> => {
-  const { onInit, onQuestion, onFinished, onError, timeout = DEFAULT_TIMEOUT } = options;
+  const {
+    onInit,
+    onFeedback,
+    onClosing,
+    onQuestion,
+    onFinished,
+    onError,
+    timeout = DEFAULT_TIMEOUT,
+  } = options;
 
   const token = getAuthToken();
   if (!token) {
@@ -159,6 +171,12 @@ export const submitAnswerSSE = async (
 
         if (message.type === "init") {
           onInit?.(message);
+        } else if (message.type === "feedback") {
+          // 反馈帧之后还有 question/finished 帧，不终止流
+          onFeedback?.(message.data);
+        } else if (message.type === "closing") {
+          // 告别语帧之后还有 finished 帧（报告生成完成后），不终止流
+          onClosing?.(message.data);
         } else if (message.type === "question") {
           onQuestion?.(message.data);
           cleanup();

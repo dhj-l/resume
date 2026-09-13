@@ -45,8 +45,8 @@ export interface UseRecorderReturn {
   elapsedSeconds: Ref<number>;
   /** 开始录音：请求麦克风权限并开始采集，失败抛可读 Error */
   start: () => Promise<void>;
-  /** 停止录音：未结算的尾句（满足最短时长）经 onSentence 推出 */
-  stop: () => void;
+  /** 停止录音：未结算的尾句（满足最短时长）经 onSentence 推出；discardTail 为 true 时直接丢弃尾句 */
+  stop: (options?: { discardTail?: boolean }) => void;
 }
 
 /** 将 Float32 采样（-1~1）转为 Int16 */
@@ -245,14 +245,18 @@ export const useRecorder = (options: UseRecorderOptions): UseRecorderReturn => {
     }
   };
 
-  const stop = (): void => {
+  const stop = (stopOptions?: { discardTail?: boolean }): void => {
     if (!isRecording.value) return;
     const sampleRate = audioContext?.sampleRate ?? RECORD_SAMPLE_RATE;
     const tailChunks = bufferChunks;
     const tailVoicedMs = voicedMs;
     releaseResources();
-    // 停止即视为说完：尾句阈值放宽，低于杂音阈值的丢弃
-    if (tailVoicedMs >= MIN_TAIL_SECONDS * 1000 && tailChunks.length > 0) {
+    // 停止即视为说完：尾句阈值放宽，低于杂音阈值的丢弃；调用方明确丢弃时直接不送识别
+    if (
+      !stopOptions?.discardTail &&
+      tailVoicedMs >= MIN_TAIL_SECONDS * 1000 &&
+      tailChunks.length > 0
+    ) {
       options.onSentence(encodeWav(tailChunks, sampleRate));
     }
     bufferChunks = [];

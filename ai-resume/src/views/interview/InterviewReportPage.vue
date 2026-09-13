@@ -7,8 +7,14 @@ import { Lightbulb, Trophy, Wrench } from "lucide-vue-next";
 import { useRoute, useRouter } from "vue-router";
 
 import { getSessionDetailAPI, getReportAPI } from "@/api/interview/interview";
-import type { InterviewMessage, InterviewSession } from "@/api/interview/type";
-import { getEndedReasonLabel, getExperienceLevelLabel, getFocusLabel } from "@/api/interview/type";
+import type { AnswerFeedback, InterviewMessage, InterviewSession } from "@/api/interview/type";
+import {
+  getEndedReasonLabel,
+  getExperienceLevelLabel,
+  getModeLabel,
+  getQuestionTypeLabel,
+  getSessionLevelLabel,
+} from "@/api/interview/type";
 
 import TopicRadarChart from "./components/TopicRadarChart.vue";
 
@@ -23,6 +29,10 @@ const session = ref<InterviewSession | null>(null);
 interface QAItem {
   question: InterviewMessage;
   answer?: InterviewMessage;
+  /** 反问环节：候选人的提问与面试官的回应配对 */
+  isReverse?: boolean;
+  /** 主体考察结束时的收尾引导语，单独展示 */
+  isClosing?: boolean;
 }
 
 const qaItems = computed<QAItem[]>(() => {
@@ -30,7 +40,18 @@ const qaItems = computed<QAItem[]>(() => {
   const items: QAItem[] = [];
   let current: QAItem | null = null;
   for (const msg of session.value.messages ?? []) {
-    if (msg.kind === "question") {
+    if (msg.role === "interviewer" && msg.kind === "question" && msg.questionType === "reverse") {
+      // 收尾引导语不属于任何问答对，单独展示
+      current = null;
+      items.push({ question: msg, isClosing: true });
+    } else if (msg.role === "candidate" && msg.questionType === "reverse") {
+      // 反问环节：候选人提问与面试官回应配对
+      current = { question: msg, isReverse: true };
+      items.push(current);
+    } else if (current?.isReverse && msg.role === "interviewer") {
+      current.answer = msg;
+      current = null;
+    } else if (msg.kind === "question") {
       current = { question: msg };
       items.push(current);
     } else if (current && msg.kind === "answer") {
@@ -55,12 +76,46 @@ const recommendationBadge = computed(() => {
 
 const sessionMeta = computed(() => {
   if (!session.value) return [];
+  const lc = session.value.levelConfig;
+  // 已问题数（不含反问环节的面试官回应）
+  const questionCount = (session.value.messages ?? []).filter(
+    (m) => m.kind === "question" && m.questionType !== "reverse",
+  ).length;
+  const start = session.value.startedAt ? new Date(session.value.startedAt).getTime() : NaN;
+  const end = session.value.endedAt ? new Date(session.value.endedAt).getTime() : NaN;
+  const durationMinutes =
+    !Number.isNaN(start) && !Number.isNaN(end) && end > start
+      ? Math.max(1, Math.round((end - start) / 60000))
+      : 0;
   return [
-    getFocusLabel(session.value.levelConfig?.focus ?? ""),
-    getExperienceLevelLabel(session.value.levelConfig?.experienceLevel ?? ""),
-    `${session.value.currentRound}/${session.value.targetRounds} 轮`,
+    getModeLabel(lc?.mode ?? ""),
+    getSessionLevelLabel(lc),
+    getExperienceLevelLabel(lc?.experienceLevel ?? ""),
+    questionCount > 0 ? `已问 ${questionCount} 题` : "",
+    durationMinutes > 0 ? `用时 ${durationMinutes} 分钟` : "",
   ].filter(Boolean);
 });
+
+/** 三维度总评展示项（旧报告缺失时不渲染） */
+const dimensionScoreItems = computed(() => {
+  const scores = report.value?.dimensionScores;
+  if (!scores) return [];
+  return [
+    { label: "完整性", value: scores.completeness },
+    { label: "逻辑性", value: scores.logic },
+    { label: "技术深度", value: scores.depth },
+  ];
+});
+
+/** 反问环节表现评价（未发生反问时缺失） */
+const reverseFeedback = computed(() => report.value?.reverseFeedback);
+
+/** 逐题反馈三维度展示项（分数带颜色） */
+const feedbackDims = (fb: AnswerFeedback) => [
+  { label: "完整性", value: fb.completeness, color: scoreColor(fb.completeness) },
+  { label: "逻辑性", value: fb.logic, color: scoreColor(fb.logic) },
+  { label: "技术深度", value: fb.depth, color: scoreColor(fb.depth) },
+];
 
 const endedLabel = computed(() =>
   session.value?.endedReason ? getEndedReasonLabel(session.value.endedReason) : "",
@@ -196,6 +251,33 @@ onMounted(async () => {
           </div>
         </div>
 
+        <!-- 三维度总评（与逐题反馈同口径，旧报告缺失时不渲染） -->
+        <div v-if="dimensionScoreItems.length" class="report-card p-6 md:p-8">
+          <h3 class="mb-5 text-base font-semibold text-slate-800">三维度总评</h3>
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <div v-for="dim in dimensionScoreItems" :key="dim.label">
+              <div class="mb-1.5 flex items-center justify-between">
+                <span class="text-sm font-medium text-slate-700">{{ dim.label }}</span>
+                <span
+                  class="text-sm font-semibold tabular-nums"
+                  :style="{ color: scoreColor(dim.value) }"
+                >
+                  {{ dim.value }}
+                </span>
+              </div>
+              <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  class="h-full rounded-full transition-all duration-700"
+                  :style="{
+                    width: `${Math.min(100, Math.max(0, dim.value))}%`,
+                    backgroundColor: scoreColor(dim.value),
+                  }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- 主题评分 + 雷达图 -->
         <div v-if="report.topics?.length" class="report-card p-6 md:p-8">
           <h3 class="mb-5 text-base font-semibold text-slate-800">主题评分</h3>
@@ -228,6 +310,27 @@ onMounted(async () => {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- 反问环节表现（未发生反问时不渲染） -->
+        <div v-if="reverseFeedback" class="report-card p-6 md:p-8">
+          <h3 class="mb-4 text-base font-semibold text-slate-800">反问环节表现</h3>
+          <div class="flex items-start gap-4">
+            <div
+              class="flex h-14 w-14 flex-shrink-0 flex-col items-center justify-center rounded-xl"
+              :style="{ backgroundColor: `${scoreColor(reverseFeedback.score)}1a` }"
+            >
+              <span
+                class="text-lg font-bold tabular-nums"
+                :style="{ color: scoreColor(reverseFeedback.score) }"
+              >
+                {{ reverseFeedback.score }}
+              </span>
+            </div>
+            <p class="text-sm leading-relaxed text-slate-600">
+              {{ reverseFeedback.comment || "未留下反问评价" }}
+            </p>
           </div>
         </div>
 
@@ -265,9 +368,9 @@ onMounted(async () => {
               <template #header>
                 <span class="flex items-center gap-2.5">
                   <span class="round-badge">{{ qa.question.round }}</span>
-                  <span class="text-sm font-medium text-slate-700"
-                    >第 {{ qa.question.round }} 轮</span
-                  >
+                  <span class="text-sm font-medium text-slate-700">
+                    {{ qa.isReverse || qa.isClosing ? "反问环节" : `第 ${qa.question.round} 轮` }}
+                  </span>
                 </span>
               </template>
               <template #extra>
@@ -278,7 +381,7 @@ onMounted(async () => {
                   已回答
                 </span>
                 <span
-                  v-else
+                  v-else-if="!qa.isClosing"
                   class="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] text-amber-600"
                 >
                   未回答
@@ -288,16 +391,45 @@ onMounted(async () => {
                 <div class="flex gap-2.5">
                   <span class="qa-tag qa-tag-q">问</span>
                   <p class="flex-1 text-sm leading-relaxed text-slate-800 whitespace-pre-wrap">
-                    {{ qa.question.content }}
+                    <span
+                      v-if="qa.question.questionType && !qa.isReverse && !qa.isClosing"
+                      class="mr-2 inline-block rounded bg-indigo-50 px-1.5 py-0.5 align-baseline text-[11px] text-indigo-500"
+                      >{{ getQuestionTypeLabel(qa.question.questionType) }}</span
+                    >{{ qa.question.content }}
                   </p>
                 </div>
                 <div v-if="qa.answer" class="flex gap-2.5">
                   <span class="qa-tag qa-tag-a">答</span>
-                  <p class="flex-1 text-sm leading-relaxed text-slate-600 whitespace-pre-wrap">
-                    {{ qa.answer.content }}
-                  </p>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm leading-relaxed text-slate-600 whitespace-pre-wrap">
+                      {{ qa.answer.content }}
+                    </p>
+                    <!-- 逐题反馈（与答题时的展示口径一致） -->
+                    <div
+                      v-if="qa.answer.feedback"
+                      class="mt-2 rounded-lg border border-indigo-100 bg-indigo-50/60 px-3 py-2"
+                    >
+                      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span class="text-[11px] font-medium text-indigo-500">AI 点评</span>
+                        <span
+                          v-for="dim in feedbackDims(qa.answer.feedback)"
+                          :key="dim.label"
+                          class="text-[11px] tabular-nums"
+                          :style="{ color: dim.color }"
+                        >
+                          {{ dim.label }} {{ dim.value }}
+                        </span>
+                      </div>
+                      <p
+                        v-if="qa.answer.feedback.comment"
+                        class="mt-1 text-[11px] leading-relaxed text-slate-500"
+                      >
+                        {{ qa.answer.feedback.comment }}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <p v-else class="pl-8 text-xs text-slate-400">本题未作答</p>
+                <p v-else-if="!qa.isClosing" class="pl-8 text-xs text-slate-400">本题未作答</p>
               </div>
             </CollapsePanel>
           </Collapse>

@@ -7,7 +7,11 @@ import { MessagesSquare, PanelLeftClose } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 
 import type { InterviewSessionSummary } from "@/api/interview/type";
-import { getEndedReasonLabel } from "@/api/interview/type";
+import {
+  getEndedReasonLabel,
+  getRoundProgressText,
+  getSessionLevelShortLabel,
+} from "@/api/interview/type";
 import { useInterviewStore } from "@/stores/interviewStore";
 import { formatRelativeTime } from "@/utils/day";
 
@@ -45,10 +49,19 @@ const getDotClass = (item: InterviewSessionSummary) => {
 };
 
 const getStatusText = (item: InterviewSessionSummary) => {
-  if (item.status === "in_progress") return "进行中";
+  if (item.status === "in_progress") {
+    return item.phase === "reverse" ? "反问环节" : "进行中";
+  }
   if (item.status === "completed") return "已出报告";
   return getEndedReasonLabel(item.endedReason ?? "") || "已中断";
 };
+
+/** 轮次短标签（一面/二面/三面，历史会话兜底旧 focus 标签） */
+const getLevelText = (item: InterviewSessionSummary) => getSessionLevelShortLabel(item.levelConfig);
+
+/** 题数进度（新会话按题数，历史会话保持 N/M 轮） */
+const getRoundText = (item: InterviewSessionSummary) =>
+  getRoundProgressText(item.currentRound, item.targetRounds);
 
 /** 点击记录：交给父级加载对话 */
 const handleSelect = (item: InterviewSessionSummary) => {
@@ -67,7 +80,7 @@ const handleSelect = (item: InterviewSessionSummary) => {
       </div>
       <div class="min-w-0 flex-1">
         <p class="text-sm font-semibold leading-tight text-slate-800">AI 模拟面试</p>
-        <p class="text-[11px] leading-tight text-slate-400">多轮追问 · 智能评价</p>
+        <p class="text-[11px] leading-tight text-slate-400">项目深挖 · 智能评价</p>
       </div>
       <Tooltip title="收起侧栏" placement="right">
         <button
@@ -133,8 +146,14 @@ const handleSelect = (item: InterviewSessionSummary) => {
                     <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
                   </span>
                   <span class="text-emerald-600">{{ getStatusText(item) }}</span>
-                  <span class="text-slate-300">·</span>
-                  <span>{{ item.currentRound }}/{{ item.targetRounds }} 轮</span>
+                  <template v-if="getLevelText(item)">
+                    <span class="text-slate-300">·</span>
+                    <span>{{ getLevelText(item) }}</span>
+                  </template>
+                  <template v-if="getRoundText(item)">
+                    <span class="text-slate-300">·</span>
+                    <span>{{ getRoundText(item) }}</span>
+                  </template>
                   <span class="text-slate-300">·</span>
                   <span>{{ formatRelativeTime(item.lastActivityAt) }}</span>
                 </p>
@@ -155,8 +174,14 @@ const handleSelect = (item: InterviewSessionSummary) => {
                 <p class="session-meta">
                   <span class="h-1.5 w-1.5 flex-shrink-0 rounded-full" :class="getDotClass(item)" />
                   <span>{{ getStatusText(item) }}</span>
-                  <span class="text-slate-300">·</span>
-                  <span>{{ item.currentRound }}/{{ item.targetRounds }} 轮</span>
+                  <template v-if="getLevelText(item)">
+                    <span class="text-slate-300">·</span>
+                    <span>{{ getLevelText(item) }}</span>
+                  </template>
+                  <template v-if="getRoundText(item)">
+                    <span class="text-slate-300">·</span>
+                    <span>{{ getRoundText(item) }}</span>
+                  </template>
                   <span class="text-slate-300">·</span>
                   <span>{{ formatRelativeTime(item.lastActivityAt) }}</span>
                 </p>

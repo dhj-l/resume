@@ -7,6 +7,7 @@ import type {
   GetSessionListParams,
   InterviewReport,
   InterviewSession,
+  ReverseSuggestionsResponse,
   SessionListResponse,
 } from "./type";
 
@@ -41,10 +42,17 @@ export const getSessionListAPI = (params?: GetSessionListParams) => {
 };
 
 /**
- * 提交回答（同步，最后一轮回答会自动结束面试并生成报告，耗时较长）
+ * 提交回答（同步，主体考察与反问环节共用；反问收尾会自动结束面试并生成报告，耗时较长）
  */
 export const submitAnswerAPI = (id: string, data: { content: string; channel?: string }) => {
   return http.post<AnswerResult>(`${BASE}/${id}/answers`, data);
+};
+
+/**
+ * 获取反问环节推荐话术（AI 生成 3~5 条，面试进行中与结束后均可调用）
+ */
+export const getReverseSuggestionsAPI = (id: string) => {
+  return http.get<ReverseSuggestionsResponse>(`${BASE}/${id}/reverse-suggestions`);
 };
 
 /**
