@@ -7,7 +7,7 @@ import { Lightbulb, Trophy, Wrench } from "lucide-vue-next";
 import { useRoute, useRouter } from "vue-router";
 
 import { getSessionDetailAPI, getReportAPI } from "@/api/interview/interview";
-import type { AnswerFeedback, InterviewMessage, InterviewSession } from "@/api/interview/type";
+import type { InterviewMessage, InterviewSession } from "@/api/interview/type";
 import {
   getEndedReasonLabel,
   getExperienceLevelLabel,
@@ -17,6 +17,16 @@ import {
 } from "@/api/interview/type";
 
 import TopicRadarChart from "./components/TopicRadarChart.vue";
+import {
+  countMainQuestions,
+  FEEDBACK_DIMENSION_LABELS,
+  getAnswerFeedbackDims,
+  getSessionDurationMinutes,
+  scoreColor,
+} from "./utils";
+
+/** 雷达图最多展示的主题数（维度过多时图表不可读），与下方主题评分列表为包含关系 */
+const RADAR_MAX_TOPICS = 8;
 
 const route = useRoute();
 const router = useRouter();
@@ -62,9 +72,6 @@ const qaItems = computed<QAItem[]>(() => {
   return items;
 });
 
-const scoreColor = (score: number) =>
-  score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444";
-
 /** 推荐等级徽章样式，未知值兜底 */
 const recommendationBadge = computed(() => {
   const rec = report.value?.recommendation ?? "";
@@ -77,16 +84,10 @@ const recommendationBadge = computed(() => {
 const sessionMeta = computed(() => {
   if (!session.value) return [];
   const lc = session.value.levelConfig;
-  // 已问题数（不含反问环节的面试官回应）
-  const questionCount = (session.value.messages ?? []).filter(
-    (m) => m.kind === "question" && m.questionType !== "reverse",
-  ).length;
-  const start = session.value.startedAt ? new Date(session.value.startedAt).getTime() : NaN;
-  const end = session.value.endedAt ? new Date(session.value.endedAt).getTime() : NaN;
-  const durationMinutes =
-    !Number.isNaN(start) && !Number.isNaN(end) && end > start
-      ? Math.max(1, Math.round((end - start) / 60000))
-      : 0;
+  // 已问题数（不含反问环节的面试官回应），与对话页共用同一统计口径
+  const questionCount = countMainQuestions(session.value.messages);
+  // 与对话页共用同一时长口径（向下取整），避免同一会话两页显示差 1 分钟
+  const durationMinutes = getSessionDurationMinutes(session.value.startedAt, session.value.endedAt);
   return [
     getModeLabel(lc?.mode ?? ""),
     getSessionLevelLabel(lc),
@@ -101,21 +102,17 @@ const dimensionScoreItems = computed(() => {
   const scores = report.value?.dimensionScores;
   if (!scores) return [];
   return [
-    { label: "完整性", value: scores.completeness },
-    { label: "逻辑性", value: scores.logic },
-    { label: "技术深度", value: scores.depth },
+    { label: FEEDBACK_DIMENSION_LABELS.completeness, value: scores.completeness },
+    { label: FEEDBACK_DIMENSION_LABELS.logic, value: scores.logic },
+    { label: FEEDBACK_DIMENSION_LABELS.depth, value: scores.depth },
   ];
 });
 
 /** 反问环节表现评价（未发生反问时缺失） */
 const reverseFeedback = computed(() => report.value?.reverseFeedback);
 
-/** 逐题反馈三维度展示项（分数带颜色） */
-const feedbackDims = (fb: AnswerFeedback) => [
-  { label: "完整性", value: fb.completeness, color: scoreColor(fb.completeness) },
-  { label: "逻辑性", value: fb.logic, color: scoreColor(fb.logic) },
-  { label: "技术深度", value: fb.depth, color: scoreColor(fb.depth) },
-];
+/** 逐题反馈三维度展示项（分数带颜色），与对话页共用同一实现 */
+const feedbackDims = getAnswerFeedbackDims;
 
 const endedLabel = computed(() =>
   session.value?.endedReason ? getEndedReasonLabel(session.value.endedReason) : "",
@@ -127,9 +124,11 @@ const goBack = () => {
   router.push({ path: "/interview/chat", query: id ? { id } : undefined });
 };
 
-/** 雷达图数据（维度过多时截取前 8 个，保证可读性） */
+/** 雷达图数据（维度过多时只取前 N 个，保证可读性；列表仍展示全部主题） */
 const radarTopics = computed(() =>
-  (report.value?.topics ?? []).slice(0, 8).map((t) => ({ name: t.title, score: t.score ?? 0 })),
+  (report.value?.topics ?? [])
+    .slice(0, RADAR_MAX_TOPICS)
+    .map((t) => ({ name: t.title, score: t.score ?? 0 })),
 );
 
 const summaryBlocks = computed(() => [
@@ -172,7 +171,7 @@ onMounted(async () => {
     ]);
     report.value = reportRes.data;
   } catch {
-    message.error("该面试尚未生成评价报告");
+    // 报告未生成 / 生成中：页面下方已有同文案的空态兜底，此处不再重复弹提示
   } finally {
     pageLoading.value = false;
   }
@@ -284,6 +283,12 @@ onMounted(async () => {
           <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-5">
             <div class="lg:col-span-2">
               <TopicRadarChart :topics="radarTopics" />
+              <p
+                v-if="report.topics.length > RADAR_MAX_TOPICS"
+                class="mt-2 text-center text-xs text-slate-300"
+              >
+                雷达图展示前 {{ RADAR_MAX_TOPICS }} 个主题，完整评分见右侧列表
+              </p>
             </div>
             <div class="space-y-5 lg:col-span-3">
               <div v-for="topic in report.topics" :key="topic.topicKey">

@@ -128,6 +128,7 @@ export const useRecorder = (options: UseRecorderOptions): UseRecorderReturn => {
   let mediaStream: MediaStream | null = null;
   let sourceNode: MediaStreamAudioSourceNode | null = null;
   let processorNode: ScriptProcessorNode | null = null;
+  let silentGainNode: GainNode | null = null;
   let elapsedTimer: number | null = null;
 
   /** 当前累积句的 PCM16 分片 */
@@ -164,6 +165,8 @@ export const useRecorder = (options: UseRecorderOptions): UseRecorderReturn => {
     }
     sourceNode?.disconnect();
     sourceNode = null;
+    silentGainNode?.disconnect();
+    silentGainNode = null;
     mediaStream?.getTracks().forEach((track) => track.stop());
     mediaStream = null;
     audioContext?.close().catch(() => undefined);
@@ -233,6 +236,7 @@ export const useRecorder = (options: UseRecorderOptions): UseRecorderReturn => {
       mediaStream = stream;
       sourceNode = source;
       processorNode = processor;
+      silentGainNode = silentGain;
       elapsedSeconds.value = 0;
       isRecording.value = true;
       elapsedTimer = window.setInterval(() => {

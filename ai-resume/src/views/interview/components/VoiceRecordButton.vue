@@ -53,7 +53,8 @@ const handleClick = async () => {
   // 录音中再次点击：结束录音，尾句送识别
   if (isRecording.value) {
     if (elapsedSeconds.value < MIN_RECORD_SECONDS) {
-      stop();
+      // 误触：尾句按杂音丢弃，不发起识别（与 MIN_RECORD_SECONDS 的语义一致）
+      stop({ discardTail: true });
       message.warning("录音时间太短，请说完一句话后再结束");
       return;
     }
@@ -75,7 +76,8 @@ const stopAll = () => {
   queue.cancelAll();
 };
 
-defineExpose({ stopAll });
+/** 对外暴露录音状态：isRecording 供父组件判断「录音是否进行中」（如开始语音回答时打断题目语音播放） */
+defineExpose({ stopAll, isRecording });
 </script>
 
 <template>

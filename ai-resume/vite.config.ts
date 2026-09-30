@@ -3,11 +3,14 @@ import path from "path";
 import vue from "@vitejs/plugin-vue";
 import { defineConfig } from "vite";
 import { visualizer } from "rollup-plugin-visualizer";
+import VueDevTools from "vite-plugin-vue-devtools";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    // Vue 开发者工具（仅开发服务器生效，apply: "serve"）
+    VueDevTools(),
     // 打包分析（手动开启：open: true）
     visualizer({
       filename: "dist/stats.html",

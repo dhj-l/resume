@@ -9,7 +9,7 @@
  * JSON 错误包络而非 SSE，需按响应 Content-Type 区分处理。
  */
 
-import { getAuthToken, parseSseFrame } from "./sse";
+import { getAuthToken, parseSseFrame as parseGenericSseFrame } from "@/api/sse";
 
 /** TTS 流式事件帧 */
 export type TtsStreamEvent =
@@ -126,10 +126,9 @@ export const getQuestionTtsStreamAPI = (
           buffer = buffer.slice(separatorIndex + 2);
           separatorIndex = buffer.indexOf("\n\n");
 
-          const message = parseSseFrame(frame);
-          if (!message) continue;
+          const event = parseGenericSseFrame<TtsStreamEvent>(frame, "TTS SSE");
+          if (!event) continue;
 
-          const event = message as unknown as TtsStreamEvent;
           if (event.type === "meta") {
             onMeta?.({ sampleRate: event.sampleRate, channels: event.channels });
           } else if (event.type === "chunk") {

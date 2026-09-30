@@ -7,6 +7,7 @@
  * - 整段 PCM 按 `sessionId:round` 缓存在内存，喇叭重播直接命中缓存（免上游请求）
  * - 流式失败时自动降级到旧的完整 wav 接口（blob + <audio>），行为不回退
  * - 单例播放：播新题先停旧音频，播放中再点同一题即停止
+ * - stop() 对外暴露，供调用方主动打断播放（如开始语音回答时）
  */
 import { ref } from "vue";
 
@@ -113,7 +114,22 @@ export const useTtsPlayer = () => {
       legacyAudioEl.pause();
     }
     clearFinishTimer();
+    loadingKey.value = null;
     playingKey.value = null;
+  };
+
+  /** 释放兜底 <audio> 与临时 object URL，避免卸载后泄漏 */
+  const releaseLegacyAudio = () => {
+    if (legacyAudioEl) {
+      legacyAudioEl.pause();
+      legacyAudioEl.removeAttribute("src");
+      legacyAudioEl.load();
+      legacyAudioEl = null;
+    }
+    if (legacyUrl) {
+      URL.revokeObjectURL(legacyUrl);
+      legacyUrl = null;
+    }
   };
 
   /** done 后等待剩余音频播完再清除播放态 */
@@ -289,7 +305,7 @@ export const useTtsPlayer = () => {
   /** 切换会话 / 组件卸载时停止播放（内存缓存保留，切回可秒播） */
   const dispose = () => {
     stop();
-    loadingKey.value = null;
+    releaseLegacyAudio();
     void engine.dispose();
   };
 
@@ -306,6 +322,8 @@ export const useTtsPlayer = () => {
     play,
     autoPlay,
     toggleAutoPlay,
+    /** 主动打断当前播放（含上游请求与兜底音频）；幂等，可安全重复调用 */
+    stop,
     dispose,
     isLoading,
     isPlaying,

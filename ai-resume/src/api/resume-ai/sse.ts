@@ -7,6 +7,7 @@
  */
 
 import type { AiResumeParams } from "@/api/resume/type";
+import { getAuthToken, parseSseFrame } from "@/api/sse";
 
 import type {
   SseCompleteMessage,
@@ -34,38 +35,6 @@ export interface GenerateAiResumeSseOptions extends SseCallbacks {
 
 /** 默认超时：10 分钟 */
 const DEFAULT_TIMEOUT = 10 * 60 * 1000;
-
-/** 从 localStorage 读取 auth token，与 src/http/request.ts 保持一致 */
-const getAuthToken = (): string | null => {
-  try {
-    const authStoreStr = localStorage.getItem("auth");
-    if (!authStoreStr) return null;
-    const authStore = JSON.parse(authStoreStr);
-    return authStore?.token ?? null;
-  } catch (e) {
-    console.warn("Failed to retrieve auth token", e);
-    return null;
-  }
-};
-
-/** 解析单个 SSE 帧：合并多行 data: 字段并 JSON.parse */
-const parseSseFrame = (frame: string): SseMessage | null => {
-  const dataLines = frame
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith("data:"))
-    .map((line) => line.slice(5).trim());
-
-  if (dataLines.length === 0) return null;
-
-  const jsonStr = dataLines.join("\n");
-  try {
-    return JSON.parse(jsonStr) as SseMessage;
-  } catch (e) {
-    console.warn("Failed to parse SSE frame", jsonStr, e);
-    return null;
-  }
-};
 
 /**
  * 调用 AI 生成简历 SSE 端点（POST /resume-ai/generatesse）
@@ -148,7 +117,7 @@ export const generateAiResumeSSE = async (
         const frame = buffer.slice(0, separatorIndex);
         buffer = buffer.slice(separatorIndex + 2);
 
-        const message = parseSseFrame(frame);
+        const message = parseSseFrame<SseMessage>(frame, "SSE");
         separatorIndex = buffer.indexOf("\n\n");
         if (!message) continue;
 

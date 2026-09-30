@@ -2,11 +2,8 @@
 import { computed, onMounted, reactive, ref } from "vue";
 
 import {
-  AppstoreOutlined,
   ArrowLeftOutlined,
   CheckCircleFilled,
-  CodeOutlined,
-  FolderOpenOutlined,
   IdcardOutlined,
   ReadOutlined,
 } from "@ant-design/icons-vue";
@@ -26,8 +23,19 @@ import type { UserResumeListItem } from "@/api/resume/type";
 import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
 import { AI_INTERVIEW_TIPS } from "@/utils/aiTips";
 
+import { INTERVIEW_STAGE_OPTIONS, SESSION_IDLE_TIMEOUT_MINUTES } from "./utils";
+
 const JD_MIN_LENGTH = 150;
 const JD_MAX_LENGTH = 5000;
+/** 参与面试的简历列表一次拉取上限（足够覆盖个人简历数量） */
+const RESUME_FETCH_PAGE_SIZE = 100;
+/**
+ * 校招模式固定使用的经验层级
+ *
+ * 校招不提交 experienceLevel（服务端归一为 junior），此值仅用于界面标识与
+ * 社招/校招来回切换时的状态回正，保证表单状态与提交体语义一致。
+ */
+const DEFAULT_CAMPUS_LEVEL: ExperienceLevel = "junior";
 
 const router = useRouter();
 const route = useRoute();
@@ -50,7 +58,7 @@ const form = reactive({
   mode: "campus" as InterviewMode,
   stage: "first" as InterviewStage,
   /** 仅社招模式使用（校招固定按应届生标准，服务端归一为 junior） */
-  experienceLevel: "mid" as ExperienceLevel,
+  experienceLevel: DEFAULT_CAMPUS_LEVEL as ExperienceLevel,
 });
 
 const modeOptions = [
@@ -75,26 +83,13 @@ const experiencedLevelOptions = [
   { value: "expert", label: "5 年以上经验" },
 ];
 
-const stageOptions = [
-  {
-    value: "first",
-    label: "一面 · 基础技术面",
-    desc: "未来同组资深工程师：项目/实习深挖约 7 成 + 八股基础约 3 成",
-    icon: CodeOutlined,
-  },
-  {
-    value: "second",
-    label: "二面 · 项目深入面",
-    desc: "直属 Leader：项目深挖约 7 成（选型/架构/难点/量化）+ 系统设计约 3 成",
-    icon: FolderOpenOutlined,
-  },
-  {
-    value: "third",
-    label: "三面 · 综合面",
-    desc: "总监/交叉面官：项目引申至架构与决策约 6 成 + 技术广度与开放性问题约 4 成",
-    icon: AppstoreOutlined,
-  },
-];
+/** 会话超时提示文案（时长口径统一取 SESSION_IDLE_TIMEOUT_MINUTES） */
+const timeoutHintText = `${SESSION_IDLE_TIMEOUT_MINUTES} 分钟内无任何活动，上次面试已被自动关闭。你可以重新发起新的面试。`;
+
+/**
+ * 面试轮次选项（与对话页欢迎页胶囊共用同一份定义，label 取自后端标签映射表）
+ */
+const stageOptions = INTERVIEW_STAGE_OPTIONS;
 
 const jdLength = computed(() => form.jobDescription.trim().length);
 
@@ -123,17 +118,27 @@ const canSubmit = computed(
 const fetchResumes = async () => {
   resumesLoading.value = true;
   try {
-    const { data } = await getUserResumesAPI({ page: 1, pageSize: 100 });
+    const { data } = await getUserResumesAPI({ page: 1, pageSize: RESUME_FETCH_PAGE_SIZE });
     resumes.value = data.list.filter((item) => !item.isTemplate);
+  } catch {
+    // 简历列表拉取失败不阻塞表单：选择框为空，全局拦截器已提示，可刷新重试
   } finally {
     resumesLoading.value = false;
   }
 };
 
-/** 切换面试模式：校招固定按应届生考察，无需经验层级 */
+/**
+ * 切换面试模式
+ *
+ * - 社招模式不接受 junior（后端会拒绝），切换时若非校招默认值则保持原选择、否则取 mid
+ * - 校招模式固定按应届生（junior）考察，显式回正经验层级，避免残留社招选择
+ *   导致提交体与界面展示不一致
+ */
 const handleSelectMode = (mode: InterviewMode) => {
   form.mode = mode;
-  if (mode === "experienced" && form.experienceLevel === "junior") {
+  if (mode === "campus") {
+    form.experienceLevel = DEFAULT_CAMPUS_LEVEL;
+  } else if (form.experienceLevel === DEFAULT_CAMPUS_LEVEL) {
     form.experienceLevel = "mid";
   }
 };
@@ -206,7 +211,9 @@ onMounted(async () => {
   if (stageQuery && stageQuery in INTERVIEW_STAGE_LABEL_MAP) {
     form.stage = stageQuery;
   }
-  await Promise.all([checkCurrentSession(), fetchResumes()]);
+  // allSettled：任一前置请求失败也不能让页面停留在 loading 遮罩
+  // （两个子任务内部已各自兜底，此处保证 pageLoading 必然复位）
+  await Promise.allSettled([checkCurrentSession(), fetchResumes()]);
   pageLoading.value = false;
 });
 </script>
@@ -240,7 +247,7 @@ onMounted(async () => {
           show-icon
           class="mb-4 rounded-xl"
           message="上次面试因超时已关闭"
-          description="45 分钟内无任何活动，上次面试已被自动关闭。你可以重新发起新的面试。"
+          :description="timeoutHintText"
         />
 
         <!-- 进行中会话恢复 -->

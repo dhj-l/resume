@@ -5,15 +5,12 @@ import {
   BulbOutlined,
   CheckCircleFilled,
   ClockCircleOutlined,
-  CodeOutlined,
   FileDoneOutlined,
-  FolderOpenOutlined,
   LoadingOutlined,
   RobotOutlined,
   SendOutlined,
   SoundFilled,
   SoundOutlined,
-  AppstoreOutlined,
 } from "@ant-design/icons-vue";
 import { Button, Input, Modal, Popover, Spin, Tooltip, message } from "ant-design-vue";
 import { MessagesSquare, PanelLeftOpen, Volume2, VolumeX } from "lucide-vue-next";
@@ -25,9 +22,8 @@ import {
   getReverseSuggestionsAPI,
   getSessionDetailAPI,
 } from "@/api/interview/interview";
-import { submitAnswerSSE } from "@/api/interview/sse";
+import { submitAnswerSSE, type InterviewSseErrorInfo } from "@/api/interview/sse";
 import type {
-  AnswerFeedback,
   EndedReason,
   InterviewMessage,
   InterviewPhase,
@@ -44,15 +40,27 @@ import {
 import { useAuthStore } from "@/stores/auth";
 import { useInterviewStore } from "@/stores/interviewStore";
 
+import InterviewAvatar from "./components/InterviewAvatar.vue";
 import InterviewSidebar from "./components/InterviewSidebar.vue";
 import VoiceRecordButton from "./components/VoiceRecordButton.vue";
 import { useTtsPlayer } from "./composables/useTtsPlayer";
+import {
+  ANSWER_MAX_LENGTH,
+  countMainQuestions,
+  DEFAULT_DIFFICULTY_LABEL,
+  DIFFICULTY_CLASS_MAP,
+  EXPIRE_WARN_MINUTES,
+  getAnswerFeedbackDims,
+  getSessionDurationMinutes,
+  getSessionTitle,
+  INTERVIEW_STAGE_OPTIONS,
+  SESSION_IDLE_TIMEOUT_MINUTES,
+  TYPE_INTERVAL,
+  TYPE_MAX_STEPS,
+} from "./utils";
 
-const ANSWER_MAX_LENGTH = 5000;
-/** 会话剩余时间临期提醒阈值（分钟） */
-const EXPIRE_WARN_MINUTES = 5;
-/** 打字机每个字符间隔（毫秒） */
-const TYPE_INTERVAL = 18;
+/** 面试已结束跳转报告页的延时（毫秒）：留出时间展示最后一条回应 */
+const REPORT_REDIRECT_DELAY = 1200;
 
 /** 右侧视图模式：empty=欢迎页 / chat=进行中对话 / replay=历史只读回放 */
 type ViewMode = "empty" | "chat" | "replay";
@@ -67,6 +75,7 @@ const {
   play: playTts,
   autoPlay: autoPlayTts,
   toggleAutoPlay,
+  stop: stopTts,
   dispose: disposeTts,
   isLoading: ttsLoading,
   isPlaying: ttsPlaying,
@@ -93,8 +102,36 @@ const messages = ref<InterviewMessage[]>([]);
 
 const answerText = ref("");
 const submitting = ref(false);
-/** 语音输入按钮（暴露 stopAll 用于发送前关闭语音收集：停止录音并丢弃在途识别） */
+/** 语音输入按钮（暴露 stopAll / isRecording：发送前关闭语音收集、感知录音进行中） */
 const voiceBtnRef = ref<InstanceType<typeof VoiceRecordButton> | null>(null);
+
+// ==================== 语音输入与题目语音互斥 ====================
+
+/**
+ * 语音转文字是否进行中
+ *
+ * 题目语音播放与麦克风录音互斥：录音期间面试官的声音会被麦克风收录，
+ * 进而被识别成用户回答；因此录音一开始就打断播放，录音期间也不自动朗读。
+ */
+const voiceRecording = computed(() => voiceBtnRef.value?.isRecording ?? false);
+
+// 录音真正开始（麦克风就绪）即打断当前播放：流式 / 旧接口兜底 / 缓存重放三条
+// 通道由 stopTts 统一处理。flush: 'sync' 保证停播与录音状态在同一次同步执行内
+// 完成，早于首个音频采样回调（ScriptProcessor 回调约 128ms 后才可能触发）。
+watch(
+  voiceRecording,
+  (active) => {
+    if (active) stopTts();
+  },
+  { flush: "sync" },
+);
+
+/** 自动朗读题目：语音输入进行中不播报（覆盖恢复现场、新问题、告别语等全部自动播报入口） */
+const autoPlayQuestion = (round: number) => {
+  if (voiceRecording.value) return;
+  autoPlayTts(sessionId.value, round);
+};
+
 /** AI 正在生成下一题 */
 const aiThinking = ref(false);
 /** 下一题打字机输出中 */
@@ -117,6 +154,18 @@ const listRef = ref<HTMLElement | null>(null);
 
 let expireTimer: number | null = null;
 let typeTimer: number | null = null;
+/** 面试结束跳转报告页的定时器（卸载时清理，避免离开页面后仍触发跳转） */
+let reportRedirectTimer: number | null = null;
+/** 正在打字的消息与完整文本（停止打字机时用于补全内容） */
+let activeTypewriter: { msg: InterviewMessage; full: string } | null = null;
+/**
+ * 提交回答的代次：每次提交自增，页面卸载时自增
+ *
+ * 提交回答的 SSE 没有取消句柄，回调会在切走之后继续到达；没有校验时，旧会话的
+ * 反馈/题目会被写进后来切换到的会话视图、改写其侧边栏卡片，甚至把浏览器跳到
+ * 那个会话的报告页。校验判据见 handleSend 的 isSubmitTargetCurrent。
+ */
+let submitToken = 0;
 /** 剩余秒数 */
 const remainSeconds = ref(0);
 /** 秒级心跳（驱动「已进行 X 分钟」刷新） */
@@ -130,9 +179,10 @@ const remainDisplay = computed(() => {
 });
 
 const remainPercent = computed(() => {
-  if (!expiresAt.value) return 100;
+  if (!expiresAt.value || !startedAt.value) return 100;
   const expireTime = new Date(expiresAt.value).getTime();
-  const startedTime = new Date(messages.value[0]?.askedAt ?? Date.now()).getTime();
+  // 基期与 elapsedMinutes 保持同一口径（会话开始时间），避免用 asksAt 缺失时进度条失真
+  const startedTime = new Date(startedAt.value).getTime();
   if (Number.isNaN(expireTime) || Number.isNaN(startedTime) || expireTime <= startedTime) {
     return 100;
   }
@@ -151,18 +201,12 @@ const headerLevelText = computed(() => {
 });
 
 /** 主体考察已进行分钟数（回放取结束时间，进行中随秒级 tick 刷新） */
-const elapsedMinutes = computed(() => {
-  const start = startedAt.value ? new Date(startedAt.value).getTime() : NaN;
-  if (Number.isNaN(start)) return 0;
-  const end = endedAt.value ? new Date(endedAt.value).getTime() : nowTick.value;
-  if (Number.isNaN(end) || end <= start) return 0;
-  return Math.floor((end - start) / 60000);
-});
+const elapsedMinutes = computed(() =>
+  getSessionDurationMinutes(startedAt.value, endedAt.value || nowTick.value),
+);
 
 /** 已问题数（不含反问环节的面试官回应） */
-const questionCount = computed(
-  () => messages.value.filter((m) => m.kind === "question" && m.questionType !== "reverse").length,
-);
+const questionCount = computed(() => countMainQuestions(messages.value));
 
 /** 反问环节在消息列表中的起始位置（用于渲染阶段分隔条） */
 const reverseStartIndex = computed(() =>
@@ -171,15 +215,22 @@ const reverseStartIndex = computed(() =>
 
 const userInitial = computed(() => authStore.userInfo?.username?.[0]?.toUpperCase() || "U");
 
-const canSubmitAnswer = computed(
+/**
+ * 发送守卫：提交中 / AI 思考中 / 打字机输出中 / 已结束 / 报告生成中均不可提交
+ *
+ * 抽成 computed 供发送按钮与键盘快捷键（Ctrl+Enter）共用，避免两处条件漂移
+ * 导致禁用按钮仍可被快捷键触发。
+ */
+const sendGuard = computed(
   () =>
-    !!answerText.value.trim() &&
     !submitting.value &&
     !aiThinking.value &&
     !typing.value &&
     !finished.value &&
     !generatingReport.value,
 );
+
+const canSubmitAnswer = computed(() => !!answerText.value.trim() && sendGuard.value);
 
 /** 考察大纲（含已考察标记，供进度 Popover 展示） */
 const topicList = computed(() =>
@@ -190,32 +241,24 @@ const topicList = computed(() =>
 );
 const askedCount = computed(() => topicList.value.filter((item) => item.asked).length);
 
-const DIFFICULTY_CLASS_MAP: Record<string, string> = {
-  基础: "bg-emerald-50 text-emerald-600",
-  进阶: "bg-sky-50 text-sky-600",
-  高阶: "bg-violet-50 text-violet-600",
-};
-
-/** 欢迎页面试轮次胶囊 */
-const stageOptions = [
-  { value: "first", label: "一面 · 基础技术面", icon: CodeOutlined },
-  { value: "second", label: "二面 · 项目深入面", icon: FolderOpenOutlined },
-  { value: "third", label: "三面 · 综合面", icon: AppstoreOutlined },
-] as const;
+/** 欢迎页面试轮次胶囊（与发起页共用同一份轮次定义） */
+const stageOptions = INTERVIEW_STAGE_OPTIONS;
 
 /** 逐题反馈三维度展示项（分数带颜色） */
-const feedbackDims = (fb: AnswerFeedback) => {
-  const color = (score: number) => (score >= 80 ? "#10b981" : score >= 60 ? "#f59e0b" : "#ef4444");
-  return [
-    { label: "完整性", value: fb.completeness, color: color(fb.completeness) },
-    { label: "逻辑性", value: fb.logic, color: color(fb.logic) },
-    { label: "技术深度", value: fb.depth, color: color(fb.depth) },
-  ];
-};
+const feedbackDims = getAnswerFeedbackDims;
 
 const endedReasonText = computed(() =>
   endedReason.value ? getEndedReasonLabel(endedReason.value) : "本场面试已结束",
 );
+
+/** 考察难度兜底标签（未知/缺失难度统一按「基础」展示） */
+const difficultyLabel = (difficulty?: string) => difficulty || DEFAULT_DIFFICULTY_LABEL;
+
+/** 进度条提示文案：进度节奏说明（含时长口径） */
+const progressTooltip = `主体考察约 30-60 分钟，AI 面试官将根据你的回答把握节奏；超过 ${SESSION_IDLE_TIMEOUT_MINUTES} 分钟无任何活动，面试将被自动关闭`;
+
+/** 剩余时间提示文案：不活动超时窗口 */
+const remainTooltip = `超过 ${SESSION_IDLE_TIMEOUT_MINUTES} 分钟无任何活动，面试将被自动关闭`;
 
 const scrollToBottom = async (smooth = false) => {
   await nextTick();
@@ -247,24 +290,39 @@ const stopExpireTimer = () => {
   }
 };
 
-const stopTypeTimer = () => {
+/**
+ * 停止打字机：补全当前正在打字的消息文本
+ *
+ * 必须补全，否则切会话（resetSessionState）/ 卸载时该条消息会以半截文本留存于
+ * 消息数组（新会话复用同一数组渲染时会显示残缺气泡）。
+ * typing 一并复位，避免下一条消息不再触发行内光标。
+ */
+const stopTypeTimer = (restore = true) => {
   if (typeTimer !== null) {
     window.clearInterval(typeTimer);
     typeTimer = null;
   }
+  if (activeTypewriter) {
+    if (restore) {
+      activeTypewriter.msg.content = activeTypewriter.full;
+    }
+    activeTypewriter = null;
+  }
+  typing.value = false;
 };
 
 /** 打字机流式输出一道题目 */
 const typewriter = (msg: InterviewMessage, full: string) => {
+  stopTypeTimer();
   typing.value = true;
   msg.content = "";
+  activeTypewriter = { msg, full };
   let i = 0;
-  const step = Math.max(1, Math.ceil(full.length / 120));
+  const step = Math.max(1, Math.ceil(full.length / TYPE_MAX_STEPS));
   typeTimer = window.setInterval(() => {
     i += step;
     if (i >= full.length) {
       msg.content = full;
-      typing.value = false;
       stopTypeTimer();
     } else {
       msg.content = full.slice(0, i);
@@ -273,10 +331,23 @@ const typewriter = (msg: InterviewMessage, full: string) => {
   }, TYPE_INTERVAL);
 };
 
+/**
+ * 重置会话状态（切会话 / 回到空态）
+ *
+ * 统一停掉一切「进行中的会话级工作」：过期计时、打字机、题目语音，以及语音输入
+ * （录音 + 排队/在途识别）。语音输入必须显式停止——聊天视图在会话之间不卸载
+ * VoiceRecordButton，只靠组件卸载兜底会让录音跨会话继续，识别文本还会被
+ * handleVoiceDelta 追加进新会话的输入框。
+ */
 const resetSessionState = () => {
   stopExpireTimer();
   stopTypeTimer();
   disposeTts();
+  // 停止录音（丢弃未识别尾句）并清空排队/在途识别，先于 answerText 清空执行，
+  // 避免残留的识别增量落在新会话的输入框里
+  voiceBtnRef.value?.stopAll();
+  // 在途提交回答的 SSE 回调由 handleSend 的 isSubmitTargetCurrent 判定失效：
+  // 这里清空 sessionId（下面的赋值）即已使其判据不成立，无需额外作废令牌
   sessionId.value = "";
   sessionTitle.value = "";
   levelConfig.value = null;
@@ -303,7 +374,7 @@ const resetSessionState = () => {
 /** 渲染会话到当前视图（chat/replay 由调用方决定） */
 const applySession = (session: InterviewSession, animate = false) => {
   sessionId.value = session._id;
-  sessionTitle.value = session.jobDescription.split("\n")[0]?.slice(0, 40) || "模拟面试";
+  sessionTitle.value = getSessionTitle(session.jobDescription);
   levelConfig.value = session.levelConfig ?? null;
   currentRound.value = session.currentRound ?? 1;
   phase.value = session.phase ?? "main";
@@ -323,7 +394,7 @@ const applySession = (session: InterviewSession, animate = false) => {
       typewriter(lastMsg, lastMsg.content);
       // 开场白/恢复现场时的最后一题同样自动播报语音（此前只有 SSE
       // question 帧触发的下一题会播，导致第一题静音）
-      autoPlayTts(sessionId.value, lastMsg.round);
+      autoPlayQuestion(lastMsg.round);
     }
   }
 };
@@ -445,10 +516,50 @@ const handleNoQuestions = () => {
   handleSend("感谢面试官的时间，我没有什么想问的了，谢谢！");
 };
 
+/**
+ * 追加一条面试官消息并触发完整展示链路
+ *
+ * 下一题（question 帧）与告别语（closing 帧）的展示行为完全一致：
+ * 追加消息 -> 滚动到底 -> 打字机输出 -> 并行请求语音自动朗读。
+ * 集中在此避免两条链路各自维护一份实现而逐渐漂移。
+ *
+ * @param content 面试官文本（题目 / 收尾语 / 回应 / 告别语）
+ * @param round 该条消息所属轮次
+ * @param isReverse 是否反问环节消息（决定是否展示「反问」徽章）
+ */
+const appendInterviewerMessage = (content: string, round: number, isReverse: boolean) => {
+  const msg: InterviewMessage = {
+    role: "interviewer",
+    content,
+    round,
+    kind: "question",
+    ...(isReverse ? { questionType: "reverse" as const } : {}),
+  };
+  messages.value.push(msg);
+  scrollToBottom(true);
+  typewriter(msg, content);
+  // 文本到达即请求语音（与打字机并行），音频就绪后自动朗读
+  autoPlayQuestion(round);
+};
+
 /** 提交回答（SSE 流式）；overrideContent 供反问快捷收尾等程序化发送使用 */
 const handleSend = async (overrideContent?: string) => {
   const content = (overrideContent ?? answerText.value).trim();
-  if (!content || submitting.value || aiThinking.value || typing.value || finished.value) return;
+  // 与发送按钮共用 sendGuard：报告生成中（输入框已禁用）同样拦截键盘快捷键提交
+  if (!content || !sendGuard.value) return;
+
+  // 本次提交的令牌与目标会话。回调只在「仍是本次提交、仍展示该会话、仍在答题视图」
+  // 时生效：
+  // - 切到别的会话 / 回空态 -> sessionId 变化，丢弃（否则旧会话的反馈、题目会写进
+  //   新会话视图，onFinished 还会把浏览器跳到新会话的报告页）
+  // - 本会话被放弃/收尾转回放 -> viewMode 变化，丢弃（回放视图不该再冒出题目）
+  // - 又发起了一次提交 -> 旧代次失效，避免两条流同时写同一会话
+  // 反过来，切走再切回本会话时判据仍成立，本次提交照常落地（不引入「切回来就再也
+  // 看不到这一轮 AI 回应」的回归）。
+  const token = ++submitToken;
+  const submitSessionId = sessionId.value;
+  const isSubmitTargetCurrent = () =>
+    token === submitToken && sessionId.value === submitSessionId && viewMode.value === "chat";
 
   // 发送即主动关闭语音收集：停止录音（丢弃尾句）、清空排队/在途识别，
   // 避免增量继续写入下一条回答；之后用户可重新点击麦克风开始新一轮输入
@@ -475,9 +586,11 @@ const handleSend = async (overrideContent?: string) => {
     { content },
     {
       onInit: () => {
+        if (!isSubmitTargetCurrent()) return;
         aiThinking.value = true;
       },
       onFeedback: (fb) => {
+        if (!isSubmitTargetCurrent()) return;
         // 逐题反馈先于下一题到达：挂到本条回答消息上（与后端落库结构一致）
         for (let i = messages.value.length - 1; i >= 0; i--) {
           const msg = messages.value[i];
@@ -489,23 +602,14 @@ const handleSend = async (overrideContent?: string) => {
         scrollToBottom(true);
       },
       onQuestion: (data) => {
+        if (!isSubmitTargetCurrent()) return;
         aiThinking.value = false;
         currentRound.value = data.round;
         const nextPhase = data.phase ?? "main";
         const enteringReverse = nextPhase === "reverse" && phase.value !== "reverse";
         phase.value = nextPhase;
-        const questionMsg: InterviewMessage = {
-          role: "interviewer",
-          content: data.nextQuestion,
-          round: data.round,
-          kind: "question",
-          ...(nextPhase === "reverse" ? { questionType: "reverse" as const } : {}),
-        };
-        messages.value.push(questionMsg);
-        scrollToBottom(true);
-        typewriter(questionMsg, data.nextQuestion);
-        // 问题到达即请求语音（与打字机并行），音频就绪后自动朗读
-        autoPlayTts(sessionId.value, data.round);
+        // 反问环节的收尾语/回应标 reverse 徽章，主体考察题目不标
+        appendInterviewerMessage(data.nextQuestion, data.round, nextPhase === "reverse");
         // 安静刷新一次会话，同步 expiresAt 与已考察主题
         refreshSessionMeta();
         if (enteringReverse) {
@@ -519,60 +623,76 @@ const handleSend = async (overrideContent?: string) => {
         }
       },
       onClosing: (data) => {
+        if (!isSubmitTargetCurrent()) return;
         // 反问收尾/候选人主动终止：面试官告别语先于报告生成到达，立即渲染
         aiThinking.value = false;
         generatingReport.value = true;
         currentRound.value = data.round;
-        const farewellMsg: InterviewMessage = {
-          role: "interviewer",
-          content: data.farewell,
-          round: data.round,
-          kind: "question",
-          // 反问环节的告别语标 reverse；主体考察中的终止告别语不加徽章
-          ...(data.phase === "reverse" ? { questionType: "reverse" as const } : {}),
-        };
-        messages.value.push(farewellMsg);
-        scrollToBottom(true);
-        typewriter(farewellMsg, data.farewell);
-        autoPlayTts(sessionId.value, data.round);
+        // 反问环节的告别语标 reverse；主体考察中的终止告别语不加徽章
+        appendInterviewerMessage(data.farewell, data.round, data.phase === "reverse");
         refreshSessionMeta();
       },
       onFinished: () => {
+        // 侧边栏刷新是全局状态同步，与当前展示哪个会话无关：即使用户已切走
+        // （下面的守卫会丢弃视图更新），也要把列表里本场的「进行中」清掉
+        void interviewStore.fetchSessionList(true);
+        if (!isSubmitTargetCurrent()) return;
         aiThinking.value = false;
         generatingReport.value = false;
         finished.value = true;
         message.success("面试已结束，正在跳转评价报告…");
         // 留出短暂时间展示最后一条回应，再进入报告页
-        window.setTimeout(() => {
+        if (reportRedirectTimer !== null) {
+          window.clearTimeout(reportRedirectTimer);
+        }
+        reportRedirectTimer = window.setTimeout(() => {
+          reportRedirectTimer = null;
           router.push({ path: "/interview/report", query: { id: sessionId.value } });
-        }, 1200);
+        }, REPORT_REDIRECT_DELAY);
       },
       onError: (err) => {
+        if (!isSubmitTargetCurrent()) return;
         aiThinking.value = false;
-        // 提交失败的回答回填输入框便于重试
-        answerText.value = answerTextBackup;
+        // 先结束本次提交流程，再回滚与提示：错误处理可能重新加载会话，
+        // 若此处仍处于 submitting 状态会与重开流程的状态互相覆盖
+        submitting.value = false;
+        // 提交失败的回答回填输入框便于重试（用户已在输入框继续输入时不覆盖新内容）
+        if (!answerText.value) {
+          answerText.value = answerTextBackup;
+        }
         messages.value = messages.value.filter((m) => m !== optimisticMsg);
-        handleSseError(err.message);
+        handleSseError(err);
       },
     },
   );
 
-  submitting.value = false;
+  // 已切走（或已发起新提交）时 submitting 由 resetSessionState / 新提交负责复位，
+  // 这里不能再动，否则会把切换后新会话正在进行的提交流程误标为结束
+  if (isSubmitTargetCurrent()) {
+    submitting.value = false;
+  }
 };
 
-/** 统一处理提交错误：超时转为回放态并引导重新发起，其余提示后可重试 */
-const handleSseError = (msg: string) => {
-  if (msg.includes("长时间无回复")) {
+/**
+ * 统一处理提交错误：超时自动关闭 -> 转回放态并引导重新发起，其余提示后可重试
+ *
+ * 超时判定：后端以 409 + 固定文案返回「长时间无回复已自动结束」（见
+ * docs/接口文档.md 提交回答「可能的错误」），这里先看建连前错误的状态码，
+ * 再回退到文案匹配，两者任一命中即按超时处理。
+ */
+const handleSseError = (err: InterviewSseErrorInfo) => {
+  const timeoutMessage = "长时间无回复";
+  if (err.message.includes(timeoutMessage)) {
     Modal.warning({
       title: "面试已自动结束",
       content: "本次面试因长时间无回复已被关闭。可重新发起一场新的模拟面试。",
       okText: "知道了",
       onOk: () => {
-        openSession(sessionId.value);
+        void openSession(sessionId.value);
       },
     });
   } else {
-    message.error(msg || "提交回答失败，请重试");
+    message.error(err.message || "提交回答失败，请重试");
   }
 };
 
@@ -591,6 +711,7 @@ const handleFinish = () => {
       try {
         await finishSessionAPI(sessionId.value);
         message.success("评价报告已生成");
+        void interviewStore.fetchSessionList(true);
         router.replace({ path: "/interview/report", query: { id: sessionId.value } });
       } catch {
         // 全局拦截器已提示
@@ -611,8 +732,7 @@ const handleCancel = () => {
       try {
         const { data: session } = await cancelSessionAPI(sessionId.value);
         message.info("面试已中断，未生成报告");
-        stopExpireTimer();
-        stopTypeTimer();
+        // applySession 内部会重启倒数计时并复位打字机，无需先手动停止
         viewMode.value = "replay";
         applySession(session);
         syncSessionToList(session);
@@ -629,8 +749,16 @@ const goReport = () => {
 
 onBeforeUnmount(() => {
   stopExpireTimer();
+  // 卸载时把正在打字的消息补全，避免残留半截文本（消息随组件一起销毁）
   stopTypeTimer();
+  if (reportRedirectTimer !== null) {
+    window.clearTimeout(reportRedirectTimer);
+    reportRedirectTimer = null;
+  }
   disposeTts();
+  // 卸载后作废在途提交的回调：否则收尾/离开页面后仍可能弹出「面试已结束」提示
+  // 并在 REPORT_REDIRECT_DELAY 之后发起一次跳转
+  submitToken += 1;
 });
 </script>
 
@@ -710,7 +838,7 @@ onBeforeUnmount(() => {
                         'bg-slate-100 text-slate-500'
                       "
                     >
-                      {{ topic.difficulty || "基础" }}
+                      {{ difficultyLabel(topic.difficulty) }}
                     </span>
                     <span
                       v-if="topic.questionType"
@@ -741,9 +869,7 @@ onBeforeUnmount(() => {
             v-if="viewMode === 'chat'"
             class="hidden items-center gap-2 md:flex md:max-w-[240px]"
           >
-            <Tooltip
-              title="主体考察约 30-60 分钟，AI 面试官将根据你的回答把握节奏；超过 45 分钟无任何活动，面试将被自动关闭"
-            >
+            <Tooltip :title="progressTooltip">
               <span class="whitespace-nowrap text-xs tabular-nums text-slate-500">
                 已进行 {{ elapsedMinutes }} 分钟 · 已问 {{ questionCount }} 题
               </span>
@@ -757,7 +883,7 @@ onBeforeUnmount(() => {
           </div>
 
           <!-- 剩余时间 -->
-          <Tooltip v-if="viewMode === 'chat'" title="超过 45 分钟无任何活动，面试将被自动关闭">
+          <Tooltip v-if="viewMode === 'chat'" :title="remainTooltip">
             <div class="hidden items-center gap-1.5 sm:flex">
               <ClockCircleOutlined :class="remainWarn ? 'text-red-500' : 'text-slate-400'" />
               <div class="w-16">
@@ -868,17 +994,7 @@ onBeforeUnmount(() => {
                   :class="msg.role === 'candidate' ? 'flex-row-reverse' : ''"
                 >
                   <!-- 头像 -->
-                  <div
-                    class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full shadow-sm"
-                    :class="
-                      msg.role === 'candidate'
-                        ? 'border border-slate-200 bg-slate-100 text-sm font-semibold text-slate-500'
-                        : 'bg-gradient-to-br from-indigo-500 to-violet-500 text-white'
-                    "
-                  >
-                    <span v-if="msg.role === 'candidate'">{{ userInitial }}</span>
-                    <RobotOutlined v-else />
-                  </div>
+                  <InterviewAvatar :role="msg.role" :initial="userInitial" />
 
                   <!-- 气泡 -->
                   <div class="max-w-[80%] md:max-w-[75%]">
@@ -904,11 +1020,19 @@ onBeforeUnmount(() => {
                       >
                         {{ getQuestionTypeLabel(msg.questionType) }}
                       </span>
-                      <!-- 问题语音：自动朗读失败或想重听时点击播放，播放中点击即停止 -->
+                      <!-- 问题语音：自动朗读失败或想重听时点击播放，播放中点击即停止；
+                           录音中禁用（避免面试官声音被麦克风收录成回答） -->
                       <button
                         v-if="msg.role === 'interviewer' && sessionId"
                         class="tts-btn"
-                        :title="ttsPlaying(sessionId, msg.round) ? '停止播放' : '播放本题语音'"
+                        :disabled="voiceRecording"
+                        :title="
+                          voiceRecording
+                            ? '录音中不可播放题目语音'
+                            : ttsPlaying(sessionId, msg.round)
+                              ? '停止播放'
+                              : '播放本题语音'
+                        "
                         @click="playTts(sessionId, msg.round)"
                       >
                         <LoadingOutlined v-if="ttsLoading(sessionId, msg.round)" spin />
@@ -967,11 +1091,7 @@ onBeforeUnmount(() => {
 
               <!-- AI 思考中 -->
               <div v-if="aiThinking" class="flex items-start gap-3">
-                <div
-                  class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-sm"
-                >
-                  <RobotOutlined />
-                </div>
+                <InterviewAvatar role="interviewer" />
                 <div
                   class="rounded-2xl rounded-tl-sm border border-slate-200/80 bg-white px-4 py-3 shadow-sm"
                 >
@@ -1192,6 +1312,16 @@ onBeforeUnmount(() => {
 .tts-btn:hover {
   color: #6366f1;
   background-color: rgba(99, 102, 241, 0.08);
+}
+
+.tts-btn:disabled {
+  cursor: not-allowed;
+  color: #cbd5e1;
+}
+
+.tts-btn:disabled:hover {
+  background-color: transparent;
+  color: #cbd5e1;
 }
 
 .topic-popover-scroll::-webkit-scrollbar {

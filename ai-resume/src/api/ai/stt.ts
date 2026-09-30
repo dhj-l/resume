@@ -11,7 +11,7 @@
  * 接口契约见后端仓库 docs/api/speech-to-text.md。
  */
 
-import { getAuthToken } from "../interview/sse";
+import { getAuthToken, parseSseFrame } from "@/api/sse";
 
 /** STT SSE 帧类型 */
 type SttSseFrame =
@@ -38,24 +38,6 @@ export interface TranscribeOptions extends SttTranscribeCallbacks {
 
 /** 默认超时：90 秒 */
 const DEFAULT_TIMEOUT = 90 * 1000;
-
-/** 解析单个 SSE 帧：合并多行 data: 字段并 JSON.parse */
-const parseSttFrame = (frame: string): SttSseFrame | null => {
-  const dataLines = frame
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith("data:"))
-    .map((line) => line.slice(5).trim());
-
-  if (dataLines.length === 0) return null;
-
-  try {
-    return JSON.parse(dataLines.join("\n")) as SttSseFrame;
-  } catch (e) {
-    console.warn("Failed to parse STT SSE frame", frame, e);
-    return null;
-  }
-};
 
 /**
  * 调用语音转文字端点（POST /ai/stt/stream）
@@ -146,7 +128,7 @@ export const transcribeAudioStream = async (
         buffer = buffer.slice(separatorIndex + 2);
         separatorIndex = buffer.indexOf("\n\n");
 
-        const message = parseSttFrame(frame);
+        const message = parseSseFrame<SttSseFrame>(frame, "STT SSE");
         if (!message) continue;
 
         if (message.type === "delta") {

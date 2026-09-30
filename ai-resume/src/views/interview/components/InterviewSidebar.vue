@@ -15,6 +15,8 @@ import {
 import { useInterviewStore } from "@/stores/interviewStore";
 import { formatRelativeTime } from "@/utils/day";
 
+import { getSessionTitle } from "../utils";
+
 const props = defineProps<{
   /** 当前在右侧展示的会话 id */
   activeId?: string;
@@ -39,8 +41,8 @@ const endedSessions = computed(() =>
   store.sessionList.filter((item) => item.status !== "in_progress"),
 );
 
-const getTitle = (item: InterviewSessionSummary) =>
-  item.jobDescription.split("\n")[0]?.slice(0, 40) || "模拟面试";
+/** 会话标题：与对话页头部共用同一派生规则 */
+const getTitle = (item: InterviewSessionSummary) => getSessionTitle(item.jobDescription);
 
 const getDotClass = (item: InterviewSessionSummary) => {
   if (item.status === "in_progress") return "bg-emerald-500";

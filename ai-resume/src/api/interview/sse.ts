@@ -9,6 +9,8 @@
  * 此时响应是标准 JSON 错误包络而非 SSE，需按响应 Content-Type 区分处理。
  */
 
+import { getAuthToken, parseSseFrame as parseGenericSseFrame } from "@/api/sse";
+
 import type {
   InterviewSseErrorMessage,
   InterviewSseFinishedMessage,
@@ -16,6 +18,23 @@ import type {
   InterviewSseMessage,
   InterviewSseQuestionMessage,
 } from "./type";
+
+/** 与 stt.ts / tts.ts 保持既有导入路径：统一从共享实现读取 token */
+export { getAuthToken };
+
+/**
+ * SSE 错误元信息
+ *
+ * 建连前的业务性错误以标准 JSON 包络返回（如 409 已结束 / 已超时），
+ * 错误信封中的 `code` 与 HTTP 状态码是比中文文案更可靠的判定依据，
+ * 调用方据此区分「超时自动关闭」等场景，避免依赖 message 子串匹配。
+ */
+export interface InterviewSseErrorInfo extends Error {
+  /** HTTP 状态码（建连前错误才有） */
+  httpStatus?: number;
+  /** 业务错误码（后端信封 code 字段） */
+  code?: number;
+}
 
 /** SSE 回调集合 */
 export interface InterviewSseCallbacks {
@@ -26,7 +45,8 @@ export interface InterviewSseCallbacks {
   onClosing?: (data: Extract<InterviewSseMessage, { type: "closing" }>["data"]) => void;
   onQuestion?: (data: InterviewSseQuestionMessage["data"]) => void;
   onFinished?: (data: InterviewSseFinishedMessage["data"]) => void;
-  onError?: (error: Error) => void;
+  /** 失败回调；建连前错误携带 httpStatus / code 元信息，供调用方分类处理 */
+  onError?: (error: InterviewSseErrorInfo) => void;
 }
 
 /** SSE 调用选项 */
@@ -38,36 +58,26 @@ export interface SubmitAnswerSseOptions extends InterviewSseCallbacks {
 /** 默认超时：8 分钟（反问收尾需等待评价报告生成，后端单次生成上限 4 分钟 + 1 次重试） */
 const DEFAULT_TIMEOUT = 8 * 60 * 1000;
 
-/** 从 localStorage 读取 auth token，与 src/http/request.ts 保持一致 */
-export const getAuthToken = (): string | null => {
-  try {
-    const authStoreStr = localStorage.getItem("auth");
-    if (!authStoreStr) return null;
-    const authStore = JSON.parse(authStoreStr);
-    return authStore?.token ?? null;
-  } catch (e) {
-    console.warn("Failed to retrieve auth token", e);
-    return null;
-  }
-};
-
 /** 解析单个 SSE 帧：合并多行 data: 字段并 JSON.parse */
-export const parseSseFrame = (frame: string): InterviewSseMessage | null => {
-  const dataLines = frame
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith("data:"))
-    .map((line) => line.slice(5).trim());
+export const parseSseFrame = (frame: string): InterviewSseMessage | null =>
+  parseGenericSseFrame<InterviewSseMessage>(frame, "interview SSE");
 
-  if (dataLines.length === 0) return null;
-
-  const jsonStr = dataLines.join("\n");
+/** 把建连前的 JSON 错误包络转换为带元信息的 Error */
+const buildErrorInfo = async (response: Response, fallbackMessage: string) => {
+  const error = new Error(fallbackMessage) as InterviewSseErrorInfo;
+  error.httpStatus = response.status;
   try {
-    return JSON.parse(jsonStr) as InterviewSseMessage;
-  } catch (e) {
-    console.warn("Failed to parse interview SSE frame", jsonStr, e);
-    return null;
+    const json = await response.json();
+    if (json?.message) {
+      error.message = json.message;
+    }
+    if (typeof json?.code === "number") {
+      error.code = json.code;
+    }
+  } catch {
+    // 保留默认错误信息与状态码
   }
+  return error;
 };
 
 /**
@@ -127,21 +137,17 @@ export const submitAnswerSSE = async (
     // 业务性错误在建连前抛出，响应是标准 JSON 错误包络而非 SSE
     const contentType = response.headers.get("Content-Type") ?? "";
     if (!contentType.includes("text/event-stream")) {
-      let errMsg = `提交回答失败（HTTP ${response.status}）`;
-      try {
-        const json = await response.json();
-        if (json?.message) errMsg = json.message;
-      } catch {
-        // 保留默认错误信息
-      }
+      const error = await buildErrorInfo(response, `提交回答失败（HTTP ${response.status}）`);
       cleanup();
-      onError?.(new Error(errMsg));
+      onError?.(error);
       return;
     }
 
     if (!response.body) {
+      const error = new Error(`提交回答失败（HTTP ${response.status}）`) as InterviewSseErrorInfo;
+      error.httpStatus = response.status;
       cleanup();
-      onError?.(new Error(`提交回答失败（HTTP ${response.status}）`));
+      onError?.(error);
       return;
     }
 
