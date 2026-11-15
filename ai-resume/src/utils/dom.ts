@@ -2,7 +2,11 @@ import html2canvas from "html2canvas";
 
 export const extractEffectiveCssForElement = (element: Element) => {
   const matchedCss: string[] = [];
-  const processedSelectors = new Set<string>();
+  // 按完整规则文本去重，而不是按选择器名：Tailwind 产物中存在多条
+  // 选择器相同（如 *,:before,:after）但声明不同的规则，其中一条携带
+  // --tw-gradient-* 等变量默认值，按选择器去重会把它丢掉，导致导出
+  // PDF 时渐变等依赖这些变量的样式全部失效。
+  const processedRules = new Set<string>();
 
   for (const styleSheet of document.styleSheets) {
     let rules;
@@ -27,12 +31,12 @@ export const extractEffectiveCssForElement = (element: Element) => {
           continue;
         }
 
-        if (processedSelectors.has(selectorText)) continue;
+        if (processedRules.has(rule.cssText)) continue;
 
         try {
           if (element.matches(selectorText) || element.querySelectorAll(selectorText).length > 0) {
             matchedCss.push(rule.cssText);
-            processedSelectors.add(selectorText);
+            processedRules.add(rule.cssText);
           }
         } catch (e) {
           continue;

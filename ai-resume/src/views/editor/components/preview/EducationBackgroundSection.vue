@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { EducationBackground } from "@/stores/type";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import { getEducationBackgroundStyles } from "./EducationBackgroundSection";
 import type { templateType } from "./type";
@@ -14,10 +15,12 @@ const props = defineProps<{
 }>();
 
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getEducationBackgroundStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("educationBackground");
   setIsExpanded(true);
 };
@@ -30,6 +33,7 @@ const handleClick = () => {
   -->
   <div v-if="data && data.length > 0" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
+      <component :is="styles.titleIcon" v-if="styles.titleIcon" :class="styles.titleIconClass" />
       {{ label || "教育背景" }}
     </h3>
     <div :class="styles.listWrapper">

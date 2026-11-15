@@ -1,3 +1,7 @@
+import type { Component } from "vue";
+
+import { Banknote, CalendarClock, MapPin, Target } from "lucide-vue-next";
+
 import type { templateType } from "./type";
 
 interface JobIntentionStyles {
@@ -8,6 +12,12 @@ interface JobIntentionStyles {
   label: string;
   value: string;
   empty: string;
+  /** 模块标题图标（可选，仅部分模板使用） */
+  titleIcon?: Component;
+  titleIconClass?: string;
+  /** 意向条目图标（与 contentArray 顺序对齐：期望职位/意向城市/期望薪资/入职时间） */
+  itemIcons?: Component[];
+  itemIconClass?: string;
 }
 
 export const getJobIntentionStyles = (type: templateType): JobIntentionStyles => {
@@ -26,28 +36,44 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
     case "double-column":
       return {
         ...commonStyles,
-        container: `${commonStyles.container}`, // Removed p-0 mb-0
-        // 双栏模式下可能需要调整间距
-        contentWrapper: "flex flex-wrap gap-4 text-gray-700", // Removed text-sm
+        container: `${commonStyles.container}`,
+        title:
+          "flex items-center gap-2 text-base font-bold text-slate-800 border-b-2 border-indigo-500 pb-2 mb-4",
+        titleIcon: Target,
+        titleIconClass: "w-4 h-4 text-indigo-500 shrink-0",
+        contentWrapper: "grid grid-cols-2 gap-x-6 gap-y-2 text-gray-700",
+        item: "inline-flex items-start gap-1.5",
+        label: "text-gray-400 shrink-0",
+        value: "font-medium text-gray-700",
+        itemIcons: [Target, MapPin, Banknote, CalendarClock],
+        itemIconClass: "w-3.5 h-3.5 text-indigo-500 shrink-0 mt-0.5",
       };
     case "simple":
       return {
         ...commonStyles,
         title:
-          "text-lg font-bold text-[#6D28D9] pl-3 border-l-[3px] border-[#6D28D9] mb-4 bg-[#F5F3FF] py-1.5 px-4 rounded-r-md",
+          "flex items-center gap-2 text-base font-bold text-[#5b21b6] pl-3 border-l-4 border-[#7c3aed] mb-4",
+        titleIcon: Target,
+        titleIconClass: "w-4 h-4 text-[#7c3aed] shrink-0",
         container: `${commonStyles.container}`,
-        contentWrapper: "flex flex-wrap gap-4 sm:gap-8 text-gray-600",
-        label: "font-medium text-[#6D28D9]",
-        value: "break-words text-gray-800",
+        contentWrapper: "flex flex-wrap gap-x-8 gap-y-2 text-gray-600",
+        item: "inline-flex items-center gap-1.5",
+        label: "font-medium text-[#7c3aed]",
+        value: "text-gray-800",
+        itemIcons: [Target, MapPin, Banknote, CalendarClock],
+        itemIconClass: "w-3.5 h-3.5 text-[#7c3aed] shrink-0",
       };
     case "modern":
       return {
         ...commonStyles,
-        title: "text-base font-bold text-white/80 pl-3 border-l-[3px] border-white/40 mb-4",
+        title: "hidden",
         container: `${commonStyles.container}`,
         contentWrapper: "grid grid-cols-2 gap-x-6 gap-y-2 text-white/80",
-        label: "text-white/60",
+        item: "inline-flex items-start gap-1.5",
+        label: "text-white/60 shrink-0",
         value: "font-medium text-white",
+        itemIcons: [Target, MapPin, Banknote, CalendarClock],
+        itemIconClass: "w-3.5 h-3.5 text-white/70 shrink-0 mt-0.5",
       };
     case "elegant":
       return {
@@ -64,9 +90,12 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
         ...commonStyles,
         title: "hidden",
         container: `${commonStyles.container}`,
-        contentWrapper: "flex flex-wrap gap-x-6 gap-y-1 text-[#666]",
-        label: "text-[#999] text-xs uppercase tracking-wider",
+        contentWrapper: "flex flex-wrap gap-x-6 gap-y-1.5 text-[#666]",
+        item: "inline-flex items-start gap-1.5",
+        label: "text-[#999] text-xs uppercase tracking-wider shrink-0",
         value: "text-[#333] font-medium",
+        itemIcons: [Target, MapPin, Banknote, CalendarClock],
+        itemIconClass: "w-3.5 h-3.5 text-gray-300 shrink-0 mt-0.5",
       };
     case "luxury":
       return {
@@ -77,11 +106,63 @@ export const getJobIntentionStyles = (type: templateType): JobIntentionStyles =>
         label: "text-white/50 text-xs",
         value: "font-medium text-white text-sm",
       };
+    case "classic":
+      return {
+        ...commonStyles,
+        container: `${commonStyles.container}`,
+        title:
+          "flex items-center gap-2 text-base font-bold text-[#1f4e79] border-b-2 border-[#1f4e79] pb-2 mb-4",
+        titleIcon: Target,
+        titleIconClass: "w-4 h-4 text-[#1f4e79] shrink-0",
+        contentWrapper: "flex flex-wrap gap-x-8 gap-y-1.5 text-gray-700",
+        item: "inline-flex items-center gap-1.5",
+        label: "text-gray-400",
+        value: "font-medium text-gray-700",
+        itemIcons: [Target, MapPin, Banknote, CalendarClock],
+        itemIconClass: "w-3.5 h-3.5 text-[#1f4e79] shrink-0",
+      };
+    case "fresh":
+      return {
+        ...commonStyles,
+        container: `${commonStyles.container}`,
+        title: "hidden",
+        contentWrapper: "grid grid-cols-2 gap-x-6 gap-y-2",
+        item: "inline-flex items-start gap-1.5",
+        label: "text-gray-400 shrink-0",
+        value: "font-medium text-gray-700",
+        itemIcons: [Target, MapPin, Banknote, CalendarClock],
+        itemIconClass: "w-3.5 h-3.5 text-teal-600 shrink-0 mt-0.5",
+      };
+    case "sidebar-dark":
+      return {
+        ...commonStyles,
+        container: `${commonStyles.container}`,
+        title:
+          "flex items-center gap-2 text-base font-bold text-[#1f2d3d] border-b border-gray-200 pb-2 mb-3.5",
+        titleIcon: Target,
+        titleIconClass: "w-4 h-4 text-[#1f2d3d] shrink-0",
+        contentWrapper: "grid grid-cols-2 gap-x-6 gap-y-1.5 text-gray-700",
+        item: "inline-flex items-start gap-1.5",
+        label: "text-gray-400 shrink-0",
+        value: "font-medium text-gray-700",
+        itemIcons: [Target, MapPin, Banknote, CalendarClock],
+        itemIconClass: "w-3.5 h-3.5 text-[#1f2d3d]/60 shrink-0 mt-0.5",
+      };
     case "default":
     default:
       return {
         ...commonStyles,
-        container: `${commonStyles.container}`, // Removed p-4 mb-4
+        container: `${commonStyles.container}`,
+        title:
+          "flex items-center gap-2 text-base font-bold text-gray-900 border-b-2 border-gray-900 pb-2 mb-4",
+        titleIcon: Target,
+        titleIconClass: "w-4 h-4 text-primary-500 shrink-0",
+        contentWrapper: "flex flex-wrap gap-x-8 gap-y-1.5 text-gray-700",
+        item: "inline-flex items-center gap-1.5",
+        label: "text-gray-400",
+        value: "font-medium text-gray-700",
+        itemIcons: [Target, MapPin, Banknote, CalendarClock],
+        itemIconClass: "w-3.5 h-3.5 text-primary-500 shrink-0",
       };
   }
 };

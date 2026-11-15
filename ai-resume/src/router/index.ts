@@ -51,6 +51,18 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/views/user/GenerationRecords.vue"),
         meta: { title: "生成记录", requiresAuth: true, animation: "fade-slide-up" },
       },
+      {
+        name: "AnalysisRecords",
+        path: "/user/analysis-records",
+        component: () => import("@/views/user/AnalysisRecords.vue"),
+        meta: { title: "分析记录", requiresAuth: true, animation: "fade-slide-up" },
+      },
+      {
+        name: "QuestionRecords",
+        path: "/user/question-records",
+        component: () => import("@/views/user/QuestionRecords.vue"),
+        meta: { title: "押题记录", requiresAuth: true, animation: "fade-slide-up" },
+      },
     ],
   },
   {
@@ -58,6 +70,12 @@ const routes: RouteRecordRaw[] = [
     name: "Editor",
     component: () => import("@/views/editor/EditorPage.vue"),
     meta: { title: "简历编辑", requiresAuth: true, animation: "scale-in" },
+  },
+  {
+    path: "/compare",
+    name: "AiResumeCompare",
+    component: () => import("@/views/editor/AiResumeComparePage.vue"),
+    meta: { title: "AI 生成对比", requiresAuth: true, animation: "scale-in" },
   },
   {
     path: "/auth/gitee/callback",
@@ -76,6 +94,30 @@ const routes: RouteRecordRaw[] = [
     name: "AnalysisDetail",
     component: () => import("@/views/editor/AnalysisDetailPage.vue"),
     meta: { title: "AI 分析详情", requiresAuth: true, animation: "scale-in" },
+  },
+  {
+    path: "/question-detail",
+    name: "QuestionDetail",
+    component: () => import("@/views/editor/QuestionDetailPage.vue"),
+    meta: { title: "AI 押题详情", requiresAuth: true, animation: "scale-in" },
+  },
+  {
+    path: "/interview",
+    name: "InterviewSetup",
+    component: () => import("@/views/interview/InterviewSetupPage.vue"),
+    meta: { title: "发起模拟面试", requiresAuth: true, animation: "fade" },
+  },
+  {
+    path: "/interview/chat",
+    name: "InterviewChat",
+    component: () => import("@/views/interview/InterviewChatPage.vue"),
+    meta: { title: "模拟面试", requiresAuth: true, animation: "none" },
+  },
+  {
+    path: "/interview/report",
+    name: "InterviewReport",
+    component: () => import("@/views/interview/InterviewReportPage.vue"),
+    meta: { title: "面试评价报告", requiresAuth: true, animation: "fade" },
   },
   {
     path: "/auth",

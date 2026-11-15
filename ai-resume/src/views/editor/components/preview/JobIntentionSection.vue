@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { JobIntention } from "@/stores/type";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import { getJobIntentionStyles } from "./JobIntentionSection";
 import type { templateType } from "./type";
@@ -14,10 +15,12 @@ const props = defineProps<{
 }>();
 
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getJobIntentionStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("jobIntention");
   setIsExpanded(true);
 };
@@ -59,11 +62,17 @@ const isVisible = computed(() => {
   -->
   <div v-if="isVisible" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
+      <component :is="styles.titleIcon" v-if="styles.titleIcon" :class="styles.titleIconClass" />
       {{ label || "求职意向" }}
     </h3>
     <div v-if="data" :class="styles.contentWrapper">
-      <template v-for="item in contentArray" :key="item.label">
+      <template v-for="(item, index) in contentArray" :key="item.label">
         <div v-if="item.value" :class="styles.item">
+          <component
+            :is="styles.itemIcons[index]"
+            v-if="styles.itemIcons?.[index]"
+            :class="styles.itemIconClass"
+          />
           <span :class="styles.label">{{ item.label }}：</span>
           <span :class="styles.value">{{ item.value }}</span>
         </div>

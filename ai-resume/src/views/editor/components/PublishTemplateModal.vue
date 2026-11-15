@@ -43,6 +43,11 @@ const handleOk = async () => {
     await formRef.value.validate();
     confirmLoading.value = true;
 
+    if (!resumeData.value._id) {
+      message.error("请先保存简历");
+      return;
+    }
+
     // 获取当前简历封面
     const element = getElement(".resume-preview-wrapper");
     if (!element) {

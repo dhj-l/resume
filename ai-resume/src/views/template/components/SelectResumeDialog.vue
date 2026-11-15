@@ -94,6 +94,11 @@
           </div>
         </div>
       </div>
+
+      <!-- Module Selection Section -->
+      <div>
+        <ModuleSelectPanel v-model="selectedModules" />
+      </div>
     </div>
 
     <!-- Footer Actions -->
@@ -121,7 +126,10 @@ import { message } from "ant-design-vue";
 
 import { getUserResumesAPI } from "@/api/resume/resume";
 import type { UserResumeListItem } from "@/api/resume/type";
+import { SSE_MODULE_KEYS } from "@/api/resume-ai/type";
 import { formatDate } from "@/utils/day";
+
+import ModuleSelectPanel from "./ModuleSelectPanel.vue";
 
 const props = defineProps<{
   open: boolean;
@@ -130,13 +138,14 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:open", value: boolean): void;
-  (e: "submit", payload: { jd: string; resumeId: string }): void;
+  (e: "submit", payload: { jd: string; resumeId: string; modules: string[] }): void;
   (e: "create-new"): void;
 }>();
 
 // State
 const jobDescription = ref("");
 const selectedResumeId = ref<string | null>(null);
+const selectedModules = ref<string[]>([...SSE_MODULE_KEYS]);
 const resumes = ref<UserResumeListItem[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -151,8 +160,20 @@ const fetchResumes = async () => {
   loading.value = true;
   error.value = null;
   try {
-    const res = await getUserResumesAPI();
-    resumes.value = res?.data?.list || [];
+    // 对话框需要展示用户全部简历：后端单页上限 100，按 total 分页拉全量
+    const PAGE_SIZE = 100;
+    const first = await getUserResumesAPI({ page: 1, pageSize: PAGE_SIZE });
+    const firstList = first?.data?.list || [];
+    const total = first?.data?.total ?? firstList.length;
+    const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const rest = await Promise.all(
+      Array.from({ length: pageCount - 1 }, (_, index) =>
+        getUserResumesAPI({ page: index + 2, pageSize: PAGE_SIZE }),
+      ),
+    );
+    resumes.value = [...firstList, ...rest.flatMap((item) => item?.data?.list || [])];
+  } catch {
+    error.value = "加载简历列表失败，请重试";
   } finally {
     loading.value = false;
   }
@@ -171,10 +192,15 @@ const handleConfirm = () => {
     message.warning("请选择一份简历");
     return;
   }
+  if (selectedModules.value.length === 0) {
+    message.warning("请至少选择一个模块");
+    return;
+  }
 
   emit("submit", {
     jd: jobDescription.value,
     resumeId: selectedResumeId.value,
+    modules: [...selectedModules.value],
   });
 
   // Optional: Reset state or close dialog?
@@ -186,19 +212,12 @@ watch(
   () => props.open,
   (newVal) => {
     if (newVal) {
-      // Reset selection when opening, but keep JD maybe?
-      // Or reset everything? Let's keep it simple and reset selection only if needed.
-      // Or maybe we want to fetch fresh data every time.
-      if (resumes.value.length === 0) {
-        fetchResumes();
-      } else {
-        // Optionally refresh silently or check if stale
-        fetchResumes();
-      }
-      // Reset selection?
+      // 打开时重置状态并拉取最新简历列表
       selectedResumeId.value = null;
-      // Reset JD? Ideally clear it for a new task.
       jobDescription.value = "";
+      selectedModules.value = [...SSE_MODULE_KEYS];
+      error.value = null;
+      fetchResumes();
     }
   },
 );

@@ -10,38 +10,30 @@
         fontSize: globalFontSize,
       }"
     >
-      <!-- 首页 header -->
-      <div class="flex items-center justify-between mb-6 border-b-4 border-gray-800 pb-2">
-        <div class="flex items-end gap-4">
-          <h1 class="text-3xl font-bold text-gray-800 leading-none">个人简历</h1>
-          <div class="flex flex-col text-gray-500">
-            <span class="text-xs">细心从每一个细节开始</span>
-            <span class="text-lg font-medium leading-none">Personal resume</span>
-          </div>
+      <!-- 头部：基本信息（左对齐 + 渐变分隔线） -->
+      <div v-if="basicInfoModule" :style="{ marginBottom: globalModuleMargin }">
+        <div
+          class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
+        >
+          <component
+            :is="getComponent(basicInfoModule)"
+            :data="resumeData.basicInfo"
+            :label="basicInfoModule.label"
+            :template-type="currentTemplateType"
+          />
         </div>
-        <div class="flex gap-3">
-          <div class="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
-            <Box class="h-4 w-4" />
-          </div>
-          <div class="w-8 h-8 rounded-full bg-gray-700 text-white flex items-center justify-center">
-            <Mail class="h-4 w-4" />
-          </div>
-        </div>
+        <div
+          class="h-1 mt-5 bg-gradient-to-r from-primary-600 via-primary-400/70 to-transparent rounded-full"
+        ></div>
       </div>
 
-      <!-- 所有模块连续渲染 -->
+      <!-- 其余模块连续渲染 -->
       <div
-        v-for="item in activeModules"
+        v-for="item in contentModules"
         :key="item.moduleKey"
         :class="{
           'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
-            ![
-              'workExperience',
-              'educationBackground',
-              'projectExperience',
-              'campusExperience',
-              'internshipExperience',
-            ].includes(item.moduleKey),
+            !listModules.includes(item.moduleKey),
         }"
         :style="{ marginBottom: globalModuleMargin }"
       >
@@ -74,18 +66,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject } from "vue";
+import { computed, ref, inject, unref } from "vue";
 
-import { Box, Mail } from "lucide-vue-next";
-import { storeToRefs } from "pinia";
-
-import { useResumeStore } from "@/stores/resumeStore";
 import type { ResumeData, ModuleItem } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
 import { usePageMarkers } from "@/views/editor/hooks/usePageMarkers";
+import { useResumeView } from "@/views/editor/hooks/useResumeView";
 
+const resumeData = ref(inject<ResumeData>("resumeData")!);
 const {
   moduleOrder,
   currentTemplateType,
@@ -93,19 +83,34 @@ const {
   globalFontSize,
   globalLineHeight,
   globalModuleMargin,
-} = storeToRefs(useResumeStore());
-const resumeData = ref(inject<ResumeData>("resumeData")!);
+} = useResumeView(resumeData);
 
 const componentMap: Record<string, any> = {
   basicInfo: BasicInfoSection,
   jobIntention: JobIntentionSection,
 };
 
+const listModules = [
+  "workExperience",
+  "educationBackground",
+  "projectExperience",
+  "campusExperience",
+  "internshipExperience",
+];
+
 const { activeModules } = useActiveModules(moduleOrder, resumeData);
 
 const getComponent = (item: ModuleItem) => {
-  return item.component || componentMap[item.moduleKey];
+  return item.component ? unref(item.component) : componentMap[item.moduleKey];
 };
+
+const basicInfoModule = computed(() =>
+  activeModules.value.find((m) => m.moduleKey === "basicInfo"),
+);
+
+const contentModules = computed(() => {
+  return activeModules.value.filter((item) => item.moduleKey !== "basicInfo");
+});
 
 // 分页标记线
 const contentRef = ref<HTMLElement | null>(null);

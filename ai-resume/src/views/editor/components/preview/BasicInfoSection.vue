@@ -3,6 +3,8 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { BasicInfo } from "@/stores/type";
+import { getFullImageUrl } from "@/utils/image";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import { getBasicInfoStyles } from "./BasicInfoSection";
 import type { templateType } from "./type";
@@ -15,10 +17,12 @@ const props = defineProps<{
   templateType: templateType;
 }>();
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getBasicInfoStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("basicInfo");
   setIsExpanded(true);
 };
@@ -52,7 +56,7 @@ const contentArray = computed(() => {
   ];
 });
 const fullAvatar = computed(() => {
-  return import.meta.env.VITE_DEFAULT_AVATAR + props.data.avatar;
+  return getFullImageUrl(props.data.avatar);
 });
 </script>
 
@@ -63,14 +67,19 @@ const fullAvatar = computed(() => {
   -->
   <div v-if="data" :class="styles.container" @click="handleClick">
     <div :class="styles.contentWrapper">
-      <img :src="fullAvatar" alt="avatar" :class="styles.avatar" />
+      <img v-if="data.avatar" :src="fullAvatar" alt="avatar" :class="styles.avatar" />
       <div :class="styles.infoWrapper">
         <h1 :class="styles.name">
           {{ data.name }}
         </h1>
         <div :class="styles.detailsWrapper">
-          <template v-for="item in contentArray" :key="item.label">
+          <template v-for="(item, index) in contentArray" :key="item.label">
             <div v-if="item.value" :class="styles.detailItem">
+              <component
+                :is="styles.detailIcons[index]"
+                v-if="styles.detailIcons?.[index]"
+                :class="styles.detailIconClass"
+              />
               <span>{{ item.label }}：{{ item.value }}</span>
             </div>
           </template>

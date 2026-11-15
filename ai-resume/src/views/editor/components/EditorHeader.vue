@@ -17,7 +17,9 @@ import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 
 import { downloadResumeAPI } from "@/api/resume/resume";
+import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
 import { useResumeStore } from "@/stores/resumeStore";
+import { PDF_EXPORT_TIPS } from "@/utils/aiTips";
 import { extractEffectiveCssForElement, getDomCover, getDomHtml, getElement } from "@/utils/dom";
 import { downloadPdf } from "@/utils/download";
 import { uploadImage } from "@/utils/upload";
@@ -32,6 +34,8 @@ const { resumeData } = storeToRefs(useResumeStore());
 const { setCurrentTemplate, saveResume, setResumeDataString } = useResumeStore();
 interface Props {
   resumeTitle?: string;
+  /** AI 生成中：锁定编辑类操作 */
+  aiGenerating?: boolean;
 }
 
 const resumeTitle = computed(() => {
@@ -40,7 +44,7 @@ const resumeTitle = computed(() => {
 
 const pdfName = computed(() => {
   const { basicInfo, jobIntention } = resumeData.value;
-  return basicInfo.name + "-" + jobIntention?.jobIntention;
+  return [basicInfo?.name, jobIntention?.jobIntention].filter(Boolean).join("-") || "简历";
 });
 const props = withDefaults(defineProps<Props>(), {
   resumeTitle: "未命名简历",
@@ -49,6 +53,7 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   "update:resumeTitle": [value: string];
   "toggle-ai-drawer": [];
+  "toggle-questions-drawer": [];
 }>();
 
 const currentTemplateLabel = computed(() => {
@@ -57,6 +62,7 @@ const currentTemplateLabel = computed(() => {
 });
 const router = useRouter();
 const exportLoading = ref(false);
+const isSaving = ref(false);
 const publishModalRef = ref();
 
 const isEditingTitle = ref(false);
@@ -75,10 +81,17 @@ const handleToggleAiDrawer = () => {
   emit("toggle-ai-drawer");
 };
 
+const handleToggleQuestionsDrawer = () => {
+  emit("toggle-questions-drawer");
+};
+
 const handleSave = async () => {
   const result = await autoSave(true);
-  if (result === false) return;
-  message.success("草稿保存成功");
+  if (result) {
+    message.success("草稿保存成功");
+  } else {
+    message.error("保存失败，请稍后重试");
+  }
 };
 
 /**
@@ -86,27 +99,42 @@ const handleSave = async () => {
  * @param isUpdateCover 是否更新封面
  */
 const autoSave = async (isUpdateCover: boolean = false) => {
-  //如果是更新封面，或者没有封面，才需要更新封面
-  if (isUpdateCover || !resumeData.value.cover) {
-    const element = getElement(".resume-preview-wrapper");
-    if (!element) return false;
+  // AI 生成中禁止自动保存，避免默认值覆盖草稿中已生成的模块
+  if (props.aiGenerating) return false;
+  if (isSaving.value) return true;
+  // 简历尚未创建/加载成功时不允许保存
+  if (!resumeData.value._id) return false;
 
-    const elementHeight = (element as HTMLElement).offsetHeight;
-    const COVER_HEIGHT_THRESHOLD = 1200;
+  isSaving.value = true;
+  try {
+    //如果是更新封面，或者没有封面，才需要更新封面
+    if (isUpdateCover || !resumeData.value.cover) {
+      const element = getElement(".resume-preview-wrapper");
+      if (!element) return false;
 
-    const coverFile = await getDomCover(
-      element as HTMLElement,
-      elementHeight > COVER_HEIGHT_THRESHOLD ? COVER_HEIGHT_THRESHOLD : undefined,
-    );
+      const elementHeight = (element as HTMLElement).offsetHeight;
+      const COVER_HEIGHT_THRESHOLD = 1200;
 
-    const url = await uploadImage(coverFile);
-    if (url) {
-      setResumeDataString("cover", url);
-    } else {
-      message.error("封面上传失败");
+      const coverFile = await getDomCover(
+        element as HTMLElement,
+        elementHeight > COVER_HEIGHT_THRESHOLD ? COVER_HEIGHT_THRESHOLD : undefined,
+      );
+
+      const url = await uploadImage(coverFile);
+      if (url) {
+        setResumeDataString("cover", url);
+      } else if (isUpdateCover) {
+        message.error("封面上传失败");
+      }
     }
+    await saveResume();
+    return true;
+  } catch (error) {
+    console.error("Auto save failed:", error);
+    return false;
+  } finally {
+    isSaving.value = false;
   }
-  await saveResume();
 };
 
 const handleExport = async () => {
@@ -171,6 +199,7 @@ const validateTitle = (title: string): string => {
 };
 
 const startEditingTitle = () => {
+  if (props.aiGenerating) return;
   editingTitleValue.value = resumeTitle.value;
   isEditingTitle.value = true;
 };
@@ -214,6 +243,7 @@ interface HeaderButtonConfig {
   icon?: Component;
   type?: ButtonType;
   loading?: boolean;
+  disabled?: boolean;
   onClick: () => void;
 }
 
@@ -232,6 +262,12 @@ const middleButtons: HeaderButtonConfig[] = [
     icon: toRaw(Sparkles),
     onClick: handleToggleAiDrawer,
   },
+  {
+    key: "ai-questions",
+    label: "AI押题",
+    icon: toRaw(Sparkles),
+    onClick: handleToggleQuestionsDrawer,
+  },
 ];
 
 const rightButtons = computed<HeaderButtonConfig[]>(() => [
@@ -239,12 +275,14 @@ const rightButtons = computed<HeaderButtonConfig[]>(() => [
     key: "save",
     label: "保存草稿",
     icon: toRaw(SaveOutlined),
+    disabled: props.aiGenerating,
     onClick: handleSave,
   },
   {
     key: "publish",
     label: "发布为模板",
     icon: toRaw(UploadOutlined),
+    disabled: props.aiGenerating,
     onClick: handleOpenPublishModal,
   },
   {
@@ -253,6 +291,7 @@ const rightButtons = computed<HeaderButtonConfig[]>(() => [
     icon: toRaw(FilePdfOutlined),
     type: "primary",
     loading: exportLoading.value,
+    disabled: props.aiGenerating,
     onClick: handleExport,
   },
 ]);
@@ -357,6 +396,7 @@ onUnmounted(() => {
         :key="btn.key"
         :type="btn.type"
         :loading="btn.loading"
+        :disabled="btn.disabled"
         class="flex items-center"
         @click="btn.onClick"
       >
@@ -385,6 +425,14 @@ onUnmounted(() => {
 
     <!-- Publish Template Modal -->
     <PublishTemplateModal ref="publishModalRef" :resume-title="props.resumeTitle" />
+
+    <!-- 导出 PDF 全屏遮罩动画 -->
+    <FullScreenLoading
+      v-model:loading="exportLoading"
+      text="正在导出 PDF，请稍候..."
+      :tips="PDF_EXPORT_TIPS"
+      :timeout="120000"
+    />
   </header>
 </template>
 

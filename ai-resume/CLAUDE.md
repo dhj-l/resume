@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI Resume Builder (大学生智能简历生成系统) — a Vue 3 SPA for creating, editing, and exporting resumes. Backend is a separate NestJS + MongoDB app running on `localhost:3000`. The UI is entirely in Chinese.
+AI Resume Builder (大学生智能简历生成系统) — a Vue 3 SPA for creating, editing, and exporting resumes. Backend is a separate NestJS + MongoDB app. Production: `https://ai-jl.top`. The UI is entirely in Chinese.
 
 ## Common Commands
 
@@ -50,7 +50,7 @@ Two Pinia stores:
 ### API Layer (`src/api/`)
 
 Each domain (auth, user, resume, templates, upload) has its own directory with `*.ts` (functions) and `type.ts` (TypeScript interfaces). All HTTP requests go through `src/http/request.ts` — an Axios instance with:
-- `VITE_API_BASE_URL` as base (default `http://localhost:3000/api/v1`)
+- `VITE_API_BASE_URL` as base (production: `https://ai-jl.top/api/v1`)
 - 100s timeout
 - Bearer token injected from localStorage
 - 401 responses trigger automatic logout + redirect to login

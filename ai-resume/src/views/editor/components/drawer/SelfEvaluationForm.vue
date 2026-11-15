@@ -15,7 +15,7 @@ const update = (val: string) => {
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div v-if="data" class="space-y-4">
     <div class="flex items-center justify-between mb-1">
       <span class="text-xs text-gray-400">自我评价</span>
       <AiPolishButton module-key="selfEvaluation" content-field="content" />

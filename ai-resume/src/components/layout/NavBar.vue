@@ -9,29 +9,13 @@
         <div
           class="w-10 h-10 bg-primary-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/20 group-hover:scale-105 transition-transform"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" />
-            <path d="M14 2v4a2 2 0 0 0 2 2h4" />
-            <path d="M10 9H8" />
-            <path d="M16 13H8" />
-            <path d="M16 17H8" />
-          </svg>
+          <FileTextOutlined class="text-xl" />
         </div>
         <span class="text-xl font-bold text-gray-900 tracking-tight">大学生简历</span>
       </router-link>
 
       <!-- Center: Navigation -->
-      <div class="hidden md:flex items-center gap-8">
+      <div class="hidden md:flex items-center gap-6">
         <a
           v-for="item in navItems"
           :key="item.name"
@@ -102,7 +86,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 
-import { LockOutlined, LogoutOutlined } from "@ant-design/icons-vue";
+import { FileTextOutlined, LockOutlined, LogoutOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 import { useRouter } from "vue-router";
 
@@ -120,7 +104,11 @@ const navItems = [
   { name: "首页", path: "/" },
   { name: "模板", path: "/templates" },
   { name: "我的简历", path: "/user/resumes", requiresAuth: true },
+  { name: "模拟面试", path: "/interview", requiresAuth: true },
   { name: "生成记录", path: "/user/generations", requiresAuth: true },
+  { name: "分析记录", path: "/user/analysis-records", requiresAuth: true },
+  { name: "押题记录", path: "/user/question-records", requiresAuth: true },
+  { name: "面试记录", path: "/interview/chat", requiresAuth: true },
 ];
 
 const handleScroll = () => {

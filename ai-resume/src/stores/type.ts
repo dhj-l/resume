@@ -30,6 +30,8 @@ export interface ResumeData {
   internshipExperience?: InternshipExperience[];
   selfEvaluation?: SortableModule;
   cover?: string;
+  /** AI 生成状态：空串（普通简历）/ generating / completed / failed */
+  aiStatus?: string;
 }
 
 export interface JobIntention {

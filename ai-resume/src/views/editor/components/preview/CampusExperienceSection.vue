@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { CampusExperience } from "@/stores/type";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import { getCampusExperienceStyles } from "./CampusExperienceSection";
 import type { templateType } from "./type";
@@ -14,10 +15,12 @@ const props = defineProps<{
 }>();
 
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getCampusExperienceStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("campusExperience");
   setIsExpanded(true);
 };
@@ -30,6 +33,7 @@ const handleClick = () => {
   -->
   <div v-if="data && data.length > 0" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
+      <component :is="styles.titleIcon" v-if="styles.titleIcon" :class="styles.titleIconClass" />
       {{ label || "校园经历" }}
     </h3>
     <div :class="styles.listWrapper">
@@ -46,7 +50,7 @@ const handleClick = () => {
             </span>
           </div>
 
-          <p :class="styles.description" v-safe-html="experience.content"></p>
+          <p v-safe-html="experience.content" :class="styles.description"></p>
         </div>
       </template>
       <div v-else :class="styles.empty">暂无校园经历信息</div>

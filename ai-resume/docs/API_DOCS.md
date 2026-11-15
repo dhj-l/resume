@@ -2,7 +2,7 @@
 
 > 版本：v1.0
 > 更新日期：2024-02-13
-> 基础 URL：`http://localhost:3000`
+> 基础 URL：`https://ai-jl.top`
 
 ---
 
@@ -41,7 +41,7 @@ AI 简历管理系统是一个基于 NestJS + MongoDB 的在线简历制作平�
 | 环境     | 地址                    |
 | -------- | ----------------------- |
 | 开发环境 | `http://localhost:3000` |
-| 生产环境 | 待定                    |
+| 生产环境 | `https://ai-jl.top`    |
 
 ### 2.2 API 版本
 
@@ -148,7 +148,7 @@ Authorization: Bearer {token}
 **示例：**
 
 ```bash
-curl -X GET http://localhost:3000/api/v1/resume \
+curl -X GET https://ai-jl.top/api/v1/resume \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -243,7 +243,7 @@ curl -X GET http://localhost:3000/api/v1/resume \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/user \
+curl -X POST https://ai-jl.top/api/v1/user \
   -H "Content-Type: application/json" \
   -d '{
     "username": "zhangsan",
@@ -318,7 +318,7 @@ curl -X POST http://localhost:3000/api/v1/user \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/user/login \
+curl -X POST https://ai-jl.top/api/v1/user/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "zhangsan@example.com",
@@ -367,7 +367,7 @@ curl -X POST http://localhost:3000/api/v1/user/login \
 **cURL 示例**
 
 ```bash
-curl -X GET http://localhost:3000/api/v1/user/profile \
+curl -X GET https://ai-jl.top/api/v1/user/profile \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -427,7 +427,7 @@ curl -X GET http://localhost:3000/api/v1/user/profile \
 **cURL 示例**
 
 ```bash
-curl -X PATCH http://localhost:3000/api/v1/user/profile \
+curl -X PATCH https://ai-jl.top/api/v1/user/profile \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -490,7 +490,7 @@ curl -X PATCH http://localhost:3000/api/v1/user/profile \
 **cURL 示例**
 
 ```bash
-curl -X PATCH http://localhost:3000/api/v1/user/change-password \
+curl -X PATCH https://ai-jl.top/api/v1/user/change-password \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -542,7 +542,7 @@ curl -X PATCH http://localhost:3000/api/v1/user/change-password \
 **cURL 示例**
 
 ```bash
-curl -X GET http://localhost:3000/api/v1/user \
+curl -X GET https://ai-jl.top/api/v1/user \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -595,7 +595,7 @@ curl -X GET http://localhost:3000/api/v1/user \
 **cURL 示例**
 
 ```bash
-curl -X GET http://localhost:3000/api/v1/user/507f1f77bcf86cd799439011 \
+curl -X GET https://ai-jl.top/api/v1/user/507f1f77bcf86cd799439011 \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -666,7 +666,7 @@ curl -X GET http://localhost:3000/api/v1/user/507f1f77bcf86cd799439011 \
 **cURL 示例**
 
 ```bash
-curl -X PATCH http://localhost:3000/api/v1/user/507f1f77bcf86cd799439011 \
+curl -X PATCH https://ai-jl.top/api/v1/user/507f1f77bcf86cd799439011 \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -724,7 +724,7 @@ curl -X PATCH http://localhost:3000/api/v1/user/507f1f77bcf86cd799439011 \
 **cURL 示例**
 
 ```bash
-curl -X DELETE http://localhost:3000/api/v1/user/507f1f77bcf86cd799439011 \
+curl -X DELETE https://ai-jl.top/api/v1/user/507f1f77bcf86cd799439011 \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -778,7 +778,7 @@ curl -X DELETE http://localhost:3000/api/v1/user/507f1f77bcf86cd799439011 \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/resume/download \
+curl -X POST https://ai-jl.top/api/v1/resume/download \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -865,7 +865,7 @@ curl -X POST http://localhost:3000/api/v1/resume/download \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/resume \
+curl -X POST https://ai-jl.top/api/v1/resume \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -922,7 +922,7 @@ curl -X POST http://localhost:3000/api/v1/resume \
 **cURL 示例**
 
 ```bash
-curl -X GET http://localhost:3000/api/v1/resume/templates \
+curl -X GET https://ai-jl.top/api/v1/resume/templates \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -971,7 +971,7 @@ curl -X GET http://localhost:3000/api/v1/resume/templates \
 **cURL 示例**
 
 ```bash
-curl -X GET http://localhost:3000/api/v1/resume \
+curl -X GET https://ai-jl.top/api/v1/resume \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -1029,7 +1029,7 @@ curl -X GET http://localhost:3000/api/v1/resume \
 **cURL 示例**
 
 ```bash
-curl -X GET http://localhost:3000/api/v1/resume/507f1f77bcf86cd799439012 \
+curl -X GET https://ai-jl.top/api/v1/resume/507f1f77bcf86cd799439012 \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -1099,7 +1099,7 @@ curl -X GET http://localhost:3000/api/v1/resume/507f1f77bcf86cd799439012 \
 **cURL 示例**
 
 ```bash
-curl -X PATCH http://localhost:3000/api/v1/resume/507f1f77bcf86cd799439012 \
+curl -X PATCH https://ai-jl.top/api/v1/resume/507f1f77bcf86cd799439012 \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -1153,7 +1153,7 @@ curl -X PATCH http://localhost:3000/api/v1/resume/507f1f77bcf86cd799439012 \
 **cURL 示例**
 
 ```bash
-curl -X DELETE http://localhost:3000/api/v1/resume/507f1f77bcf86cd799439012 \
+curl -X DELETE https://ai-jl.top/api/v1/resume/507f1f77bcf86cd799439012 \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -1222,7 +1222,7 @@ curl -X DELETE http://localhost:3000/api/v1/resume/507f1f77bcf86cd799439012 \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/resume/507f1f77bcf86cd799439012/copy \
+curl -X POST https://ai-jl.top/api/v1/resume/507f1f77bcf86cd799439012/copy \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -1311,7 +1311,7 @@ curl -X POST http://localhost:3000/api/v1/resume/507f1f77bcf86cd799439012/copy \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/template \
+curl -X POST https://ai-jl.top/api/v1/template \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -1374,7 +1374,7 @@ curl -X POST http://localhost:3000/api/v1/template \
 **cURL 示例**
 
 ```bash
-curl -X GET "http://localhost:3000/api/v1/template?page=1&pageSize=10&name=Java"
+curl -X GET "https://ai-jl.top/api/v1/template?page=1&pageSize=10&name=Java"
 ```
 
 ---
@@ -1431,7 +1431,7 @@ curl -X GET "http://localhost:3000/api/v1/template?page=1&pageSize=10&name=Java"
 **cURL 示例**
 
 ```bash
-curl -X GET http://localhost:3000/api/v1/template/507f1f77bcf86cd799439013
+curl -X GET https://ai-jl.top/api/v1/template/507f1f77bcf86cd799439013
 ```
 
 ---
@@ -1513,7 +1513,7 @@ curl -X GET http://localhost:3000/api/v1/template/507f1f77bcf86cd799439013
 **cURL 示例**
 
 ```bash
-curl -X PATCH http://localhost:3000/api/v1/template/507f1f77bcf86cd799439013 \
+curl -X PATCH https://ai-jl.top/api/v1/template/507f1f77bcf86cd799439013 \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{
@@ -1567,7 +1567,7 @@ curl -X PATCH http://localhost:3000/api/v1/template/507f1f77bcf86cd799439013 \
 **cURL 示例**
 
 ```bash
-curl -X DELETE http://localhost:3000/api/v1/template/507f1f77bcf86cd799439013 \
+curl -X DELETE https://ai-jl.top/api/v1/template/507f1f77bcf86cd799439013 \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 ```
 
@@ -1632,7 +1632,7 @@ curl -X DELETE http://localhost:3000/api/v1/template/507f1f77bcf86cd799439013 \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/upload/image \
+curl -X POST https://ai-jl.top/api/v1/upload/image \
   -F "file=@/path/to/image.png"
 ```
 
@@ -1677,7 +1677,7 @@ curl -X POST http://localhost:3000/api/v1/upload/image \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/upload/resume \
+curl -X POST https://ai-jl.top/api/v1/upload/resume \
   -F "file=@/path/to/resume.pdf"
 ```
 
@@ -1776,7 +1776,7 @@ curl -X POST http://localhost:3000/api/v1/upload/resume \
 **cURL 示例**
 
 ```bash
-curl -X POST http://localhost:3000/api/v1/resume-ai/generate \
+curl -X POST https://ai-jl.top/api/v1/resume-ai/generate \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
   -H "Content-Type: application/json" \
   -d '{ ... }'

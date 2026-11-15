@@ -3,6 +3,7 @@ import { computed } from "vue";
 
 import { useResumeStore } from "@/stores/resumeStore";
 import type { SortableModule } from "@/stores/type";
+import { usePreviewOnly } from "@/views/editor/hooks/usePreviewOnly";
 
 import { getCertificatesStyles } from "./CertificatesSection";
 import type { templateType } from "./type";
@@ -13,10 +14,12 @@ const props = defineProps<{
   templateType: templateType;
 }>();
 const { setCurrentModel, setIsExpanded } = useResumeStore();
+const previewOnly = usePreviewOnly();
 
 const styles = computed(() => getCertificatesStyles(props.templateType));
 
 const handleClick = () => {
+  if (previewOnly) return;
   setCurrentModel("certificates");
   setIsExpanded(true);
 };
@@ -40,8 +43,9 @@ const isVisible = computed(() => {
   -->
   <div v-if="isVisible" :class="styles.container" @click="handleClick">
     <h3 :class="styles.title">
+      <component :is="styles.titleIcon" v-if="styles.titleIcon" :class="styles.titleIconClass" />
       {{ label || "荣誉证书" }}
     </h3>
-    <div v-safe-html="data?.content"></div>
+    <div v-safe-html="data?.content" :class="styles.list"></div>
   </div>
 </template>

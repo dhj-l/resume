@@ -1,20 +1,54 @@
 <script setup lang="ts">
-import { watch } from "vue";
+import { computed, provide, watch } from "vue";
 
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 
+import AiGeneratingOverlay from "@/components/common/AiGeneratingOverlay.vue";
+import { useAiGenerateStore } from "@/stores/aiGenerateStore";
 import { useResumeStore } from "@/stores/resumeStore";
+import type { ResumeData } from "@/stores/type";
+import { PREVIEW_ONLY_KEY } from "@/views/editor/hooks/usePreviewOnly";
+import { useResumeView } from "@/views/editor/hooks/useResumeView";
 import { templateList } from "@/views/editor/templates/index";
 
-const { resumeData, globalFontSize, globalLineHeight } = storeToRefs(useResumeStore());
+const props = withDefaults(
+  defineProps<{
+    /** 传入独立数据源（对比页双预览）；缺省使用全局简历 store */
+    data?: ResumeData;
+    /** 预览态：点击模块不触发编辑器选中/展开 */
+    previewOnly?: boolean;
+    /** 是否显示 AI 生成中悬浮标注（编辑器内为 true） */
+    showGeneratingBadge?: boolean;
+    /** 自适应面板宽度（对比页双预览使用）；缺省保持 A4 210mm 固定宽度 */
+    fluid?: boolean;
+  }>(),
+  {
+    previewOnly: false,
+    showGeneratingBadge: true,
+    fluid: false,
+  },
+);
+
+const { resumeData: storeResumeData } = storeToRefs(useResumeStore());
 const { getResumeDetail } = useResumeStore();
+const aiGenerate = useAiGenerateStore();
 
 const route = useRoute();
+
+const previewData = computed<ResumeData>(() => props.data ?? storeResumeData.value);
+provide("resumeData", previewData);
+provide(PREVIEW_ONLY_KEY, props.previewOnly);
+
+const { globalFontSize, globalLineHeight } = useResumeView(previewData);
+
 watch(
   () => route.query.id,
   (newVal) => {
-    if (newVal) {
+    // 仅在编辑器路由内监听：离开编辑页（如跳转 /analysis-detail）时，
+    // 该组件仍处于 out-in 过渡的挂载期，query.id 已变成其他页面的 id，
+    // 若不限定路由，会把分析记录 ID 误当成简历 ID 请求，触发 404 提示。
+    if (route.name === "Editor" && newVal) {
       getResumeDetail(newVal as string);
     }
   },
@@ -27,17 +61,29 @@ watch(
   这里只展示模板，不涉及复杂的逻辑。
 -->
 <template>
-  <div
-    class="resume-preview-wrapper w-[210mm]"
-    :style="{
-      lineHeight: globalLineHeight,
-      '--resume-fs': globalFontSize,
-      '--resume-lh': globalLineHeight,
-    }"
-  >
-    <template v-for="item in templateList" :key="item.value">
-      <component :is="item.component" v-if="item.value === resumeData.type" />
-    </template>
+  <div class="flex flex-col items-center gap-3">
+    <!-- AI 生成中：动画卡片（不遮挡预览） -->
+    <AiGeneratingOverlay
+      v-if="showGeneratingBadge && aiGenerate.status === 'generating'"
+      :status="aiGenerate.status"
+      :current="aiGenerate.currentModule"
+      :total="aiGenerate.totalModules"
+      :label="aiGenerate.moduleLabel"
+    />
+
+    <div
+      class="resume-preview-wrapper"
+      :class="fluid ? 'w-full' : 'w-[210mm]'"
+      :style="{
+        lineHeight: globalLineHeight,
+        '--resume-fs': globalFontSize,
+        '--resume-lh': globalLineHeight,
+      }"
+    >
+      <template v-for="item in templateList" :key="item.value">
+        <component :is="item.component" v-if="item.value === previewData.type" />
+      </template>
+    </div>
   </div>
 </template>
 

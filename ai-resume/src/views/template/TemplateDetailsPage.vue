@@ -153,7 +153,12 @@
       :submitting="isImportingResume"
       @submit="handleImportResumeSubmit"
     />
-    <FullScreenLoading v-model:loading="isGlobalLoading" />
+    <FullScreenLoading
+      v-model:loading="isGlobalLoading"
+      :progress="aiProgress"
+      :tips="AI_GENERATING_TIPS"
+      :timeout="600000"
+    />
   </div>
 </template>
 
@@ -164,10 +169,13 @@ import { message } from "ant-design-vue";
 import { Calendar, Users, Edit3, Sparkles, Upload } from "lucide-vue-next";
 import { useRoute, useRouter } from "vue-router";
 
-import { generateAiResumeAPI, createResumeAPI, importResumeAPI } from "@/api/resume/resume";
+import { createResumeAPI, importResumeAPI } from "@/api/resume/resume";
+import type { AiResumeParams } from "@/api/resume/type";
 import { getTemplateByIdAPI } from "@/api/templates/templates";
 import type { TemplateDetails } from "@/api/templates/type";
 import FullScreenLoading from "@/components/common/FullScreenLoading.vue";
+import { useAiGenerateStore } from "@/stores/aiGenerateStore";
+import { AI_GENERATING_TIPS } from "@/utils/aiTips";
 import { formatDate } from "@/utils/day";
 import { getFullImageUrl } from "@/utils/image";
 
@@ -185,6 +193,7 @@ const isAiCreating = ref(false);
 const isImporting = ref(false);
 const isImportingResume = ref(false);
 const isGlobalLoading = ref(false);
+const aiGenerateStore = useAiGenerateStore();
 
 const createModeOpen = ref(false);
 const aiDialogOpen = ref(false);
@@ -219,6 +228,67 @@ const pushToEditor = (resumeId: string) => {
   });
 };
 
+const aiProgress = ref<{ current: number; total: number; label: string } | null>(null);
+
+interface RunAiGenerateOptions {
+  successText?: string;
+  onComplete?: () => void;
+  onFinally?: () => void;
+}
+
+/**
+ * 统一处理 AI 生成：收到 init（草稿已创建）后立即跳转编辑页，
+ * 生成在后台继续并由 aiGenerateStore 维护，编辑页实时渲染。
+ */
+const runAiGenerate = async (payload: AiResumeParams, options: RunAiGenerateOptions = {}) => {
+  const { successText = "AI 简历生成成功", onComplete, onFinally } = options;
+  // startGeneration 返回本次调用是否仍是最近一代；被新调用取代时为 false
+  let isCurrent = true;
+
+  isGlobalLoading.value = true;
+  aiProgress.value = null;
+
+  try {
+    isCurrent = await aiGenerateStore.startGeneration(payload, (resumeId) => {
+      // 持久化 payload，供刷新后检测生成中断
+      sessionStorage.setItem(
+        `ai-generate:${resumeId}`,
+        JSON.stringify({
+          payload,
+          startedAt: Date.now(),
+          totalModules: aiGenerateStore.totalModules,
+        }),
+      );
+      if (payload.parseType === "select") {
+        // 选择已有简历：进入对比页，原版 vs AI 版实时对比，完成后再选择版本
+        router.push({
+          path: "/compare",
+          query: { originalId: payload.resumeId, draftId: resumeId },
+        });
+      } else {
+        pushToEditor(resumeId);
+      }
+    });
+
+    // startGeneration 在 complete / error 后返回；已被新调用取代则不再处理本次收尾
+    if (!isCurrent) return;
+
+    if (aiGenerateStore.status === "completed") {
+      message.success(successText);
+      onComplete?.();
+    } else if (aiGenerateStore.status === "failed") {
+      message.error(aiGenerateStore.error || "AI 生成失败");
+    }
+  } finally {
+    // 仅当前代次负责收尾，避免旧调用清掉新调用的 isGlobalLoading
+    if (isCurrent) {
+      aiProgress.value = null;
+      isGlobalLoading.value = false;
+      onFinally?.();
+    }
+  }
+};
+
 const handleUseTemplate = async () => {
   if (!template.value || isCreating.value) return;
 
@@ -232,6 +302,8 @@ const handleUseTemplate = async () => {
     if (data && data._id) {
       pushToEditor(data._id);
     }
+  } catch {
+    // 错误提示已由请求拦截器统一处理
   } finally {
     isCreating.value = false;
   }
@@ -255,73 +327,81 @@ const handleModeSelect = (mode: "manual" | "select" | "upload") => {
 const handleAiSubmit = async (data: any) => {
   if (!template.value || isGlobalLoading.value) return;
 
-  try {
-    isAiCreating.value = true;
-    isGlobalLoading.value = true;
-    const { data: resData } = await generateAiResumeAPI({
+  isAiCreating.value = true;
+  await runAiGenerate(
+    {
       parseType: "manual",
       jobDescription: data.jd,
       detailInfo: { ...data.userInfo, supplementary: data.supplementary },
       templateType: template.value.resume.type,
-    });
-
-    if (resData && resData._id) {
-      message.success("AI 简历生成成功");
-      pushToEditor(resData._id);
-      aiDialogOpen.value = false;
-    }
-  } finally {
-    isAiCreating.value = false;
-    isGlobalLoading.value = false;
-  }
+      modules: data.modules,
+    },
+    {
+      successText: "AI 简历生成成功",
+      onComplete: () => {
+        aiDialogOpen.value = false;
+      },
+      onFinally: () => {
+        isAiCreating.value = false;
+      },
+    },
+  );
 };
 
-const handleSelectResumeSubmit = async (payload: { jd: string; resumeId: string }) => {
+const handleSelectResumeSubmit = async (payload: {
+  jd: string;
+  resumeId: string;
+  modules: string[];
+}) => {
   if (!template.value || isGlobalLoading.value) return;
-  isImporting.value = true;
-  isGlobalLoading.value = true;
 
-  try {
-    const { data: resData } = await generateAiResumeAPI({
+  isImporting.value = true;
+  await runAiGenerate(
+    {
       parseType: "select",
       jobDescription: payload.jd,
       resumeId: payload.resumeId,
       templateType: template.value.resume.type,
-    });
-
-    if (resData && resData._id) {
-      message.success("基于已有简历生成成功");
-      pushToEditor(resData._id);
-      selectResumeOpen.value = false;
-    }
-  } finally {
-    isImporting.value = false;
-    isGlobalLoading.value = false;
-  }
+      modules: payload.modules,
+    },
+    {
+      successText: "基于已有简历生成成功",
+      onComplete: () => {
+        selectResumeOpen.value = false;
+      },
+      onFinally: () => {
+        isImporting.value = false;
+      },
+    },
+  );
 };
 
-const handleUploadResumeSubmit = async (payload: { resumeText: string; jdText: string }) => {
+const handleUploadResumeSubmit = async (payload: {
+  resumeText: string;
+  jdText: string;
+  modules: string[];
+}) => {
   if (!template.value || isGlobalLoading.value) return;
-  isImporting.value = true;
-  isGlobalLoading.value = true;
 
-  try {
-    const { data: resData } = await generateAiResumeAPI({
+  isImporting.value = true;
+  await runAiGenerate(
+    {
       parseType: "upload",
       jobDescription: payload.jdText,
       resumeContent: payload.resumeText,
       templateType: template.value.resume.type,
-    });
-
-    if (resData && resData._id) {
-      message.success("生成成功");
-      pushToEditor(resData._id);
-      uploadResumeOpen.value = false;
-    }
-  } finally {
-    isImporting.value = false;
-    isGlobalLoading.value = false;
-  }
+      modules: payload.modules,
+    },
+    {
+      successText: "生成成功",
+      onComplete: () => {
+        uploadResumeOpen.value = false;
+      },
+      onFinally: () => {
+        isImporting.value = false;
+      },
+    },
+  );
 };
 
 const handleCreateNew = () => {
@@ -350,6 +430,8 @@ const handleImportResumeSubmit = async (payload: { resumeText: string }) => {
       pushToEditor(resData._id);
       importResumeOpen.value = false;
     }
+  } catch {
+    // 错误提示已由请求拦截器统一处理
   } finally {
     isImportingResume.value = false;
     isGlobalLoading.value = false;

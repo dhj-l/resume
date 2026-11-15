@@ -9,32 +9,40 @@
         fontSize: globalFontSize,
       }"
     >
-      <!-- 左栏 32% -->
-      <div
-        class="w-[32%] bg-slate-50 flex flex-col shrink-0 border-r border-gray-100"
-        :style="{
-          padding: globalPageMargin,
-          gap: globalModuleMargin,
-        }"
-      >
-        <BasicInfoSection
-          :data="resumeData!.basicInfo"
-          :label="basicInfoModule?.label"
-          :template-type="currentTemplateType"
-        />
-        <template v-for="item in leftModules" :key="item.moduleKey">
-          <div
-            class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300"
-          >
-            <component
-              :is="item.component"
-              v-if="item.isShow && item.component"
-              :data="resumeData?.[item.moduleKey]"
-              :label="item.label"
-              :template-type="currentTemplateType"
-            />
-          </div>
-        </template>
+      <!-- 左栏 32%：顶部靛蓝色块（基本信息）+ 浅灰内容区 -->
+      <div class="w-[32%] bg-slate-50 flex flex-col shrink-0 border-r border-gray-200">
+        <div
+          v-if="basicInfoModule"
+          class="bg-gradient-to-b from-indigo-600 to-indigo-700 text-white"
+          :style="{ padding: globalPageMargin }"
+        >
+          <BasicInfoSection
+            :data="resumeData!.basicInfo"
+            :label="basicInfoModule?.label"
+            :template-type="currentTemplateType"
+          />
+        </div>
+        <div
+          class="flex-1 flex flex-col min-w-0"
+          :style="{
+            padding: globalPageMargin,
+            gap: globalModuleMargin,
+          }"
+        >
+          <template v-for="item in leftModules" :key="item.moduleKey">
+            <div
+              class="outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-indigo-300"
+            >
+              <component
+                :is="getComponent(item)"
+                v-if="item.isShow && item.component"
+                :data="resumeData?.[item.moduleKey]"
+                :label="item.label"
+                :template-type="currentTemplateType"
+              />
+            </div>
+          </template>
+        </div>
       </div>
 
       <!-- 右栏 68% -->
@@ -51,13 +59,9 @@
           :template-type="currentTemplateType"
         />
         <template v-for="item in rightModules" :key="item.moduleKey">
-          <div
-            :class="{
-              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
-            }"
-          >
+          <div>
             <component
-              :is="item.component"
+              :is="getComponent(item)"
               v-if="item.isShow && item.component"
               :data="resumeData?.[item.moduleKey]"
               :label="item.label"
@@ -88,17 +92,16 @@
 </template>
 
 <script setup lang="ts">
-import { inject, computed, ref } from "vue";
+import { inject, computed, ref, unref } from "vue";
 
-import { storeToRefs } from "pinia";
-
-import { useResumeStore } from "@/stores/resumeStore";
-import type { ResumeData } from "@/stores/type";
+import type { ModuleItem, ResumeData } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
 import { usePageMarkers } from "@/views/editor/hooks/usePageMarkers";
+import { useResumeView } from "@/views/editor/hooks/useResumeView";
 
+const resumeData = ref(inject<ResumeData>("resumeData")!);
 const {
   moduleOrder,
   currentTemplateType,
@@ -106,8 +109,7 @@ const {
   globalFontSize,
   globalLineHeight,
   globalModuleMargin,
-} = storeToRefs(useResumeStore());
-const resumeData = ref(inject<ResumeData>("resumeData")!);
+} = useResumeView(resumeData);
 
 const leftModuleKeys = ["skills", "certificates", "selfEvaluation"];
 const rightModuleKeys = [
@@ -122,6 +124,10 @@ const basicInfoModule = computed(() => moduleOrder.value.find((m) => m.moduleKey
 const jobIntentionModule = computed(() =>
   moduleOrder.value.find((m) => m.moduleKey === "jobIntention"),
 );
+
+const getComponent = (item: ModuleItem) => {
+  return item.component ? unref(item.component) : null;
+};
 
 const { activeModules } = useActiveModules(moduleOrder, resumeData);
 

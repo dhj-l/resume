@@ -27,20 +27,40 @@
         </p>
       </div>
 
-      <div class="flex items-center justify-between pt-3 border-t border-[#f0f0f0]">
+      <div class="flex items-center justify-between pt-3 border-t border-[#f0f0f0] gap-3">
         <div class="text-[13px] text-[#8c8c8c] flex items-center gap-1.5">
           <CalendarOutlined />
           <span>{{ formattedTime }}</span>
         </div>
-        <a-button
-          type="primary"
-          size="small"
-          class="flex items-center"
-          @click="$emit('view', record._id)"
-        >
-          <template #icon><EyeOutlined /></template>
-          查看
-        </a-button>
+        <div class="flex items-center gap-1 shrink-0">
+          <a-popconfirm
+            title="确定删除该记录吗？"
+            ok-text="删除"
+            cancel-text="取消"
+            :ok-button-props="{ danger: true }"
+            @confirm="emit('delete', record)"
+          >
+            <a-button
+              type="text"
+              size="small"
+              danger
+              class="flex items-center"
+              :loading="deleting"
+              title="删除"
+            >
+              <template #icon><DeleteOutlined /></template>
+            </a-button>
+          </a-popconfirm>
+          <a-button
+            type="primary"
+            size="small"
+            class="flex items-center"
+            @click="emit('view', record)"
+          >
+            <template #icon><EyeOutlined /></template>
+            查看
+          </a-button>
+        </div>
       </div>
     </div>
   </div>
@@ -49,7 +69,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-import { CalendarOutlined, EyeOutlined, FileTextOutlined } from "@ant-design/icons-vue";
+import {
+  CalendarOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  FileTextOutlined,
+} from "@ant-design/icons-vue";
 
 import type { GenerationRecord } from "@/api/resume-ai/type";
 import { formatDate } from "@/utils/day";
@@ -57,10 +82,12 @@ import { templateList } from "@/views/editor/templates";
 
 const props = defineProps<{
   record: GenerationRecord;
+  deleting?: boolean;
 }>();
 
-defineEmits<{
-  (e: "view", id: string): void;
+const emit = defineEmits<{
+  (e: "view", record: GenerationRecord): void;
+  (e: "delete", record: GenerationRecord): void;
 }>();
 
 const jobTitle = computed(() => {
@@ -77,7 +104,7 @@ const jobDescription = computed(() => {
 const statusColor = computed(() => {
   const map: Record<string, string> = {
     completed: "success",
-    processing: "processing",
+    creating: "processing",
     failed: "error",
   };
   return map[props.record.status] || "default";
@@ -86,7 +113,7 @@ const statusColor = computed(() => {
 const statusLabel = computed(() => {
   const map: Record<string, string> = {
     completed: "已完成",
-    processing: "生成中",
+    creating: "生成中",
     failed: "失败",
   };
   return map[props.record.status] || props.record.status;

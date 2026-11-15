@@ -5,4 +5,7 @@ export type templateType =
   | "modern"
   | "elegant"
   | "minimal"
-  | "luxury";
+  | "luxury"
+  | "classic"
+  | "fresh"
+  | "sidebar-dark";

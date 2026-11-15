@@ -95,6 +95,11 @@
               />
             </a-form-item>
           </a-form>
+
+          <!-- Step 4: Module Selection -->
+          <div v-else-if="currentStep === 3">
+            <ModuleSelectPanel v-model="formData.modules" />
+          </div>
         </div>
       </div>
 
@@ -107,7 +112,7 @@
         <div class="flex gap-3">
           <a-button class="rounded-lg" @click="handleCancel">取消</a-button>
 
-          <a-button v-if="currentStep < 2" type="primary" class="rounded-lg px-6" @click="nextStep">
+          <a-button v-if="currentStep < 3" type="primary" class="rounded-lg px-6" @click="nextStep">
             下一步
           </a-button>
 
@@ -130,13 +135,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 
 import { message } from "ant-design-vue";
 import type { FormInstance } from "ant-design-vue";
 import { Sparkles } from "lucide-vue-next";
 
+import { SSE_MODULE_KEYS } from "@/api/resume-ai/type";
+
 import type { AiCreateFormData } from "../types";
+
+import ModuleSelectPanel from "./ModuleSelectPanel.vue";
 
 interface Props {
   open: boolean;
@@ -175,6 +184,15 @@ const stepsConfig = [
     content: {
       title: "补充关键信息",
       desc: "提供更多细节（如核心技能、主要项目、获得奖项等），让简历更出彩。",
+    },
+  },
+  {
+    key: "modules",
+    title: "选择模块",
+    description: "按需生成",
+    content: {
+      title: "选择要生成的模块",
+      desc: "取消勾选可节省生成时间与 Token 消耗。",
     },
   },
 ];
@@ -252,6 +270,7 @@ const formData = ref<AiCreateFormData>({
     yearsOfExperience: undefined,
   },
   supplementary: "",
+  modules: [...SSE_MODULE_KEYS],
 });
 
 const userInfoRules = {
@@ -280,6 +299,8 @@ const nextStep = async () => {
     } catch (error) {
       // Form validation failed
     }
+  } else {
+    currentStep.value++;
   }
 };
 
@@ -290,12 +311,40 @@ const prevStep = () => {
 };
 
 const handleSubmit = () => {
+  if (formData.value.modules.length === 0) {
+    message.warning("请至少选择一个模块");
+    return;
+  }
   emit("submit", {
     jd: formData.value.jd,
     userInfo: { ...formData.value.userInfo },
     supplementary: formData.value.supplementary,
+    modules: [...formData.value.modules],
   });
 };
+
+// 每次打开弹窗时重置步骤与表单，避免残留上一次的输入
+watch(
+  () => props.open,
+  (open) => {
+    if (!open) return;
+    currentStep.value = 0;
+    formData.value = {
+      jd: "",
+      userInfo: {
+        name: "",
+        age: undefined,
+        education: undefined,
+        school: "",
+        major: "",
+        targetRole: "",
+        yearsOfExperience: undefined,
+      },
+      supplementary: "",
+      modules: [...SSE_MODULE_KEYS],
+    };
+  },
+);
 </script>
 
 <style scoped>

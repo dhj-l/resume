@@ -8,7 +8,11 @@
       }"
     >
       <!-- Hero Header: 渐变背景 + 基本信息 + 求职意向 -->
-      <div v-if="basicInfoModule" class="bg-primary-600 text-white" :style="{ padding: globalPageMargin, fontSize: globalFontSize }">
+      <div
+        v-if="basicInfoModule"
+        class="bg-gradient-to-br from-primary-700 via-primary-600 to-primary-500 text-white"
+        :style="{ padding: globalPageMargin, fontSize: globalFontSize }"
+      >
         <div class="flex items-start gap-6">
           <!-- BasicInfo via section component -->
           <component
@@ -33,7 +37,14 @@
         <template v-for="item in contentModules" :key="item.moduleKey">
           <div
             :class="{
-              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300': !['workExperience', 'educationBackground', 'projectExperience', 'campusExperience', 'internshipExperience'].includes(item.moduleKey),
+              'outline outline-2 outline-transparent outline-offset-2 transition-all duration-200 hover:outline-dashed hover:outline-gray-300':
+                ![
+                  'workExperience',
+                  'educationBackground',
+                  'projectExperience',
+                  'campusExperience',
+                  'internshipExperience',
+                ].includes(item.moduleKey),
             }"
             :style="{ marginBottom: globalModuleMargin }"
           >
@@ -68,17 +79,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, unref } from "vue";
 
-import { storeToRefs } from "pinia";
-
-import { useResumeStore } from "@/stores/resumeStore";
 import type { ModuleItem, ResumeData } from "@/stores/type";
 import BasicInfoSection from "@/views/editor/components/preview/BasicInfoSection.vue";
 import JobIntentionSection from "@/views/editor/components/preview/JobIntentionSection.vue";
 import { useActiveModules } from "@/views/editor/hooks/useActiveModules";
 import { usePageMarkers } from "@/views/editor/hooks/usePageMarkers";
+import { useResumeView } from "@/views/editor/hooks/useResumeView";
 
+const resumeData = ref(inject<ResumeData>("resumeData")!);
 const {
   moduleOrder,
   currentTemplateType,
@@ -86,9 +96,7 @@ const {
   globalFontSize,
   globalLineHeight,
   globalModuleMargin,
-} = storeToRefs(useResumeStore());
-
-const resumeData = ref(inject<ResumeData>("resumeData")!);
+} = useResumeView(resumeData);
 
 const componentMap: Record<string, any> = {
   basicInfo: BasicInfoSection,
@@ -98,7 +106,7 @@ const componentMap: Record<string, any> = {
 const { activeModules } = useActiveModules(moduleOrder, resumeData);
 
 const getComponent = (item: ModuleItem) => {
-  return item.component || componentMap[item.moduleKey];
+  return item.component ? unref(item.component) : componentMap[item.moduleKey];
 };
 
 const basicInfoModule = computed(() =>

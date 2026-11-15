@@ -28,6 +28,10 @@ const loading = ref(false);
 
 const handleConfirm = async () => {
   const store = useResumeStore();
+  if (!store.resumeData._id) {
+    message.warning("请先保存简历后再进行 AI 润色");
+    return;
+  }
   loading.value = true;
   try {
     const res = await polishContentAPI({

@@ -1,0 +1,534 @@
+<script setup lang="ts">
+import { computed, onMounted, ref } from "vue";
+
+import { ArrowLeftOutlined, RobotOutlined } from "@ant-design/icons-vue";
+import { Button, Collapse, CollapsePanel, Progress, Spin, message } from "ant-design-vue";
+import { Lightbulb, Trophy, Wrench } from "lucide-vue-next";
+import { useRoute, useRouter } from "vue-router";
+
+import { getSessionDetailAPI, getReportAPI } from "@/api/interview/interview";
+import type { InterviewMessage, InterviewSession } from "@/api/interview/type";
+import {
+  getEndedReasonLabel,
+  getExperienceLevelLabel,
+  getModeLabel,
+  getQuestionTypeLabel,
+  getSessionLevelLabel,
+} from "@/api/interview/type";
+
+import TopicRadarChart from "./components/TopicRadarChart.vue";
+import {
+  countMainQuestions,
+  FEEDBACK_DIMENSION_LABELS,
+  getAnswerFeedbackDims,
+  getSessionDurationMinutes,
+  scoreColor,
+} from "./utils";
+
+/** 雷达图最多展示的主题数（维度过多时图表不可读），与下方主题评分列表为包含关系 */
+const RADAR_MAX_TOPICS = 8;
+
+const route = useRoute();
+const router = useRouter();
+
+const pageLoading = ref(true);
+const report = ref<Awaited<ReturnType<typeof getReportAPI>>["data"] | null>(null);
+const session = ref<InterviewSession | null>(null);
+
+/** 问答对（question + 下一条 answer 组合） */
+interface QAItem {
+  question: InterviewMessage;
+  answer?: InterviewMessage;
+  /** 反问环节：候选人的提问与面试官的回应配对 */
+  isReverse?: boolean;
+  /** 主体考察结束时的收尾引导语，单独展示 */
+  isClosing?: boolean;
+}
+
+const qaItems = computed<QAItem[]>(() => {
+  if (!session.value) return [];
+  const items: QAItem[] = [];
+  let current: QAItem | null = null;
+  for (const msg of session.value.messages ?? []) {
+    if (msg.role === "interviewer" && msg.kind === "question" && msg.questionType === "reverse") {
+      // 收尾引导语不属于任何问答对，单独展示
+      current = null;
+      items.push({ question: msg, isClosing: true });
+    } else if (msg.role === "candidate" && msg.questionType === "reverse") {
+      // 反问环节：候选人提问与面试官回应配对
+      current = { question: msg, isReverse: true };
+      items.push(current);
+    } else if (current?.isReverse && msg.role === "interviewer") {
+      current.answer = msg;
+      current = null;
+    } else if (msg.kind === "question") {
+      current = { question: msg };
+      items.push(current);
+    } else if (current && msg.kind === "answer") {
+      current.answer = msg;
+      current = null;
+    }
+  }
+  return items;
+});
+
+/** 推荐等级徽章样式，未知值兜底 */
+const recommendationBadge = computed(() => {
+  const rec = report.value?.recommendation ?? "";
+  if (rec.includes("强烈推荐")) return { bg: "bg-emerald-50 text-emerald-600 border-emerald-200" };
+  if (rec.includes("推荐")) return { bg: "bg-indigo-50 text-indigo-600 border-indigo-200" };
+  if (rec.includes("待定")) return { bg: "bg-amber-50 text-amber-600 border-amber-200" };
+  return { bg: "bg-red-50 text-red-600 border-red-200" };
+});
+
+const sessionMeta = computed(() => {
+  if (!session.value) return [];
+  const lc = session.value.levelConfig;
+  // 已问题数（不含反问环节的面试官回应），与对话页共用同一统计口径
+  const questionCount = countMainQuestions(session.value.messages);
+  // 与对话页共用同一时长口径（向下取整），避免同一会话两页显示差 1 分钟
+  const durationMinutes = getSessionDurationMinutes(session.value.startedAt, session.value.endedAt);
+  return [
+    getModeLabel(lc?.mode ?? ""),
+    getSessionLevelLabel(lc),
+    getExperienceLevelLabel(lc?.experienceLevel ?? ""),
+    questionCount > 0 ? `已问 ${questionCount} 题` : "",
+    durationMinutes > 0 ? `用时 ${durationMinutes} 分钟` : "",
+  ].filter(Boolean);
+});
+
+/** 三维度总评展示项（旧报告缺失时不渲染） */
+const dimensionScoreItems = computed(() => {
+  const scores = report.value?.dimensionScores;
+  if (!scores) return [];
+  return [
+    { label: FEEDBACK_DIMENSION_LABELS.completeness, value: scores.completeness },
+    { label: FEEDBACK_DIMENSION_LABELS.logic, value: scores.logic },
+    { label: FEEDBACK_DIMENSION_LABELS.depth, value: scores.depth },
+  ];
+});
+
+/** 反问环节表现评价（未发生反问时缺失） */
+const reverseFeedback = computed(() => report.value?.reverseFeedback);
+
+/** 逐题反馈三维度展示项（分数带颜色），与对话页共用同一实现 */
+const feedbackDims = getAnswerFeedbackDims;
+
+const endedLabel = computed(() =>
+  session.value?.endedReason ? getEndedReasonLabel(session.value.endedReason) : "",
+);
+
+/** 返回该场面试的回放页（保留会话上下文） */
+const goBack = () => {
+  const id = route.query.id as string;
+  router.push({ path: "/interview/chat", query: id ? { id } : undefined });
+};
+
+/** 雷达图数据（维度过多时只取前 N 个，保证可读性；列表仍展示全部主题） */
+const radarTopics = computed(() =>
+  (report.value?.topics ?? [])
+    .slice(0, RADAR_MAX_TOPICS)
+    .map((t) => ({ name: t.title, score: t.score ?? 0 })),
+);
+
+const summaryBlocks = computed(() => [
+  {
+    title: "优势亮点",
+    icon: Trophy,
+    soft: "bg-emerald-50 text-emerald-600",
+    list: report.value?.strengths ?? [],
+  },
+  {
+    title: "待改进项",
+    icon: Wrench,
+    soft: "bg-amber-50 text-amber-600",
+    list: report.value?.weaknesses ?? [],
+  },
+  {
+    title: "提升建议",
+    icon: Lightbulb,
+    soft: "bg-indigo-50 text-indigo-600",
+    list: report.value?.suggestions ?? [],
+  },
+]);
+
+onMounted(async () => {
+  const id = route.query.id as string;
+  if (!id) {
+    message.error("缺少面试会话 ID");
+    router.replace({ path: "/interview" });
+    return;
+  }
+
+  try {
+    const [reportRes] = await Promise.all([
+      getReportAPI(id),
+      getSessionDetailAPI(id)
+        .then((res) => {
+          session.value = res.data;
+        })
+        .catch(() => undefined),
+    ]);
+    report.value = reportRes.data;
+  } catch {
+    // 报告未生成 / 生成中：页面下方已有同文案的空态兜底，此处不再重复弹提示
+  } finally {
+    pageLoading.value = false;
+  }
+});
+</script>
+
+<template>
+  <div class="min-h-screen bg-slate-50">
+    <!-- Header -->
+    <div
+      class="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-slate-200/70 bg-white/85 px-4 backdrop-blur-md md:px-6"
+    >
+      <Button type="text" class="flex items-center" @click="goBack">
+        <template #icon><ArrowLeftOutlined /></template>
+        返回
+      </Button>
+      <div
+        class="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-sm shadow-indigo-200"
+      >
+        <RobotOutlined class="text-xs" />
+      </div>
+      <span class="text-sm font-semibold text-slate-800">面试评价报告</span>
+    </div>
+
+    <Spin :spinning="pageLoading">
+      <div v-if="report" class="mx-auto max-w-4xl space-y-6 px-4 py-8">
+        <!-- 总览卡片 -->
+        <div class="report-card p-6 md:p-8">
+          <div class="flex flex-col items-center gap-8 sm:flex-row">
+            <!-- 分数环 -->
+            <div class="relative h-[150px] w-[150px] flex-shrink-0">
+              <Progress
+                type="circle"
+                :percent="report.overallScore"
+                :size="150"
+                :stroke-color="{ '0%': '#6366f1', '100%': '#8b5cf6' }"
+                :stroke-width="8"
+                :format="() => ''"
+              />
+              <div
+                class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center"
+              >
+                <span class="text-4xl font-bold text-slate-800">{{ report.overallScore }}</span>
+                <span class="mt-1 text-xs text-slate-400">综合得分</span>
+              </div>
+            </div>
+
+            <!-- 概要 -->
+            <div class="flex-1 space-y-3">
+              <div class="flex flex-wrap items-center gap-2">
+                <span
+                  class="rounded-full border px-3 py-1 text-xs font-semibold"
+                  :class="recommendationBadge.bg"
+                >
+                  {{ report.recommendation || "暂无结论" }}
+                </span>
+                <span
+                  v-for="meta in sessionMeta"
+                  :key="meta"
+                  class="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-500"
+                >
+                  {{ meta }}
+                </span>
+                <span
+                  v-if="endedLabel"
+                  class="rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-400"
+                >
+                  {{ endedLabel }}
+                </span>
+              </div>
+              <h2 class="text-base font-semibold text-slate-800">总评</h2>
+              <p class="text-sm leading-relaxed text-slate-600 whitespace-pre-wrap">
+                {{ report.summary }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 三维度总评（与逐题反馈同口径，旧报告缺失时不渲染） -->
+        <div v-if="dimensionScoreItems.length" class="report-card p-6 md:p-8">
+          <h3 class="mb-5 text-base font-semibold text-slate-800">三维度总评</h3>
+          <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+            <div v-for="dim in dimensionScoreItems" :key="dim.label">
+              <div class="mb-1.5 flex items-center justify-between">
+                <span class="text-sm font-medium text-slate-700">{{ dim.label }}</span>
+                <span
+                  class="text-sm font-semibold tabular-nums"
+                  :style="{ color: scoreColor(dim.value) }"
+                >
+                  {{ dim.value }}
+                </span>
+              </div>
+              <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                <div
+                  class="h-full rounded-full transition-all duration-700"
+                  :style="{
+                    width: `${Math.min(100, Math.max(0, dim.value))}%`,
+                    backgroundColor: scoreColor(dim.value),
+                  }"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 主题评分 + 雷达图 -->
+        <div v-if="report.topics?.length" class="report-card p-6 md:p-8">
+          <h3 class="mb-5 text-base font-semibold text-slate-800">主题评分</h3>
+          <div class="grid grid-cols-1 items-center gap-8 lg:grid-cols-5">
+            <div class="lg:col-span-2">
+              <TopicRadarChart :topics="radarTopics" />
+              <p
+                v-if="report.topics.length > RADAR_MAX_TOPICS"
+                class="mt-2 text-center text-xs text-slate-300"
+              >
+                雷达图展示前 {{ RADAR_MAX_TOPICS }} 个主题，完整评分见右侧列表
+              </p>
+            </div>
+            <div class="space-y-5 lg:col-span-3">
+              <div v-for="topic in report.topics" :key="topic.topicKey">
+                <div class="mb-1.5 flex items-center justify-between">
+                  <span class="text-sm font-medium text-slate-700">{{ topic.title }}</span>
+                  <span
+                    class="text-sm font-semibold tabular-nums"
+                    :style="{ color: scoreColor(topic.score ?? 0) }"
+                  >
+                    {{ topic.score }}
+                  </span>
+                </div>
+                <div class="h-2 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    class="h-full rounded-full transition-all duration-700"
+                    :style="{
+                      width: `${Math.min(100, Math.max(0, topic.score ?? 0))}%`,
+                      backgroundColor: scoreColor(topic.score ?? 0),
+                    }"
+                  />
+                </div>
+                <p v-if="topic.comment" class="mt-1.5 text-xs leading-relaxed text-slate-500">
+                  {{ topic.comment }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 反问环节表现（未发生反问时不渲染） -->
+        <div v-if="reverseFeedback" class="report-card p-6 md:p-8">
+          <h3 class="mb-4 text-base font-semibold text-slate-800">反问环节表现</h3>
+          <div class="flex items-start gap-4">
+            <div
+              class="flex h-14 w-14 flex-shrink-0 flex-col items-center justify-center rounded-xl"
+              :style="{ backgroundColor: `${scoreColor(reverseFeedback.score)}1a` }"
+            >
+              <span
+                class="text-lg font-bold tabular-nums"
+                :style="{ color: scoreColor(reverseFeedback.score) }"
+              >
+                {{ reverseFeedback.score }}
+              </span>
+            </div>
+            <p class="text-sm leading-relaxed text-slate-600">
+              {{ reverseFeedback.comment || "未留下反问评价" }}
+            </p>
+          </div>
+        </div>
+
+        <!-- 优势 / 不足 / 建议 -->
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div v-for="block in summaryBlocks" :key="block.title" class="report-card p-5">
+            <p class="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-800">
+              <span
+                class="inline-flex h-7 w-7 items-center justify-center rounded-lg"
+                :class="block.soft"
+              >
+                <component :is="block.icon" class="h-4 w-4" />
+              </span>
+              {{ block.title }}
+            </p>
+            <ul class="space-y-2.5">
+              <li
+                v-for="(item, idx) in block.list"
+                :key="idx"
+                class="flex gap-2 text-xs leading-relaxed text-slate-600"
+              >
+                <span class="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-slate-300" />
+                {{ item }}
+              </li>
+            </ul>
+            <p v-if="!block.list?.length" class="text-xs text-slate-300">暂无内容</p>
+          </div>
+        </div>
+
+        <!-- 问答回顾 -->
+        <div v-if="qaItems.length" class="report-card p-6 md:p-8">
+          <h3 class="mb-4 text-base font-semibold text-slate-800">问答回顾</h3>
+          <Collapse class="qa-collapse">
+            <CollapsePanel v-for="(qa, idx) in qaItems" :key="idx" :show-arrow="false">
+              <template #header>
+                <span class="flex items-center gap-2.5">
+                  <span class="round-badge">{{ qa.question.round }}</span>
+                  <span class="text-sm font-medium text-slate-700">
+                    {{ qa.isReverse || qa.isClosing ? "反问环节" : `第 ${qa.question.round} 轮` }}
+                  </span>
+                </span>
+              </template>
+              <template #extra>
+                <span
+                  v-if="qa.answer"
+                  class="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] text-emerald-600"
+                >
+                  已回答
+                </span>
+                <span
+                  v-else-if="!qa.isClosing"
+                  class="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] text-amber-600"
+                >
+                  未回答
+                </span>
+              </template>
+              <div class="space-y-4 pb-1">
+                <div class="flex gap-2.5">
+                  <span class="qa-tag qa-tag-q">问</span>
+                  <p class="flex-1 text-sm leading-relaxed text-slate-800 whitespace-pre-wrap">
+                    <span
+                      v-if="qa.question.questionType && !qa.isReverse && !qa.isClosing"
+                      class="mr-2 inline-block rounded bg-indigo-50 px-1.5 py-0.5 align-baseline text-[11px] text-indigo-500"
+                      >{{ getQuestionTypeLabel(qa.question.questionType) }}</span
+                    >{{ qa.question.content }}
+                  </p>
+                </div>
+                <div v-if="qa.answer" class="flex gap-2.5">
+                  <span class="qa-tag qa-tag-a">答</span>
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm leading-relaxed text-slate-600 whitespace-pre-wrap">
+                      {{ qa.answer.content }}
+                    </p>
+                    <!-- 逐题反馈（与答题时的展示口径一致） -->
+                    <div
+                      v-if="qa.answer.feedback"
+                      class="mt-2 rounded-lg border border-indigo-100 bg-indigo-50/60 px-3 py-2"
+                    >
+                      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <span class="text-[11px] font-medium text-indigo-500">AI 点评</span>
+                        <span
+                          v-for="dim in feedbackDims(qa.answer.feedback)"
+                          :key="dim.label"
+                          class="text-[11px] tabular-nums"
+                          :style="{ color: dim.color }"
+                        >
+                          {{ dim.label }} {{ dim.value }}
+                        </span>
+                      </div>
+                      <p
+                        v-if="qa.answer.feedback.comment"
+                        class="mt-1 text-[11px] leading-relaxed text-slate-500"
+                      >
+                        {{ qa.answer.feedback.comment }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p v-else-if="!qa.isClosing" class="pl-8 text-xs text-slate-400">本题未作答</p>
+              </div>
+            </CollapsePanel>
+          </Collapse>
+        </div>
+
+        <div class="flex justify-center gap-3 pb-8">
+          <Button class="rounded-full" @click="router.push({ path: '/interview/chat' })">
+            再来一场面试
+          </Button>
+          <Button
+            type="primary"
+            class="start-btn rounded-full"
+            @click="router.push('/user/resumes')"
+          >
+            返回我的简历
+          </Button>
+        </div>
+
+        <p class="pb-8 text-center text-xs text-slate-400">
+          * 本报告由 AI 自动生成，仅供参考，请结合实际情况理性看待
+        </p>
+      </div>
+
+      <!-- 无报告兜底 -->
+      <div v-else-if="!pageLoading" class="py-24 text-center">
+        <div
+          class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-300"
+        >
+          <RobotOutlined class="text-xl" />
+        </div>
+        <p class="text-sm text-slate-400">该面试尚未生成评价报告</p>
+        <Button
+          type="primary"
+          class="start-btn mt-4 rounded-full"
+          @click="router.push({ path: '/interview' })"
+        >
+          去发起面试
+        </Button>
+      </div>
+    </Spin>
+  </div>
+</template>
+
+<style scoped>
+.report-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 8px 24px -8px rgba(15, 23, 42, 0.06);
+}
+
+.start-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border: none;
+}
+
+.start-btn:not(:disabled):hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+}
+
+.round-badge {
+  display: inline-flex;
+  height: 1.375rem;
+  width: 1.375rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.qa-tag {
+  display: inline-flex;
+  height: 1.375rem;
+  width: 1.375rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.qa-tag-q {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.qa-tag-a {
+  background: #f1f5f9;
+  color: #64748b;
+}
+</style>
