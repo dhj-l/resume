@@ -31,6 +31,13 @@ dist-ssr
 .claude
 .vercel
 
+# Agent / AI 工具生成目录与产物（仅本地保留，不入库）
+.trae
+.shared
+.reasonix
+.zcode
+CLAUDE.md
+
 # Playwright
 playwright-report/
 test-results/

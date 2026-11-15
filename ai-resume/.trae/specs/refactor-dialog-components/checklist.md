@@ -1,4 +1,0 @@
-- [x] CreateModeDialog.vue uses `@ant-design/icons-vue` and has minimal logic.
-- [x] SelectResumeDialog.vue uses `@ant-design/icons-vue` and has no API calls.
-- [x] UploadResumeDialog.vue uses `@ant-design/icons-vue` and has no file processing logic.
-- [x] All three components export necessary Props and Emits for parent component compatibility.
